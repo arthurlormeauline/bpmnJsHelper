@@ -1,0 +1,2154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0n88c3u" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.32.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
+  <bpmn:error id="Error_1j7t288" name="installation.ticket.exception" />
+  <bpmn:signal id="Signal_1lrdvk2" name="consul" />
+  <bpmn:signal id="Signal_2ih3b01" name="crm" />
+  <bpmn:signal id="Signal_08p7s1e" name="returnMainAfterCrm" />
+  <bpmn:signal id="Signal_03wr2z6" name="audit.installation.logout" />
+  <bpmn:error id="Error_1r0yb8q" name="CheckInputKo" errorCode="CheckInputKo" camunda:errorMessage="CheckInputKo" />
+  <bpmn:collaboration id="Collaboration_0rekvb2">
+    <bpmn:participant id="main" name="MAIN" processRef="tus.prc.audit.installation.main" />
+    <bpmn:participant id="Participant_0ygxvio" name="Audit Installation" />
+    <bpmn:participant id="crm" name="GET INFOS CUSTOMER" processRef="tus.prc.audit.installation.crm" />
+    <bpmn:participant id="logoutKC" name="Logout Keycloak" processRef="tus.prc.audit.installation.logoutKC" />
+    <bpmn:participant id="ticket" name="Create Ticket" processRef="tus.prc.audit.installation.ticket" />
+  </bpmn:collaboration>
+  <bpmn:process id="tus.prc.audit.installation.main" name="tus.prc.audit.installation.main" isExecutable="true" camunda:historyTimeToLive="1">
+    <bpmn:sequenceFlow id="Flow_0744ofd" sourceRef="tus.prc.audit.installation.main.params2" targetRef="tus.prc.audit.installation.main.loginKcUCR" />
+    <bpmn:sequenceFlow id="tus.prc.audit.installation.main.flux.auditDeviceKo" name="Audit technique KO ou insatisfaisant" sourceRef="tus.prc.audit.installation.main.gw.resultAuditDevice" targetRef="tus.prc.audit.installation.main.params2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isFailureDevices}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="tus.prc.audit.installation.main.flux.auditDeviceOk" name="Audit technique OK" sourceRef="tus.prc.audit.installation.main.gw.resultAuditDevice" targetRef="tus.prc.audit.installation.main.sendMail">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isFailureDevices}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_08n3ntd" sourceRef="tus.prc.audit.installation.main.auditEvents" targetRef="tus.prc.audit.installation.main.gw.resultAuditDevice" />
+    <bpmn:sequenceFlow id="Flow_0lritqe" sourceRef="tus.prc.audit.installation.main.getEvents" targetRef="tus.prc.audit.installation.main.auditEvents" />
+    <bpmn:sequenceFlow id="Flow_1sq0czg" sourceRef="tus.prc.audit.installation.main.auditDevices" targetRef="tus.prc.audit.installation.main.getEvents" />
+    <bpmn:sequenceFlow id="Flow_0l9tw1y" sourceRef="tus.prc.audit.installation.main.getDevices" targetRef="tus.prc.audit.installation.main.auditDevices" />
+    <bpmn:sequenceFlow id="Flow_1jpkqo2" sourceRef="tus.prc.audit.installation.main.loginKc" targetRef="tus.prc.audit.installation.main.signalCrm" />
+    <bpmn:sequenceFlow id="Flow_0g8jbom" sourceRef="tus.prc.audit.installation.main.params" targetRef="tus.prc.audit.installation.main.loginKc" />
+    <bpmn:sequenceFlow id="Flow_197pa8l" sourceRef="tus.prc.audit.installation.main.checkInputs" targetRef="tus.prc.audit.installation.main.params" />
+    <bpmn:sequenceFlow id="Flow_06rz999" sourceRef="tus.prc.audit.installation.main.start" targetRef="tus.prc.audit.installation.main.checkInputs" />
+    <bpmn:subProcess id="Activity_1l4bnrk" name="Handle Exceptions" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_0uxq8a8" name="Start exceptions">
+        <bpmn:outgoing>Flow_081ek6p</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_1w7awt7" errorRef="Error_0rr0nwa" camunda:errorMessageVariable="errorIdMain" />
+      </bpmn:startEvent>
+      <bpmn:scriptTask id="Activity_1cehc71" name="set retries" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_081ek6p</bpmn:incoming>
+        <bpmn:outgoing>Flow_11hbkju</bpmn:outgoing>
+        <bpmn:script>print("Start retry");
+var nbRetry= execution.getVariable("nbRetry");
+if(nbRetry!=null){
+nbRetry=nbRetry+1;
+}else 
+nbRetry=1;
+execution.setVariable("nbRetry",nbRetry);
+var duration=null;
+switch(nbRetry){
+case 1:
+duration="PT15S";
+break;
+case 2:
+duration="PT1M";
+break;
+case 3:
+duration="PT2M"
+break;
+}
+execution.setVariable("duration",duration);</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:exclusiveGateway id="Gateway_0ua4nfd">
+        <bpmn:incoming>Flow_11hbkju</bpmn:incoming>
+        <bpmn:outgoing>Flow_1x72b8b</bpmn:outgoing>
+        <bpmn:outgoing>Flow_03zwc0n</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Activity_1e7qwhk" name="Send internal mail">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="payload">
+                <camunda:script scriptFormat="JavaScript">var alarme= execution.getVariable("type");
+var process= "tus.prc.newXp.infosCrm";
+var task = execution.getVariable('taskOnError');
+var contrat = execution.getVariable("contractId");
+var gateway = execution.getVariable("gatewayId");
+var nbRetry = execution.getVariable('nbRetry')-1;
+ '{"options": {"alarme":"'+alarme+'","process":"'+process+'","task":"'+task+'","contrat":"'+contrat +'", "gateway":"'+gateway +'", "nbRetry":"'+nbRetry +'"}}';</camunda:script>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="Content-Type">application/json</camunda:entry>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="url">
+                <camunda:script scriptFormat="JavaScript">var mail = "team.usages@protectline.fr";
+var workflow = "tus.prc.alarmManagement.intrusion";
+var env= execution.getVariable('env');
+
+var obj= '%5BCAMUNDA%5D%5B'+ env +'%5D%20Traitement%20non%20termin%C3%A9%20sur%20'+ workflow;
+var from = "TUS";
+var template = "tus-support-new";
+var url_notif = execution.getVariable('urlNotification');
+url_notif+'/email?from='+from+'&amp;subject='+obj+'&amp;template='+ template +'&amp;to='+mail;</camunda:script>
+              </camunda:inputParameter>
+              <camunda:outputParameter name="response_send_internal_mail">
+                <camunda:script scriptFormat="JavaScript" />
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_03zwc0n</bpmn:incoming>
+        <bpmn:outgoing>Flow_0k6wd4v</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:intermediateCatchEvent id="Event_1rrpydn" name="pause">
+        <bpmn:incoming>Flow_1x72b8b</bpmn:incoming>
+        <bpmn:outgoing>Flow_1jn1qgz</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_1247hxd">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${duration}</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:scriptTask id="Activity_1qsuwmc" name="Return to Last Task" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_1jn1qgz</bpmn:incoming>
+        <bpmn:outgoing>Flow_1fjnk7t</bpmn:outgoing>
+        <bpmn:script>print('Return to flow is Running');
+var exceptions= execution.getVariable('errorIdMain');
+if(exceptions!= null){
+execution.getProcessEngineServices().
+getRuntimeService().createProcessInstanceModification(execution.getProcessInstanceId()).startBeforeActivity(exceptions).execute();
+}</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:endEvent id="Event_1q7rqua">
+        <bpmn:incoming>Flow_1fjnk7t</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:endEvent id="Event_1ealru8" name="Logout">
+        <bpmn:incoming>Flow_0k6wd4v</bpmn:incoming>
+        <bpmn:signalEventDefinition id="SignalEventDefinition_09rbg41" signalRef="Signal_03wr2z6">
+          <bpmn:extensionElements>
+            <camunda:in variables="all" />
+            <camunda:in businessKey="#{execution.processBusinessKey}" />
+          </bpmn:extensionElements>
+        </bpmn:signalEventDefinition>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_081ek6p" sourceRef="Event_0uxq8a8" targetRef="Activity_1cehc71" />
+      <bpmn:sequenceFlow id="Flow_11hbkju" sourceRef="Activity_1cehc71" targetRef="Gateway_0ua4nfd" />
+      <bpmn:sequenceFlow id="Flow_1x72b8b" name="retry &#60;4" sourceRef="Gateway_0ua4nfd" targetRef="Event_1rrpydn">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&lt;= 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_03zwc0n" name="Retry &#62;3" sourceRef="Gateway_0ua4nfd" targetRef="Activity_1e7qwhk">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&gt; 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0k6wd4v" sourceRef="Activity_1e7qwhk" targetRef="Event_1ealru8" />
+      <bpmn:sequenceFlow id="Flow_1jn1qgz" sourceRef="Event_1rrpydn" targetRef="Activity_1qsuwmc" />
+      <bpmn:sequenceFlow id="Flow_1fjnk7t" sourceRef="Activity_1qsuwmc" targetRef="Event_1q7rqua" />
+    </bpmn:subProcess>
+    <bpmn:endEvent id="tus.prc.audit.installation.main.signalCreateTicket" name="Creation ticket">
+      <bpmn:incoming>Flow_0dcs788</bpmn:incoming>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1k46d1p" signalRef="Signal_1ci5vpb">
+        <bpmn:extensionElements>
+          <camunda:in variables="all" />
+        </bpmn:extensionElements>
+      </bpmn:signalEventDefinition>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="tus.prc.audit.installation.main.loginKc" name="authentication KC UAD">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${basicToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">${url_kc}token</camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=password&amp;username=${userName}&amp;password=${password}</camunda:inputParameter>
+            <camunda:outputParameter name="response">
+              <camunda:script scriptFormat="JavaScript">print("login KC");
+var resp = connector.getVariable('response');
+var respStatusCode = connector.getVariable('statusCode');
+
+print("Response status api authenticate: "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if(respStatusCode == 200){
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+var obj = JSON.parse(resp);
+var token ='Bearer '+obj.access_token;
+var refreshToken =obj.refresh_token;
+
+execution.setVariable("token",token);
+execution.setVariable("refreshToken",refreshToken);
+}else{
+print('Error to authenticate from KC');
+print("Response error api authenticate: "+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to login UAD", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.main.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0g8jbom</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jpkqo2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="tus.prc.audit.installation.main.auditEvents" name="Audit events" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0lritqe</bpmn:incoming>
+      <bpmn:outgoing>Flow_08n3ntd</bpmn:outgoing>
+      <bpmn:script>print("audit events");
+try{
+var eventsList = JSON.parse(execution.getVariable("eventList"));
+var auditDevice = JSON.parse(execution.getVariable("resultAuditDevice"));
+
+nbMES = 0;
+nbMHS = 0;
+var nbStream = [];
+
+for (var i = 0; i &lt; eventsList.length; i++) {
+    var {gatewayId, cid, type} = eventsList[i];
+    if (eventsList[i].cid === "1401") {
+        nbMHS++;
+    } else if (eventsList[i].cid === "3401" || eventsList[i].cid === "3441") {
+        nbMES++;
+    } else if (!nbStream[gatewayId]) {
+        nbStream[gatewayId] = {streamingRequestCount: 0, streamingStatusTypes: []};
+    }
+    if (cid === "streamingRequest") {
+        nbStream[gatewayId].streamingRequestCount++;
+    } else if (cid === "streamingStatus") {
+        if (!nbStream[gatewayId].streamingStatusTypes[type]) {
+            nbStream[gatewayId].streamingStatusTypes[type] = 0;
+        }
+        nbStream[gatewayId].streamingStatusTypes[type]++;
+    }
+}
+
+var resultFinal= [];
+isFailure = false;
+for(var j = 0; j &lt; auditDevice.length; j++){
+    if(auditDevice[j].deviceType==="gateway"){
+        if(nbMES &lt; 1 &amp;&amp; nbMHS &lt;1){
+            isFailure = true;
+        }
+         var countCrow = {"activationCount":nbMES, "desactivationCount":nbMHS}
+        resultFinal.push({...auditDevice[j], ...countCrow})
+    }else if(auditDevice[j].deviceType==="camera"){
+        var streamOk = typeof nbStream[auditDevice[j].deviceId].streamingStatusTypes["streaming OK"] ==="undefined" ? 0: nbStream[auditDevice[j].deviceId].streamingStatusTypes["streaming OK"];
+        var ddeStream = typeof nbStream[auditDevice[j].deviceId].streamingRequestCount ==="undefined" ? 0: nbStream[auditDevice[j].deviceId].streamingRequestCount;
+        var countStream = {"streamingSuccessCount": streamOk, "streamingRequestCount": ddeStream}
+        if(streamOk &lt; 1 &amp;&amp; (streamOk/ddeStream &lt; 0.8)){
+            isFailure = true;
+        }
+        resultFinal.push({...auditDevice[j], ...countStream})
+    }else{
+        resultFinal.push(auditDevice[j])
+    }
+}
+execution.setVariable("isFailureEvents", isFailure);
+execution.setVariable("resultFinal", JSON.stringify(resultFinal));
+execution.setVariable("eventsList", "");
+execution.setVariable("auditDevice", "");
+}catch(e){
+    runtimeService.createIncident(
+        "failedJob",
+        execution.getId(), 
+        "Incident détecté : Problème audit events"
+    );
+    throw new Error("Problème lors de l'audit des events - Incident créé !");
+}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="tus.prc.audit.installation.main.getEvents" name="Get Events">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${urlEvent}v1/events?contractId=${contractId}&amp;limit=200&amp;cid=streamingRequest&amp;cid=streamingFailure&amp;cid=streamingSuccess&amp;cid=1401&amp;cid=3401&amp;cid=3441&amp;cid=streamingRequest&amp;cid=streamingStatus&amp;sDateTime=${dateInstallation}&amp;eDateTime=${dateNotifEnd}</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="response get events">
+              <camunda:script scriptFormat="JavaScript">print("get events");
+var resp = connector.getVariable('response')
+var respStatusCode = connector.getVariable('statusCode')
+print("Response status get events: "+respStatusCode);
+//print("est ce que c'est vide ? "+execution.getVariable("listOfDevices"));
+print(resp)
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if (respStatusCode == 200) {
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable("eventList", resp);
+
+}else{
+print('Error to get list of events');
+print('Message error : '+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to get events", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.main.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1sq0czg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lritqe</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="tus.prc.audit.installation.main.auditDevices" name="Audit Devices" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0l9tw1y</bpmn:incoming>
+      <bpmn:outgoing>Flow_1sq0czg</bpmn:outgoing>
+      <bpmn:script>print("audit devices");
+try{
+const listOfDevices= JSON.parse(execution.getVariable("devicesList"));
+const expectedValuesGatewayCrow = {"installationState":"active", "fuseDefault":false, "tamperDefault":false, "ethernetConnectionDefault":false};
+const expectedValuesGatewayCrowWIFI = {"WiFi_Enabled":false, "wifiRssi":1};
+const expectedValuesDevicesCrow = {"installationState":"active", "supervisionDefault":false, "lowBattery":false, "tamperDefault":false};
+const expectedValuesSercomm = {"installationState":"active", "signalWifi":1};
+const expectedValuesMeari = {"installationState":"active", "signalWifi":1};
+var diff;
+var result = [];
+var isFailure = false;
+
+function compareJson(obj1, obj2) {
+    const differences = {};
+    const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+    keys.forEach(key =&gt; {
+        if (obj1[key] !== obj2[key]) {
+            if(key === "wifiRssi" || key === "signalWifi"){
+                if(typeof obj1[key] ==='undefined' || obj1[key] &lt; obj2[key]) {
+                    differences[key] = {current: obj1[key], expected: obj2[key]};
+                }
+            }else {
+                differences[key] = {current: obj1[key], expected: obj2[key]};
+            }
+        }
+    });
+    return differences;
+}
+
+    for(var i=0 ; i &lt; listOfDevices.length;i++){
+        if(listOfDevices[i].constructor==="Crow" &amp;&amp; listOfDevices[i].deviceType==="gateway"){
+            var currentValuesGatewayCrow = {
+                "installationState":listOfDevices[i].installationState,
+                "fuseDefault":listOfDevices[i].diagnostics.fuseDefault,
+                "tamperDefault":listOfDevices[i].diagnostics.tamperDefault,
+                "ethernetConnectionDefault":listOfDevices[i].diagnostics.ethernetConnectionDefault
+            };
+
+            if(typeof listOfDevices[i].parameters.WiFi_Enabled !=="undefined"){
+                currentValuesGatewayCrow["WiFi_Enabled"]=listOfDevices[i].parameters.WiFi_Enabled;
+                currentValuesGatewayCrow["wifiRssi"]=listOfDevices[i].attributes.wifiRssi;
+                diff = compareJson(Object.fromEntries(currentValuesGatewayCrow), expectedValuesGatewayCrowWIFI);
+            }
+
+            diff = compareJson(currentValuesGatewayCrow, expectedValuesGatewayCrow);
+            auditStatusAuditCrow = Object.keys(diff).length === 0 ? "success" : "failure";
+            if(auditStatusAuditCrow ==="failure"){
+                isFailure = true;
+            }
+
+            var obj ={
+                "category": "centrale Crow",
+                "deviceType": listOfDevices[i].deviceType,
+                "auditResult": auditStatusAuditCrow,
+                "auditFailures": Object.keys(diff)
+            }
+            result.push(obj);
+
+        }else if(listOfDevices[i].constructor==="Crow" &amp;&amp; listOfDevices[i].deviceType!=="gateway" &amp;&amp; listOfDevices[i].deviceType!=="tag" &amp;&amp; listOfDevices[i].deviceType!=="remote"){
+            var currentValuesDevicesCrow = {
+                "installationState":listOfDevices[i].installationState,
+                "supervisionDefault":listOfDevices[i].diagnostics.supervisionDefault,
+                "lowBattery":listOfDevices[i].diagnostics.lowBattery,
+                "tamperDefault":listOfDevices[i].diagnostics.tamperDefault
+            };
+
+            diff = compareJson(currentValuesDevicesCrow, expectedValuesDevicesCrow);
+            auditStatusAuditDevicesCrow = Object.keys(diff).length === 0 ? "success" : "failure";
+            if(auditStatusAuditDevicesCrow ==="failure"){
+                isFailure = true;
+            }
+            var obj={
+                "category":"autre device Crow",
+                "deviceType":listOfDevices[i].deviceType,
+                "auditResult":auditStatusAuditDevicesCrow,
+                "serialNumber":listOfDevices[i].serialNumber,
+                "location":listOfDevices[i].location,
+                "auditFailures": Object.keys(diff)
+            }
+            result.push(obj);
+
+        }else if(listOfDevices[i].constructor==="Sercomm"){
+            var currentValuesSercomm = {
+                "installationState":listOfDevices[i].installationState,
+                "signalWifi":listOfDevices[i].attributes.signalWifi
+            };
+
+            diff = compareJson(currentValuesSercomm, expectedValuesSercomm);
+            auditStatusAuditSercomm = Object.keys(diff).length === 0 ? "success" : "failure";
+            if(auditStatusAuditSercomm ==="failure"){
+                isFailure = true;
+            }
+            var obj={
+                "category":"Sercomm",
+                "deviceType":listOfDevices[i].deviceType,
+                "auditResult":auditStatusAuditDevicesCrow,
+                "serialNumber":listOfDevices[i].serialNumber,
+                "deviceId": listOfDevices[i].deviceId,
+                "location":listOfDevices[i].location,
+                "auditFailures": Object.keys(diff)
+            }
+            result.push(obj)
+
+        }else if(listOfDevices[i].constructor==="Meari") {
+            var currentValuesMeari = {
+                "installationState":listOfDevices[i].installationState,
+                "signalWifi":listOfDevices[i].attributes.signalWifi
+            };
+
+            diff = compareJson(currentValuesMeari, expectedValuesMeari);
+            auditStatusAuditMeari = Object.keys(diff).length === 0 ? "success" : "failure";
+            if(auditStatusAuditMeari ==="failure"){
+                isFailure = true;
+            }
+            var obj={
+                "category":"Meari",
+                "deviceType":listOfDevices[i].deviceType,
+                "auditResult":auditStatusAuditDevicesCrow,
+                "serialNumber":listOfDevices[i].serialNumber,
+                "deviceId": listOfDevices[i].deviceId,
+                "location":listOfDevices[i].location,
+                "auditFailures": Object.keys(diff)
+            }
+            result.push(obj)
+        }
+    }
+execution.setVariable("isFailureDevices", isFailure);
+execution.setVariable("resultAuditDevice", JSON.stringify(result));
+execution.setVariable("listOfDevices", "");
+}catch(e){
+    runtimeService.createIncident(
+        "failedJob",
+        execution.getId(), 
+        "Incident détecté : Problème audit devices"
+    );
+    throw new Error("Problème lors de l'audit des devices - Incident créé !");
+}
+print("fin audit device");</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="tus.prc.audit.installation.main.getDevices" name="Get V2 devices by contractId">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${urlDevice}v2/devices?contractId=${contractId}</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="response get devices">
+              <camunda:script scriptFormat="JavaScript">print("get devices");
+var resp = connector.getVariable('response')
+var respStatusCode = connector.getVariable('statusCode')
+print("Response status get devices: "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if (respStatusCode == 200 || respStatusCode == 206) {
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable("devicesList", resp);
+
+}else{
+print('Error to get list of devices');
+print('Message error : '+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to get devices", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.main.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_01pz0db</bpmn:incoming>
+      <bpmn:incoming>Flow_0rudx9x</bpmn:incoming>
+      <bpmn:outgoing>Flow_0l9tw1y</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="tus.prc.audit.installation.main.start">
+      <bpmn:outgoing>Flow_06rz999</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="tus.prc.audit.installation.main.params" name="params">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_3rrd2bb">
+            <camunda:script scriptFormat="Javascript">print("Add params");
+var urlOffreContract = "https://crm-contract.dev.protectline.fr/api/contract/v1/";
+var urlOffreEmergencyContact = "https://crm-emergency-contact.dev.protectline.fr/api/emergencyContacts/v1/";
+var urlDevice = "https://device.dev.protectline.fr/";
+var urlEvent = "https://event.dev.protectline.fr/";
+var urlNotification = "https://notifications.dev.protectline.fr/";
+var urlKeycloak = "https://keycloak-21.dev.protectline.fr/realms/Protectline/protocol/openid-connect/";
+var urlOffreSupport= "https://crm-support.dev.protectline.fr/";
+var userName = "tenant-protectline@protectline.fr";
+var password = "&gt;u5w]XpvI4(y";
+var basicToken ="Y2FtdW5kYV91c2FnZTo5MTI0NWQ1Mi03ZWM3LTRiNDYtODQ2Zi02Yzg1ZTE4NjM5NzI=";
+
+var clientId = "camunda_usage";
+var clientSecret = "f9e929df-c901-4f3c-9a1f-b324d2adfbc4";
+var supplier = execution.getVariable('supplier');
+var from;
+var template;
+var marque;
+var organizationId=2;
+if(supplier === 'ORANGE'){
+ from = 'MProtegee';
+ template = 'TUS_WELCOME';
+ marque='Orange Maison Protégée';
+organizationId = 2;
+}else if(supplier === 'GROUPAMA'){
+ from = 'Groupama';
+ template = 'TUS_WELCOME';
+ marque='Groupama Box Habitat';
+organizationId = 3;
+}
+var bodyTicket = '{"channel": null,"customerId": "'+execution.getVariable("customerId")+'","description": "la Vérification de bon fonctionnement 7 jours après installation est KO","event": "Motif::Sous-motif","groupId": 5,"organizationId": "'+organizationId+'","ownerId": 1,"stateId": 1,"subscriptionId": "'+execution.getVariable("contractId")+'","ticketCreationSource": "CRM","title": "vérification 7 jours après installation","type": "customer_complaint","priorityId": 3}';
+print(bodyTicket);
+
+var body = '{"contractId":"'+contractId+'","contact":"contact 1","source":"Welcome","options": {"brand":"'+marque+'"}}';
+
+execution.setVariable("from", from);
+execution.setVariable("template", template);
+execution.setVariable("marque", marque);
+execution.setVariable("objetMail", "Bienvenue");
+execution.setVariable("body", body);
+execution.setVariable("bodyTicket",bodyTicket);
+execution.setVariable("urlOffreContract",urlOffreContract);
+execution.setVariable("urlOffreEmergencyContact",urlOffreEmergencyContact);
+execution.setVariable("urlDevice",urlDevice);
+execution.setVariable("urlEvent",urlEvent);
+execution.setVariable("urlNotification",urlNotification);
+execution.setVariable("url_kc",urlKeycloak);
+execution.setVariable("urlOffreSupport",urlOffreSupport);
+execution.setVariable("userName",userName);
+execution.setVariable("password",password);
+execution.setVariable("basicToken",basicToken);
+execution.setVariable("clientId",clientId);
+execution.setVariable("clientSecret",clientSecret);</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_197pa8l</bpmn:incoming>
+      <bpmn:outgoing>Flow_0g8jbom</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:scriptTask id="tus.prc.audit.installation.main.checkInputs" name="Check Inputs" camunda:asyncBefore="true" scriptFormat="Javascript">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_06rz999</bpmn:incoming>
+      <bpmn:outgoing>Flow_197pa8l</bpmn:outgoing>
+      <bpmn:script>print("check inputs");
+var contractId = execution.getVariable("contractId");
+var customerId = execution.getVariable("customerId");
+var organizationId = execution.getVariable("organizationId");
+
+var surfaceControlOk = true;
+if(typeof contractId == 'undefined' || contractId == null || contractId == ''){
+surfaceControlOk = false;
+}else if(typeof customerId == 'undefined' || customerId == null || customerId == ''){
+surfaceControlOk = false;
+}else if(typeof organizationId == 'undefined' || organizationId == null || organizationId == ''){
+surfaceControlOk = false;
+}
+if (!surfaceControlOk) { 
+    runtimeService.createIncident(
+        "failedJob",
+        execution.getId(), 
+        "Incident détecté : Problème de contrôle de surface"
+    );
+    throw new Error("Contrôle de surface KO - Incident créé !");
+}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="tus.prc.audit.installation.main.sendMail" name="Send Mail &#34;Welcome&#34;">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${urlNotification}email?from=${from}&amp;subject=${objetMail}&amp;template=${template}&amp;to=${email}</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${body}</camunda:inputParameter>
+            <camunda:outputParameter name="reponse">
+              <camunda:script scriptFormat="JavaScript">print("send mail");
+var resp = connector.getVariable('response')
+var respStatusCode = connector.getVariable('statusCode');
+print("send mail 2500 Contact 1 : " + respStatusCode + " " + resp);
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (respStatusCode == 201 || respStatusCode == 200) {
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null){
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+}else{
+print('Error to get list of devices');
+print('Message error : '+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to send mail", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.main.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>tus.prc.audit.installation.main.flux.auditDeviceOk</bpmn:incoming>
+      <bpmn:outgoing>Flow_0p3y0lb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:task id="Activity_0w7u07a" name="A supprimer TEMP">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_196d6qa">
+            <camunda:script scriptFormat="javascript">execution.setVariable("dateInstallation", "2024-03-27T22%3A59%3A59Z");
+execution.setVariable("dateNotifEnd", "2025-03-27T22%3A59%3A59Z");
+execution.setVariable("supplier","ORANGE");</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_01pz0db</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_01pz0db" sourceRef="Activity_0w7u07a" targetRef="tus.prc.audit.installation.main.getDevices" />
+    <bpmn:sequenceFlow id="Flow_0dcs788" sourceRef="tus.prc.audit.installation.main.loginKcUCR" targetRef="tus.prc.audit.installation.main.signalCreateTicket" />
+    <bpmn:sequenceFlow id="Flow_0p3y0lb" sourceRef="tus.prc.audit.installation.main.sendMail" targetRef="tus.prc.audit.installation.main.signalLogout" />
+    <bpmn:endEvent id="tus.prc.audit.installation.main.signalLogout" name="Logout">
+      <bpmn:incoming>Flow_0p3y0lb</bpmn:incoming>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_12ewr3n" signalRef="Signal_03wr2z6">
+        <bpmn:extensionElements>
+          <camunda:in variables="all" />
+          <camunda:in businessKey="#{execution.processBusinessKey}" />
+        </bpmn:extensionElements>
+      </bpmn:signalEventDefinition>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="Event_0jvom2r">
+      <bpmn:outgoing>Flow_0rudx9x</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1rsexav" signalRef="Signal_08p7s1e" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0rudx9x" sourceRef="Event_0jvom2r" targetRef="tus.prc.audit.installation.main.getDevices" />
+    <bpmn:serviceTask id="tus.prc.audit.installation.main.loginKcUCR" name="authentication KC UCR">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${basicToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">${url_kc}token</camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=password&amp;username=${userName}&amp;password=${password}</camunda:inputParameter>
+            <camunda:outputParameter name="response">
+              <camunda:script scriptFormat="JavaScript">print("login UCR");
+var resp = connector.getVariable('response');
+var respStatusCode = connector.getVariable('statusCode');
+
+print("Response status api authenticate: "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if(respStatusCode == 200){
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+var obj = JSON.parse(resp);
+var token ='Bearer '+obj.access_token;
+var refreshToken =obj.refresh_token;
+
+execution.setVariable("token",token);
+execution.setVariable("refreshToken",refreshToken);
+}else{
+print('Error to authenticate from KC');
+print("Response error api authenticate: "+resp);
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, resp);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+/*end create incident*/
+ throw new org.camunda.bpm.engine.delegate.BpmnError('loginUCR',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0744ofd</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dcs788</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:task id="tus.prc.audit.installation.main.params2" name="params">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_3rrd2bb">
+            <camunda:script scriptFormat="Javascript">print("get params 2");
+var userName = "usageSupport@protectline.fr";
+var password = "*T5_3sPL#9H_15=9k3chK";
+
+execution.setVariable("userName",userName);
+execution.setVariable("password",password);</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>tus.prc.audit.installation.main.flux.auditDeviceKo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0744ofd</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="tus.prc.audit.installation.main.gw.resultAuditDevice">
+      <bpmn:incoming>Flow_08n3ntd</bpmn:incoming>
+      <bpmn:outgoing>tus.prc.audit.installation.main.flux.auditDeviceOk</bpmn:outgoing>
+      <bpmn:outgoing>tus.prc.audit.installation.main.flux.auditDeviceKo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="tus.prc.audit.installation.main.signalCrm">
+      <bpmn:incoming>Flow_1jpkqo2</bpmn:incoming>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_010xz5i" signalRef="Signal_2ih3b01">
+        <bpmn:extensionElements>
+          <camunda:in variables="all" />
+        </bpmn:extensionElements>
+      </bpmn:signalEventDefinition>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_1f5ua6k" name="logout KC UAD">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${basicToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">${url_kc}logout</camunda:inputParameter>
+            <camunda:inputParameter name="payload">refresh_token=${refreshToken}&amp;client_id=${clientId}&amp;client_secret=${clientSecret}&amp;grant_type=refresh_token</camunda:inputParameter>
+            <camunda:outputParameter name="response">
+              <camunda:script scriptFormat="JavaScript">var respStatusCode = connector.getVariable('statusCode');
+var resp = connector.getVariable('response');
+
+print("Response status api logout  : "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if(respStatusCode == 204){
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+print('Logout succeeded');
+}else{
+print('Error to logout from KC');
+print("Response error api logout : "+resp);
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, resp);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+/*end create incident*/
+ throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:signal id="Signal_1ci5vpb" name="ticketCrm" />
+  <bpmn:error id="Error_1u8bt52" name="installation.crm.exception" />
+  <bpmn:error id="Error_0ysel3h" name="installation.logout.exception" />
+  <bpmn:error id="Error_0rr0nwa" name="installation.main.exception" errorCode="installation.main.exception" camunda:errorMessage="installation.main.exception" />
+  <bpmn:process id="tus.prc.audit.installation.crm" name="tus.prc.audit.installation.crm" isExecutable="true" camunda:historyTimeToLive="1">
+    <bpmn:serviceTask id="tus.prc.audit.installation.crm.getContract" name="Get contract Infos">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${urlOffreContract}${customerId}/contracts/${contractId}</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="response get contract from CRM">
+              <camunda:script scriptFormat="JavaScript">//var resp = connector.getVariable('response')
+//var respStatusCode = connector.getVariable('statusCode')
+var resp = "error CRM"
+var respStatusCode = "502";
+print("Response status get contract: "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if (respStatusCode == 200) {
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+var response = JSON.parse(resp);
+execution.setVariable("statusContract", response.contracts[0].status);
+
+var dateInstall = response.contracts[0].activationDate.split("T")[0]+"T22%3A59%3A59Z";
+
+const date = new Date(response.contracts[0].activationDate);
+date.setFullYear(date.getFullYear() + 1);
+const dateNotifEnd = date.toISOString().split("T")[0]+"T22%3A59%3A59Z";
+execution.setVariable("dateInstallation", dateInstall);
+execution.setVariable("dateNotifEnd", dateNotifEnd);
+execution.setVariable("supplier",response.contracts[0].sellerDetails.parentSellerCode);
+
+if(response.contracts[0].status!="ACTIVE"){
+createCamundaIncident();
+}
+
+}else{
+print('Error to get contract infos from Offre ');
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to get contracts info", context, response);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.crm.exception', activityId);
+}
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1d5pm2b</bpmn:incoming>
+      <bpmn:outgoing>Flow_18h58xi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="tus.prc.audit.installation.crm.startSignal">
+      <bpmn:outgoing>Flow_1d5pm2b</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1i6pesy" signalRef="Signal_2ih3b01" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="tus.prc.audit.installation.crm.getEmergency" name="Get emergency Contact">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${urlOffreEmergencyContact}${contractId}/emergencyContacts</camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="response get emergency contact from CRM">
+              <camunda:script scriptFormat="JavaScript">var resp = connector.getVariable('response')
+var respStatusCode = connector.getVariable('statusCode')
+
+print("Response status get emergency contact: "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if (respStatusCode == 200) {
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+var response = JSON.parse(resp);
+execution.setVariable("email", response[0].email);
+}else{
+print('Error to get emergency contract from Offre');
+print('Message error : '+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to get emergency contact", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.crm.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_18h58xi</bpmn:incoming>
+      <bpmn:outgoing>Flow_0v6yt39</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="tus.prc.audit.installation.crm.signalReturnMain">
+      <bpmn:incoming>Flow_0v6yt39</bpmn:incoming>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1seqlbz" signalRef="Signal_08p7s1e">
+        <bpmn:extensionElements>
+          <camunda:in variables="all" />
+        </bpmn:extensionElements>
+      </bpmn:signalEventDefinition>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="Activity_1s9fdq2" name="Handle Exceptions" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_0rwyqel" name="Start exceptions">
+        <bpmn:outgoing>Flow_1py41zf</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_0l9r496" errorRef="Error_1u8bt52" camunda:errorMessageVariable="errorIdCrm" />
+      </bpmn:startEvent>
+      <bpmn:scriptTask id="Activity_1egq9bb" name="set retries" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_1py41zf</bpmn:incoming>
+        <bpmn:outgoing>Flow_1a1buvf</bpmn:outgoing>
+        <bpmn:script>var nbRetry= execution.getVariable("nbRetry");
+if(nbRetry!=null){
+nbRetry=nbRetry+1;
+}else 
+nbRetry=1;
+execution.setVariable("nbRetry",nbRetry);
+var duration=null;
+switch(nbRetry){
+case 1:
+duration="PT15S";
+break;
+case 2:
+duration="PT1M";
+break;
+case 3:
+duration="PT2M"
+break;
+}
+execution.setVariable("duration",duration);</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:exclusiveGateway id="Gateway_09og0ee">
+        <bpmn:incoming>Flow_1a1buvf</bpmn:incoming>
+        <bpmn:outgoing>Flow_1l41wen</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1qk1c2n</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Activity_1ulmnwu" name="Send internal mail">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="payload">
+                <camunda:script scriptFormat="JavaScript">var alarme= execution.getVariable("type");
+var process= "tus.prc.newXp.infosCrm";
+var task = execution.getVariable('taskOnError');
+var contrat = execution.getVariable("contractId");
+var gateway = execution.getVariable("gatewayId");
+var nbRetry = execution.getVariable('nbRetry')-1;
+ '{"options": {"alarme":"'+alarme+'","process":"'+process+'","task":"'+task+'","contrat":"'+contrat +'", "gateway":"'+gateway +'", "nbRetry":"'+nbRetry +'"}}';</camunda:script>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="Content-Type">application/json</camunda:entry>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="url">
+                <camunda:script scriptFormat="JavaScript">var mail = "team.usages@protectline.fr";
+var workflow = "tus.prc.alarmManagement.intrusion";
+var env= execution.getVariable('env');
+
+var obj= '%5BCAMUNDA%5D%5B'+ env +'%5D%20Traitement%20non%20termin%C3%A9%20sur%20'+ workflow;
+var from = "TUS";
+var template = "tus-support-new";
+var url_notif = execution.getVariable('urlNotification');
+url_notif+'/email?from='+from+'&amp;subject='+obj+'&amp;template='+ template +'&amp;to='+mail;</camunda:script>
+              </camunda:inputParameter>
+              <camunda:outputParameter name="response_send_internal_mail">
+                <camunda:script scriptFormat="JavaScript" />
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1qk1c2n</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ix85zt</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:intermediateCatchEvent id="Event_0988nlh" name="pause">
+        <bpmn:incoming>Flow_1l41wen</bpmn:incoming>
+        <bpmn:outgoing>Flow_1t7jkxo</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_0mcxpjx">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${duration}</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:scriptTask id="Activity_1qm8keq" name="Return to Last Task" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_1t7jkxo</bpmn:incoming>
+        <bpmn:outgoing>Flow_1vnpbs8</bpmn:outgoing>
+        <bpmn:script>print('Return to flow is Running');
+var exceptions= execution.getVariable('errorIdCrm');
+if(exceptions!= null){
+execution.getProcessEngineServices().
+getRuntimeService().createProcessInstanceModification(execution.getProcessInstanceId()).startBeforeActivity(exceptions).execute();
+}</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:endEvent id="Event_0pi57p8" name="Logout">
+        <bpmn:incoming>Flow_0ix85zt</bpmn:incoming>
+        <bpmn:signalEventDefinition id="SignalEventDefinition_1hlink7" signalRef="Signal_03wr2z6">
+          <bpmn:extensionElements>
+            <camunda:in variables="all" />
+            <camunda:in businessKey="#{execution.processBusinessKey}" />
+          </bpmn:extensionElements>
+        </bpmn:signalEventDefinition>
+      </bpmn:endEvent>
+      <bpmn:endEvent id="Event_0j50zcy">
+        <bpmn:incoming>Flow_1vnpbs8</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_1py41zf" sourceRef="Event_0rwyqel" targetRef="Activity_1egq9bb" />
+      <bpmn:sequenceFlow id="Flow_1a1buvf" sourceRef="Activity_1egq9bb" targetRef="Gateway_09og0ee" />
+      <bpmn:sequenceFlow id="Flow_1l41wen" name="retry &#60;4" sourceRef="Gateway_09og0ee" targetRef="Event_0988nlh">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&lt;= 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_1qk1c2n" name="Retry &#62;3" sourceRef="Gateway_09og0ee" targetRef="Activity_1ulmnwu">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&gt; 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0ix85zt" sourceRef="Activity_1ulmnwu" targetRef="Event_0pi57p8" />
+      <bpmn:sequenceFlow id="Flow_1t7jkxo" sourceRef="Event_0988nlh" targetRef="Activity_1qm8keq" />
+      <bpmn:sequenceFlow id="Flow_1vnpbs8" sourceRef="Activity_1qm8keq" targetRef="Event_0j50zcy" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_1d5pm2b" sourceRef="tus.prc.audit.installation.crm.startSignal" targetRef="tus.prc.audit.installation.crm.getContract" />
+    <bpmn:sequenceFlow id="Flow_18h58xi" sourceRef="tus.prc.audit.installation.crm.getContract" targetRef="tus.prc.audit.installation.crm.getEmergency" />
+    <bpmn:sequenceFlow id="Flow_0v6yt39" sourceRef="tus.prc.audit.installation.crm.getEmergency" targetRef="tus.prc.audit.installation.crm.signalReturnMain" />
+  </bpmn:process>
+  <bpmn:process id="tus.prc.audit.installation.logoutKC" name="tus.prc.audit.installation.logoutKC" isExecutable="true" camunda:versionTag="newXp.intrusion_0.9.1" camunda:historyTimeToLive="1">
+    <bpmn:startEvent id="tus.prc.audit.installation.logoutKC.startSignal" name="Logout KC">
+      <bpmn:outgoing>Flow_1rjqrbp</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_14kfll9" signalRef="Signal_03wr2z6" />
+    </bpmn:startEvent>
+    <bpmn:parallelGateway id="Gateway_0as80p9">
+      <bpmn:incoming>Flow_1rjqrbp</bpmn:incoming>
+      <bpmn:outgoing>Flow_185pn74</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0d1bs15</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:endEvent id="tus.prc.audit.installation.logoutKC.endProcess" name="End process">
+      <bpmn:incoming>Flow_129ultu</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0qz75so" />
+    </bpmn:endEvent>
+    <bpmn:intermediateCatchEvent id="tus.prc.audit.installation.logoutKC.break" name="Logout session After X minutes">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_22avu4a">
+            <camunda:script scriptFormat="Javascript" />
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0d1bs15</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hj65jj</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1i0lwuo">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="tus.prc.audit.installation.logoutKC.logout" name="logout KC">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${basicToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">${url_kc}logout</camunda:inputParameter>
+            <camunda:inputParameter name="payload">refresh_token=${refreshToken}</camunda:inputParameter>
+            <camunda:outputParameter name="response">
+              <camunda:script scriptFormat="JavaScript">var respStatusCode = connector.getVariable('statusCode');
+var resp = connector.getVariable('response');
+
+print("Response status api logout  : "+respStatusCode);
+
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if(respStatusCode == 204){
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+print('Logout succeeded');
+}else{
+print('Error to logout from KC');
+print("Response error api logout : "+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to logout", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.logout.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_185pn74</bpmn:incoming>
+      <bpmn:incoming>Flow_0hj65jj</bpmn:incoming>
+      <bpmn:outgoing>Flow_129ultu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="Activity_01t2353" name="Handle Exceptions" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_1ipdpap" name="Start exceptions">
+        <bpmn:outgoing>Flow_17h1ju3</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_0lr0p6z" errorRef="Error_0ysel3h" camunda:errorMessageVariable="errorIdLogout" />
+      </bpmn:startEvent>
+      <bpmn:scriptTask id="Activity_0b1c2gi" name="set retries" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_17h1ju3</bpmn:incoming>
+        <bpmn:outgoing>Flow_017vrlq</bpmn:outgoing>
+        <bpmn:script>var nbRetry= execution.getVariable("nbRetry");
+if(nbRetry!=null){
+nbRetry=nbRetry+1;
+}else 
+nbRetry=1;
+execution.setVariable("nbRetry",nbRetry);
+var duration=null;
+switch(nbRetry){
+case 1:
+duration="PT15S";
+break;
+case 2:
+duration="PT1M";
+break;
+case 3:
+duration="PT2M"
+break;
+}
+execution.setVariable("duration",duration);</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:exclusiveGateway id="Gateway_0ljl6n8">
+        <bpmn:incoming>Flow_017vrlq</bpmn:incoming>
+        <bpmn:outgoing>Flow_006ag3v</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0y5dg35</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Activity_0b4zy1j" name="Send internal mail">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="payload">
+                <camunda:script scriptFormat="JavaScript">var alarme= execution.getVariable("type");
+var process= "tus.prc.newXp.infosCrm";
+var task = execution.getVariable('taskOnError');
+var contrat = execution.getVariable("contractId");
+var gateway = execution.getVariable("gatewayId");
+var nbRetry = execution.getVariable('nbRetry')-1;
+ '{"options": {"alarme":"'+alarme+'","process":"'+process+'","task":"'+task+'","contrat":"'+contrat +'", "gateway":"'+gateway +'", "nbRetry":"'+nbRetry +'"}}';</camunda:script>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="Content-Type">application/json</camunda:entry>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="url">
+                <camunda:script scriptFormat="JavaScript">var mail = "team.usages@protectline.fr";
+var workflow = "tus.prc.alarmManagement.intrusion";
+var env= execution.getVariable('env');
+
+var obj= '%5BCAMUNDA%5D%5B'+ env +'%5D%20Traitement%20non%20termin%C3%A9%20sur%20'+ workflow;
+var from = "TUS";
+var template = "tus-support-new";
+var url_notif = execution.getVariable('urlNotification');
+url_notif+'/email?from='+from+'&amp;subject='+obj+'&amp;template='+ template +'&amp;to='+mail;</camunda:script>
+              </camunda:inputParameter>
+              <camunda:outputParameter name="response_send_internal_mail">
+                <camunda:script scriptFormat="JavaScript" />
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0y5dg35</bpmn:incoming>
+        <bpmn:outgoing>Flow_0683ha7</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:intermediateCatchEvent id="Event_0iqyqx6" name="pause">
+        <bpmn:incoming>Flow_006ag3v</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ah62t3</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_1s62w98">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${duration}</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:scriptTask id="Activity_1fyfx0o" name="Return to Last Task" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_0ah62t3</bpmn:incoming>
+        <bpmn:outgoing>Flow_1290t5v</bpmn:outgoing>
+        <bpmn:script>print('Return to flow is Running');
+var exceptions= execution.getVariable('errorIdLogout');
+if(exceptions!= null){
+execution.getProcessEngineServices().
+getRuntimeService().createProcessInstanceModification(execution.getProcessInstanceId()).startBeforeActivity(exceptions).execute();
+}</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:endEvent id="Event_0a05nic" name="Logout">
+        <bpmn:incoming>Flow_0683ha7</bpmn:incoming>
+        <bpmn:signalEventDefinition id="SignalEventDefinition_05yados" signalRef="Signal_03wr2z6">
+          <bpmn:extensionElements>
+            <camunda:in variables="all" />
+            <camunda:in businessKey="#{execution.processBusinessKey}" />
+          </bpmn:extensionElements>
+        </bpmn:signalEventDefinition>
+      </bpmn:endEvent>
+      <bpmn:endEvent id="Event_0mbq4ig">
+        <bpmn:incoming>Flow_1290t5v</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_17h1ju3" sourceRef="Event_1ipdpap" targetRef="Activity_0b1c2gi" />
+      <bpmn:sequenceFlow id="Flow_017vrlq" sourceRef="Activity_0b1c2gi" targetRef="Gateway_0ljl6n8" />
+      <bpmn:sequenceFlow id="Flow_006ag3v" name="retry &#60;4" sourceRef="Gateway_0ljl6n8" targetRef="Event_0iqyqx6">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&lt;= 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0y5dg35" name="Retry &#62;3" sourceRef="Gateway_0ljl6n8" targetRef="Activity_0b4zy1j">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&gt; 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0683ha7" sourceRef="Activity_0b4zy1j" targetRef="Event_0a05nic" />
+      <bpmn:sequenceFlow id="Flow_0ah62t3" sourceRef="Event_0iqyqx6" targetRef="Activity_1fyfx0o" />
+      <bpmn:sequenceFlow id="Flow_1290t5v" sourceRef="Activity_1fyfx0o" targetRef="Event_0mbq4ig" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_1rjqrbp" sourceRef="tus.prc.audit.installation.logoutKC.startSignal" targetRef="Gateway_0as80p9" />
+    <bpmn:sequenceFlow id="Flow_185pn74" sourceRef="Gateway_0as80p9" targetRef="tus.prc.audit.installation.logoutKC.logout" />
+    <bpmn:sequenceFlow id="Flow_0d1bs15" sourceRef="Gateway_0as80p9" targetRef="tus.prc.audit.installation.logoutKC.break" />
+    <bpmn:sequenceFlow id="Flow_129ultu" sourceRef="tus.prc.audit.installation.logoutKC.logout" targetRef="tus.prc.audit.installation.logoutKC.endProcess" />
+    <bpmn:sequenceFlow id="Flow_0hj65jj" sourceRef="tus.prc.audit.installation.logoutKC.break" targetRef="tus.prc.audit.installation.logoutKC.logout" />
+  </bpmn:process>
+  <bpmn:process id="tus.prc.audit.installation.ticket" name="tus.prc.audit.installation.ticket" isExecutable="true">
+    <bpmn:serviceTask id="tus.prc.audit.installation.ticket.create" name="Create ticket">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${urlOffreSupport}api/support/v1/ticket/create</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${bodyTicket}</camunda:inputParameter>
+            <camunda:outputParameter name="response create ticket">
+              <camunda:script scriptFormat="JavaScript">print("post ticket");
+var resp = connector.getVariable('response')
+var respStatusCode = connector.getVariable('statusCode')
+
+print("Response status create ticket: "+respStatusCode);
+print("Response status create ticket: "+resp);
+/* get activity id from parent*/
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+/*end get activity id from parent*/
+
+if (respStatusCode == 200) {
+
+/*solve incident if exist*/
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable("devicesList", resp);
+
+}else{
+print('Error to create ticket');
+print('Message error : '+resp);
+createCamundaIncident();
+}
+
+function createCamundaIncident() {
+    var IncidentEntity = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+    var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+    
+    var context = new IncidentContext();
+    var parentScope = connector.getParentVariableScope();
+    
+    context.setActivityId(parentScope.getCurrentActivityId());
+    context.setExecutionId(parentScope.getProcessInstanceId());
+    context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+    
+    var newIncident = IncidentEntity.createAndInsertIncident("Error to create ticket", context, resp);
+    
+    execution.setVariable('incidentId', newIncident.getId());
+    execution.setVariable('taskOnError', activityId);
+    
+    throw new org.camunda.bpm.engine.delegate.BpmnError('installation.ticket.exception', activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0858n4s</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vnmjz9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="tus.prc.audit.installation.ticket.signalLogout" name="Logout">
+      <bpmn:incoming>Flow_0vnmjz9</bpmn:incoming>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_0u9em9q" signalRef="Signal_03wr2z6">
+        <bpmn:extensionElements>
+          <camunda:in variables="all" />
+          <camunda:in businessKey="#{execution.processBusinessKey}" />
+        </bpmn:extensionElements>
+      </bpmn:signalEventDefinition>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="Activity_1g5uj40" name="Handle Exceptions" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_1udr7ew" name="Start exceptions">
+        <bpmn:outgoing>Flow_1sklhye</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_0uh4c4v" errorRef="Error_1j7t288" camunda:errorMessageVariable="errorIdTicket" />
+      </bpmn:startEvent>
+      <bpmn:scriptTask id="Activity_1jveu3s" name="set retries" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_1sklhye</bpmn:incoming>
+        <bpmn:outgoing>Flow_17z4szp</bpmn:outgoing>
+        <bpmn:script>var nbRetry= execution.getVariable("nbRetry");
+if(nbRetry!=null){
+nbRetry=nbRetry+1;
+}else 
+nbRetry=1;
+execution.setVariable("nbRetry",nbRetry);
+var duration=null;
+switch(nbRetry){
+case 1:
+duration="PT15S";
+break;
+case 2:
+duration="PT1M";
+break;
+case 3:
+duration="PT2M"
+break;
+}
+execution.setVariable("duration",duration);</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:exclusiveGateway id="Gateway_07vsn9h">
+        <bpmn:incoming>Flow_17z4szp</bpmn:incoming>
+        <bpmn:outgoing>Flow_1amwtke</bpmn:outgoing>
+        <bpmn:outgoing>Flow_02yqq0l</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Activity_0ero9yw" name="Send internal mail">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="payload">
+                <camunda:script scriptFormat="JavaScript">var alarme= execution.getVariable("type");
+var process= "tus.prc.newXp.infosCrm";
+var task = execution.getVariable('taskOnError');
+var contrat = execution.getVariable("contractId");
+var gateway = execution.getVariable("gatewayId");
+var nbRetry = execution.getVariable('nbRetry')-1;
+ '{"options": {"alarme":"'+alarme+'","process":"'+process+'","task":"'+task+'","contrat":"'+contrat +'", "gateway":"'+gateway +'", "nbRetry":"'+nbRetry +'"}}';</camunda:script>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="Content-Type">application/json</camunda:entry>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="url">
+                <camunda:script scriptFormat="JavaScript">var mail = "team.usages@protectline.fr";
+var workflow = "tus.prc.alarmManagement.intrusion";
+var env= execution.getVariable('env');
+
+var obj= '%5BCAMUNDA%5D%5B'+ env +'%5D%20Traitement%20non%20termin%C3%A9%20sur%20'+ workflow;
+var from = "TUS";
+var template = "tus-support-new";
+var url_notif = execution.getVariable('urlNotification');
+url_notif+'/email?from='+from+'&amp;subject='+obj+'&amp;template='+ template +'&amp;to='+mail;</camunda:script>
+              </camunda:inputParameter>
+              <camunda:outputParameter name="response_send_internal_mail">
+                <camunda:script scriptFormat="JavaScript" />
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_02yqq0l</bpmn:incoming>
+        <bpmn:outgoing>Flow_1h16qyu</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:intermediateCatchEvent id="Event_0zasaeg" name="pause">
+        <bpmn:incoming>Flow_1amwtke</bpmn:incoming>
+        <bpmn:outgoing>Flow_1m6bunj</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_1w4b2jc">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${duration}</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:scriptTask id="Activity_1e4atlb" name="Return to Last Task" scriptFormat="JavaScript">
+        <bpmn:incoming>Flow_1m6bunj</bpmn:incoming>
+        <bpmn:outgoing>Flow_0g1ilyw</bpmn:outgoing>
+        <bpmn:script>print('Return to flow is Running');
+var exceptions= execution.getVariable('errorIdTicket');
+if(exceptions!= null){
+execution.getProcessEngineServices().
+getRuntimeService().createProcessInstanceModification(execution.getProcessInstanceId()).startBeforeActivity(exceptions).execute();
+}</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:endEvent id="Event_0axijy1" name="Logout">
+        <bpmn:incoming>Flow_1h16qyu</bpmn:incoming>
+        <bpmn:signalEventDefinition id="SignalEventDefinition_1969i61" signalRef="Signal_03wr2z6">
+          <bpmn:extensionElements>
+            <camunda:in variables="all" />
+            <camunda:in businessKey="#{execution.processBusinessKey}" />
+          </bpmn:extensionElements>
+        </bpmn:signalEventDefinition>
+      </bpmn:endEvent>
+      <bpmn:endEvent id="Event_0cuq3ca">
+        <bpmn:incoming>Flow_0g1ilyw</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_1sklhye" sourceRef="Event_1udr7ew" targetRef="Activity_1jveu3s" />
+      <bpmn:sequenceFlow id="Flow_17z4szp" sourceRef="Activity_1jveu3s" targetRef="Gateway_07vsn9h" />
+      <bpmn:sequenceFlow id="Flow_1amwtke" name="retry &#60;4" sourceRef="Gateway_07vsn9h" targetRef="Event_0zasaeg">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&lt;= 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_02yqq0l" name="Retry &#62;3" sourceRef="Gateway_07vsn9h" targetRef="Activity_0ero9yw">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nbRetry&gt; 3}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_1h16qyu" sourceRef="Activity_0ero9yw" targetRef="Event_0axijy1" />
+      <bpmn:sequenceFlow id="Flow_1m6bunj" sourceRef="Event_0zasaeg" targetRef="Activity_1e4atlb" />
+      <bpmn:sequenceFlow id="Flow_0g1ilyw" sourceRef="Activity_1e4atlb" targetRef="Event_0cuq3ca" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0858n4s" sourceRef="tus.prc.audit.installation.ticket.startSignal" targetRef="tus.prc.audit.installation.ticket.create" />
+    <bpmn:sequenceFlow id="Flow_0vnmjz9" sourceRef="tus.prc.audit.installation.ticket.create" targetRef="tus.prc.audit.installation.ticket.signalLogout" />
+    <bpmn:startEvent id="tus.prc.audit.installation.ticket.startSignal">
+      <bpmn:outgoing>Flow_0858n4s</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_0fpwg3n" signalRef="Signal_1ci5vpb" />
+    </bpmn:startEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0rekvb2">
+      <bpmndi:BPMNShape id="Participant_0914ssy_di" bpmnElement="main" isHorizontal="true" bioc:stroke="#5b176d" bioc:fill="#e1bee7" color:background-color="#e1bee7" color:border-color="#5b176d">
+        <dc:Bounds x="160" y="160" width="1420" height="680" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_03b6hcu" bpmnElement="tus.prc.audit.installation.main.signalLogout">
+        <dc:Bounds x="1472" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1472" y="228" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1cyu64t" bpmnElement="Event_0jvom2r">
+        <dc:Bounds x="222" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_06mog4v" bpmnElement="tus.prc.audit.installation.main.loginKcUCR">
+        <dc:Bounds x="1320" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1m0y5vh" bpmnElement="tus.prc.audit.installation.main.params2" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="1180" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1paagfp_di" bpmnElement="tus.prc.audit.installation.main.gw.resultAuditDevice" isMarkerVisible="true">
+        <dc:Bounds x="985" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03lmwyg_di" bpmnElement="tus.prc.audit.installation.main.signalCrm">
+        <dc:Bounds x="912" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09319do" bpmnElement="Activity_1f5ua6k">
+        <dc:Bounds x="1030" y="540" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_05gdxnu" bpmnElement="Activity_1l4bnrk" isExpanded="true">
+        <dc:Bounds x="290" y="490" width="630" height="320" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0qbgjpe" bpmnElement="Event_0uxq8a8" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="322" y="603" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="300" y="646" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0gpq1za" bpmnElement="Activity_1cehc71">
+        <dc:Bounds x="390" y="581" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0kd2973" bpmnElement="Gateway_0ua4nfd" isMarkerVisible="true">
+        <dc:Bounds x="515" y="596" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0du0m9e" bpmnElement="Activity_1e7qwhk">
+        <dc:Bounds x="500" y="700" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1xx70ko" bpmnElement="Event_1rrpydn">
+        <dc:Bounds x="612" y="603" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="615" y="646" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1udzfyd" bpmnElement="Activity_1qsuwmc">
+        <dc:Bounds x="700" y="581" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_02jg18n" bpmnElement="Event_1q7rqua">
+        <dc:Bounds x="822" y="603" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0dqg9y1" bpmnElement="Event_1ealru8">
+        <dc:Bounds x="822" y="722" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823" y="765" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0xgrb8s" bpmnElement="Flow_081ek6p">
+        <di:waypoint x="358" y="621" />
+        <di:waypoint x="390" y="621" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0i0igx0" bpmnElement="Flow_11hbkju">
+        <di:waypoint x="490" y="621" />
+        <di:waypoint x="515" y="621" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1tgsczr" bpmnElement="Flow_1x72b8b">
+        <di:waypoint x="565" y="621" />
+        <di:waypoint x="612" y="621" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="572" y="576" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_19ekcwr" bpmnElement="Flow_03zwc0n">
+        <di:waypoint x="540" y="646" />
+        <di:waypoint x="540" y="700" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="569" y="666" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0a4tw3m" bpmnElement="Flow_0k6wd4v">
+        <di:waypoint x="600" y="740" />
+        <di:waypoint x="822" y="740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0ood8fv" bpmnElement="Flow_1jn1qgz">
+        <di:waypoint x="648" y="621" />
+        <di:waypoint x="700" y="621" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_02df7ls" bpmnElement="Flow_1fjnk7t">
+        <di:waypoint x="800" y="621" />
+        <di:waypoint x="822" y="621" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1ex68jg_di" bpmnElement="tus.prc.audit.installation.main.signalCreateTicket">
+        <dc:Bounds x="1472" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1455" y="435" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00vouog_di" bpmnElement="tus.prc.audit.installation.main.loginKc">
+        <dc:Bounds x="640" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0002j96_di" bpmnElement="tus.prc.audit.installation.main.auditEvents">
+        <dc:Bounds x="790" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1ug3bzu" bpmnElement="tus.prc.audit.installation.main.getEvents">
+        <dc:Bounds x="640" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s9ldv6_di" bpmnElement="tus.prc.audit.installation.main.auditDevices">
+        <dc:Bounds x="490" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_15ewprt" bpmnElement="tus.prc.audit.installation.main.getDevices">
+        <dc:Bounds x="330" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="tus.prc.audit.installation.main.start">
+        <dc:Bounds x="222" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1t7rnnl_di" bpmnElement="tus.prc.audit.installation.main.params" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="490" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00iyv00_di" bpmnElement="tus.prc.audit.installation.main.checkInputs">
+        <dc:Bounds x="330" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_10efkv0" bpmnElement="tus.prc.audit.installation.main.sendMail">
+        <dc:Bounds x="1130" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0w7u07a_di" bpmnElement="Activity_0w7u07a" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="790" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0744ofd_di" bpmnElement="Flow_0744ofd">
+        <di:waypoint x="1280" y="410" />
+        <di:waypoint x="1320" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y9w0rs_di" bpmnElement="tus.prc.audit.installation.main.flux.auditDeviceKo">
+        <di:waypoint x="1035" y="410" />
+        <di:waypoint x="1180" y="410" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1070" y="430" width="75" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xxcz64_di" bpmnElement="tus.prc.audit.installation.main.flux.auditDeviceOk">
+        <di:waypoint x="1010" y="385" />
+        <di:waypoint x="1010" y="270" />
+        <di:waypoint x="1130" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1002" y="236" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08n3ntd_di" bpmnElement="Flow_08n3ntd">
+        <di:waypoint x="890" y="410" />
+        <di:waypoint x="985" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lritqe_di" bpmnElement="Flow_0lritqe">
+        <di:waypoint x="740" y="410" />
+        <di:waypoint x="790" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sq0czg_di" bpmnElement="Flow_1sq0czg">
+        <di:waypoint x="590" y="410" />
+        <di:waypoint x="640" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l9tw1y_di" bpmnElement="Flow_0l9tw1y">
+        <di:waypoint x="430" y="410" />
+        <di:waypoint x="490" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jpkqo2_di" bpmnElement="Flow_1jpkqo2">
+        <di:waypoint x="740" y="290" />
+        <di:waypoint x="912" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0g8jbom_di" bpmnElement="Flow_0g8jbom">
+        <di:waypoint x="590" y="290" />
+        <di:waypoint x="640" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_197pa8l_di" bpmnElement="Flow_197pa8l">
+        <di:waypoint x="430" y="290" />
+        <di:waypoint x="490" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06rz999_di" bpmnElement="Flow_06rz999">
+        <di:waypoint x="258" y="290" />
+        <di:waypoint x="330" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01pz0db_di" bpmnElement="Flow_01pz0db" bioc:stroke="#831311" color:border-color="#831311">
+        <di:waypoint x="840" y="250" />
+        <di:waypoint x="840" y="200" />
+        <di:waypoint x="280" y="200" />
+        <di:waypoint x="280" y="410" />
+        <di:waypoint x="330" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dcs788_di" bpmnElement="Flow_0dcs788">
+        <di:waypoint x="1420" y="410" />
+        <di:waypoint x="1472" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p3y0lb_di" bpmnElement="Flow_0p3y0lb">
+        <di:waypoint x="1230" y="270" />
+        <di:waypoint x="1472" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rudx9x_di" bpmnElement="Flow_0rudx9x">
+        <di:waypoint x="258" y="410" />
+        <di:waypoint x="330" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_0udo8dc_di" bpmnElement="Participant_0ygxvio" isHorizontal="true" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="160" y="80" width="1420" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0vr81fi" bpmnElement="crm" isHorizontal="true" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="160" y="860" width="690" height="730" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0yqvfu5" bpmnElement="tus.prc.audit.installation.crm.getContract">
+        <dc:Bounds x="320" y="960" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rwiaed_di" bpmnElement="tus.prc.audit.installation.crm.startSignal">
+        <dc:Bounds x="222" y="982" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0gibzo9" bpmnElement="tus.prc.audit.installation.crm.getEmergency">
+        <dc:Bounds x="480" y="960" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1h57jc1" bpmnElement="tus.prc.audit.installation.crm.signalReturnMain">
+        <dc:Bounds x="692" y="982" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1dm5f1a" bpmnElement="Activity_1s9fdq2" isExpanded="true">
+        <dc:Bounds x="240" y="1230" width="580" height="320" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1uoq2yq" bpmnElement="Event_0rwyqel" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="272" y="1343" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="250" y="1386" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_080vgbx" bpmnElement="Activity_1egq9bb">
+        <dc:Bounds x="340" y="1321" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1aq6des" bpmnElement="Gateway_09og0ee" isMarkerVisible="true">
+        <dc:Bounds x="465" y="1336" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1yd2w62" bpmnElement="Activity_1ulmnwu">
+        <dc:Bounds x="450" y="1440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0p299cs" bpmnElement="Event_0988nlh">
+        <dc:Bounds x="562" y="1343" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="565" y="1386" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_036vpbd" bpmnElement="Activity_1qm8keq">
+        <dc:Bounds x="630" y="1321" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07cyj7n" bpmnElement="Event_0pi57p8">
+        <dc:Bounds x="752" y="1462" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="753" y="1505" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_18cbvjr_di" bpmnElement="Event_0j50zcy">
+        <dc:Bounds x="752" y="1343" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0xedjit" bpmnElement="Flow_1py41zf">
+        <di:waypoint x="308" y="1361" />
+        <di:waypoint x="340" y="1361" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_18gi96o" bpmnElement="Flow_1a1buvf">
+        <di:waypoint x="440" y="1361" />
+        <di:waypoint x="465" y="1361" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0u7ijpv" bpmnElement="Flow_1l41wen">
+        <di:waypoint x="515" y="1361" />
+        <di:waypoint x="562" y="1361" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="522" y="1316" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0nppyt5" bpmnElement="Flow_1qk1c2n">
+        <di:waypoint x="490" y="1386" />
+        <di:waypoint x="490" y="1440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="519" y="1406" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1k192g5" bpmnElement="Flow_0ix85zt">
+        <di:waypoint x="550" y="1480" />
+        <di:waypoint x="752" y="1480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1edfnwf" bpmnElement="Flow_1t7jkxo">
+        <di:waypoint x="598" y="1361" />
+        <di:waypoint x="630" y="1361" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1p6w9mm" bpmnElement="Flow_1vnpbs8">
+        <di:waypoint x="730" y="1361" />
+        <di:waypoint x="752" y="1361" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d5pm2b_di" bpmnElement="Flow_1d5pm2b">
+        <di:waypoint x="258" y="1000" />
+        <di:waypoint x="320" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0z1sknt" bpmnElement="Flow_18h58xi">
+        <di:waypoint x="420" y="1000" />
+        <di:waypoint x="480" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0v6yt39_di" bpmnElement="Flow_0v6yt39">
+        <di:waypoint x="580" y="1000" />
+        <di:waypoint x="692" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_03ljmuo" bpmnElement="logoutKC" isHorizontal="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="890" y="860" width="690" height="540" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_11c6q5i" bpmnElement="tus.prc.audit.installation.logoutKC.startSignal">
+        <dc:Bounds x="942" y="960" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="934" y="1003" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0ub2uxt" bpmnElement="Gateway_0as80p9">
+        <dc:Bounds x="1025" y="953" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1kcchcl" bpmnElement="tus.prc.audit.installation.logoutKC.endProcess">
+        <dc:Bounds x="1282" y="960" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1339" y="973" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0xilu7m" bpmnElement="tus.prc.audit.installation.logoutKC.break">
+        <dc:Bounds x="1152" y="880" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1202" y="886" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0rsjatj" bpmnElement="tus.prc.audit.installation.logoutKC.logout">
+        <dc:Bounds x="1120" y="938" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1b2akac" bpmnElement="Activity_01t2353" isExpanded="true">
+        <dc:Bounds x="960" y="1050" width="580" height="320" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1rpvvma" bpmnElement="Event_1ipdpap" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="992" y="1163" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="970" y="1206" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_02u7go4" bpmnElement="Activity_0b1c2gi">
+        <dc:Bounds x="1060" y="1141" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1fetoe2" bpmnElement="Gateway_0ljl6n8" isMarkerVisible="true">
+        <dc:Bounds x="1185" y="1156" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1wbb4bu" bpmnElement="Activity_0b4zy1j">
+        <dc:Bounds x="1170" y="1260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18ql23r" bpmnElement="Event_0iqyqx6">
+        <dc:Bounds x="1282" y="1163" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1285" y="1206" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_04oap7f" bpmnElement="Activity_1fyfx0o">
+        <dc:Bounds x="1350" y="1141" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09lm5qi" bpmnElement="Event_0a05nic">
+        <dc:Bounds x="1472" y="1282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1473" y="1325" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0cbl332_di" bpmnElement="Event_0mbq4ig">
+        <dc:Bounds x="1472" y="1163" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_19fuh5a" bpmnElement="Flow_17h1ju3">
+        <di:waypoint x="1028" y="1181" />
+        <di:waypoint x="1060" y="1181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1s5ob1z" bpmnElement="Flow_017vrlq">
+        <di:waypoint x="1160" y="1181" />
+        <di:waypoint x="1185" y="1181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0xj6ov5" bpmnElement="Flow_006ag3v">
+        <di:waypoint x="1235" y="1181" />
+        <di:waypoint x="1282" y="1181" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1242" y="1136" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_08sztey" bpmnElement="Flow_0y5dg35">
+        <di:waypoint x="1210" y="1206" />
+        <di:waypoint x="1210" y="1260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1239" y="1226" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1abcy8m" bpmnElement="Flow_0683ha7">
+        <di:waypoint x="1270" y="1300" />
+        <di:waypoint x="1472" y="1300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1eslrqc" bpmnElement="Flow_0ah62t3">
+        <di:waypoint x="1318" y="1181" />
+        <di:waypoint x="1350" y="1181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1kbtsrz" bpmnElement="Flow_1290t5v">
+        <di:waypoint x="1450" y="1181" />
+        <di:waypoint x="1472" y="1181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1py1btq" bpmnElement="Flow_1rjqrbp">
+        <di:waypoint x="978" y="978" />
+        <di:waypoint x="1025" y="978" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1aratp6" bpmnElement="Flow_185pn74">
+        <di:waypoint x="1075" y="978" />
+        <di:waypoint x="1120" y="978" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_13iv45q" bpmnElement="Flow_0d1bs15">
+        <di:waypoint x="1050" y="953" />
+        <di:waypoint x="1050" y="898" />
+        <di:waypoint x="1152" y="898" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_129ultu_di" bpmnElement="Flow_129ultu">
+        <di:waypoint x="1220" y="978" />
+        <di:waypoint x="1282" y="978" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_03a7hra" bpmnElement="Flow_0hj65jj">
+        <di:waypoint x="1170" y="916" />
+        <di:waypoint x="1170" y="938" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_0wmuzmh_di" bpmnElement="ticket" isHorizontal="true" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="890" y="1430" width="690" height="470" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_15l0605" bpmnElement="tus.prc.audit.installation.ticket.create">
+        <dc:Bounds x="1090" y="1450" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1a2nudo" bpmnElement="tus.prc.audit.installation.ticket.signalLogout">
+        <dc:Bounds x="1312" y="1472" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1312" y="1448" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03rnffo_di" bpmnElement="tus.prc.audit.installation.ticket.startSignal">
+        <dc:Bounds x="982" y="1472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0hycwae" bpmnElement="Activity_1g5uj40" isExpanded="true">
+        <dc:Bounds x="960" y="1550" width="580" height="320" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_15e7458" bpmnElement="Event_1udr7ew" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="992" y="1663" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="970" y="1706" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0amqztx" bpmnElement="Activity_1jveu3s">
+        <dc:Bounds x="1060" y="1641" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09xcn9q" bpmnElement="Gateway_07vsn9h" isMarkerVisible="true">
+        <dc:Bounds x="1185" y="1656" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_16yp2mz" bpmnElement="Activity_0ero9yw">
+        <dc:Bounds x="1170" y="1760" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_11qy4gk" bpmnElement="Event_0zasaeg">
+        <dc:Bounds x="1282" y="1663" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1285" y="1706" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1gph0jo" bpmnElement="Activity_1e4atlb">
+        <dc:Bounds x="1350" y="1641" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09xj75c" bpmnElement="Event_0axijy1">
+        <dc:Bounds x="1472" y="1782" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1473" y="1825" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1svtepe_di" bpmnElement="Event_0cuq3ca">
+        <dc:Bounds x="1472" y="1663" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_1ryctc4" bpmnElement="Flow_1sklhye">
+        <di:waypoint x="1028" y="1681" />
+        <di:waypoint x="1060" y="1681" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_020tw2l" bpmnElement="Flow_17z4szp">
+        <di:waypoint x="1160" y="1681" />
+        <di:waypoint x="1185" y="1681" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1f1eqgd" bpmnElement="Flow_1amwtke">
+        <di:waypoint x="1235" y="1681" />
+        <di:waypoint x="1282" y="1681" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1242" y="1636" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1u006ht" bpmnElement="Flow_02yqq0l">
+        <di:waypoint x="1210" y="1706" />
+        <di:waypoint x="1210" y="1760" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1239" y="1726" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_05ulkkf" bpmnElement="Flow_1h16qyu">
+        <di:waypoint x="1270" y="1800" />
+        <di:waypoint x="1472" y="1800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0zlnar6" bpmnElement="Flow_1m6bunj">
+        <di:waypoint x="1318" y="1681" />
+        <di:waypoint x="1350" y="1681" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1mydb4y" bpmnElement="Flow_0g1ilyw">
+        <di:waypoint x="1450" y="1681" />
+        <di:waypoint x="1472" y="1681" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0858n4s_di" bpmnElement="Flow_0858n4s">
+        <di:waypoint x="1018" y="1490" />
+        <di:waypoint x="1090" y="1490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vnmjz9_di" bpmnElement="Flow_0vnmjz9">
+        <di:waypoint x="1190" y="1490" />
+        <di:waypoint x="1312" y="1490" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

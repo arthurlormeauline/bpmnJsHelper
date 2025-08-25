@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="WrongOption" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.protectline.Main" />
+    <module name="BpmnInJsCompiler" />
+    <option name="PROGRAM_PARAMETERS" value="-topmn" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.protectline.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

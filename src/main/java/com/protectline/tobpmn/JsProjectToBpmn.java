@@ -1,26 +1,27 @@
 package com.protectline.tobpmn;
 
-import com.protectline.tobpmn.jsprojectparser.JsProjectParser;
-import com.protectline.tojsproject.model.element.Element;
+import com.protectline.tobpmn.elementbuilder.ElementBuilder;
+import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.jsproject.JsProject;
+import com.protectline.bpmndocument.model.element.Element;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
 public class JsProjectToBpmn {
     private final Path workingDirectory;
 
-    public JsProjectToBpmn(Path workingDirectory){
+    public JsProjectToBpmn(Path workingDirectory) {
         this.workingDirectory = workingDirectory;
     }
 
     public void updateBpmn(String process) {
-        BlockSelector blockSelector = new BlockSelector();
-        ElementBuilder elementBuilder = new ElementBuilder(blockSelector);
+        JsProject jsProject = new JsProject(workingDirectory, process);
+        ElementBuilder elementBuilder = new ElementBuilder(jsProject);
         List<Element> elements = elementBuilder.buildElements();
 
 
-        ElementSelector elementSelector = new ElementSelector();
-        elementSelector.updateBpmn(elements);
+        BpmnDocument bpmnDocument = new BpmnDocument(workingDirectory, process);
+        bpmnDocument.updateBpmn(elements);
     }
 }

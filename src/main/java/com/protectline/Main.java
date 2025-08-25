@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         if (args.length > 2 || args.length < 1) {
             System.out.println("usage : javac [app] processName [options : -toJs | -toBpmn]");
         }

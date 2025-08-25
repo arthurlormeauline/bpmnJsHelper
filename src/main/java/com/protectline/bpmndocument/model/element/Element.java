@@ -1,4 +1,4 @@
-package com.protectline.tojsproject.model.element;
+package com.protectline.bpmndocument.model.element;
 
 import java.util.List;
 

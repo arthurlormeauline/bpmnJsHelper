@@ -1,8 +1,10 @@
 package com.protectline.tojsproject;
 
-import com.protectline.tojsproject.model.block.Block;
+import com.protectline.tojsproject.blockbuilder.BlockBuilder;
+import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.jsproject.JsProject;
+import com.protectline.bpmndocument.model.block.Block;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -15,11 +17,11 @@ public class BpmnToJS {
     }
 
     public void createProject(String process) {
-        ElementSelector elementSelector = new ElementSelector();
-        BlockBuilder blockBuilder = new BlockBuilder (bpmnSelector);
+        BpmnDocument bpmnDocument = new BpmnDocument(workingDirectory, process);
+        BlockBuilder blockBuilder = new BlockBuilder(bpmnDocument);
 
         List<Block> blocks = blockBuilder.buildBlocks();
-        JsProject jsProject = new JsProject();
+        JsProject jsProject = new JsProject(workingDirectory, process);
         jsProject.updateProject(blocks);
     }
 }

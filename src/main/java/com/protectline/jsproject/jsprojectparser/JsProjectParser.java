@@ -1,4 +1,4 @@
-package com.protectline.tobpmn.jsprojectparser;
+package com.protectline.jsproject.jsprojectparser;
 
 public class JsProjectParser {
     public Object parse() {

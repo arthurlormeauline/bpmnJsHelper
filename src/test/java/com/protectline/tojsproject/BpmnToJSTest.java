@@ -25,7 +25,7 @@ class BpmnToJSTest {
     @BeforeEach
     void setUp() throws Exception {
         inputResourcesPath = Path.of(Objects.requireNonNull(
-            getClass().getClassLoader().getResource("input")).toURI());
+            getClass().getClassLoader().getResource("tojsprojectTestData/input")).toURI());
         
         backupPath = tempDir.resolve("backup");
         Files.createDirectories(backupPath);

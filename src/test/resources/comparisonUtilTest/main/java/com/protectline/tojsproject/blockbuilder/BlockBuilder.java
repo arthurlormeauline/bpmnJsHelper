@@ -1,7 +1,7 @@
 package com.protectline.tojsproject.blockbuilder;
 
 import com.protectline.bpmndocument.BpmnDocument;
-import com.protectline.bpmndocument.model.block.Block;
+import com.protectline.jsproject.model.block.Block;
 
 import java.util.List;
 

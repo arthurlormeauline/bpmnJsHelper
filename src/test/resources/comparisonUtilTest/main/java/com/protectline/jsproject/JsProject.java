@@ -1,6 +1,6 @@
 package com.protectline.jsproject;
 
-import com.protectline.bpmndocument.model.block.Block;
+import com.protectline.jsproject.model.block.Block;
 
 import java.nio.file.Path;
 import java.util.List;

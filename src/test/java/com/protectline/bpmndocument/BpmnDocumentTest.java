@@ -20,21 +20,19 @@ class BpmnDocumentTest {
     @BeforeEach
     void setup() throws URISyntaxException {
         bpmnDocument = new BpmnDocument(Path.of(BpmnDocumentTest.class.getClassLoader().getResource("tests").toURI()),
-                "tus.prc.actionCombine");
+                "simplify");
     }
 
     @Test
     void should_extract_all_script() {
-        // Given
-
-        // When
+        // Given // When
         var elements = bpmnDocument.getAllScripts();
 
         // Then
         ////////////
         var startScript = new Element();
         var startEventAttributes = List.of(new Attribute("scriptFormat", "JavaScript"));
-        startScript.setPath(new Pair<>("Event_1u1d1qi", List.of(0, 0, 0)));
+        startScript.setPath(new Pair<>("Event_1u1d1qi", List.of(1, 1, 1)));
         startScript.setType(SCRIPT);
         startScript.setAttributes(startEventAttributes);
         startScript.setContent("start event script");
@@ -45,7 +43,7 @@ class BpmnDocumentTest {
                 new Attribute("scriptFormat", "JavaScript")
         );
         getDeviceByNameUrlScript.setPath(
-                new Pair<>("Activity_0rwauzg", List.of(0, 0, 0, 0, 0)));
+                new Pair<>("Activity_0rwauzg", List.of(1,1, 1, 1, 1)));
         getDeviceByNameUrlScript.setType(SCRIPT);
         getDeviceByNameUrlScript.setAttributes(getDeviceByNameUrlScriptAttributes);
         getDeviceByNameUrlScript.setContent("get device by name url scrip");
@@ -56,7 +54,7 @@ class BpmnDocumentTest {
                 new Attribute("scriptFormat", "JavaScript")
         );
         getDeviceByNameOutputScript.setPath(
-                new Pair<>("Activity_0rwauzg", List.of(0, 0, 0, 3, 0)));
+                new Pair<>("Activity_0rwauzg", List.of(1, 1, 1, 7, 1)));
         getDeviceByNameOutputScript.setType(SCRIPT);
         getDeviceByNameOutputScript.setAttributes(getDeviceByNameOutputScripAttributes);
         getDeviceByNameOutputScript.setContent("get device by name url scrip");
@@ -67,7 +65,7 @@ class BpmnDocumentTest {
                 new Attribute("scriptFormat", "JavaScript")
         );
         delayDefinitionScript.setPath(
-                new Pair<>("Activity_0q6wfo8", List.of(2)));
+                new Pair<>("Activity_0q6wfo8", List.of(5)));
         delayDefinitionScript.setType(SCRIPT);
         delayDefinitionScript.setAttributes(delayDefinitionScriptAttributes);
         delayDefinitionScript.setContent("delay definition scrip");

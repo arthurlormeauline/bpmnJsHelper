@@ -1,6 +1,6 @@
-package com.protectline.tobpmn;
+package com.protectline.tobpmn.bpmnupdate;
 
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.model.block.FunctionBlock;
 
 public class FunctionBpmnDocumentUpdater implements BpmnDocumentUpdater {
@@ -12,6 +12,6 @@ public class FunctionBpmnDocumentUpdater implements BpmnDocumentUpdater {
     }
 
     @Override
-    public void updateDocument(BpmnDocument bpmnDocument) {
+    public void updateDocument(BpmnCamundaDocument bpmnCamundaDocument) {
     }
 }

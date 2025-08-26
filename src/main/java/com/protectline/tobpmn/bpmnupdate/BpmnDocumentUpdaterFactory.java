@@ -1,4 +1,4 @@
-package com.protectline.tobpmn;
+package com.protectline.tobpmn.bpmnupdate;
 
 import com.protectline.jsproject.model.block.Block;
 import com.protectline.jsproject.model.block.BlockType;

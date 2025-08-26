@@ -1,17 +1,17 @@
 package com.protectline.jsproject.model.block;
 
+import com.protectline.bpmndocument.model.BpmnPath;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.javatuples.Pair;
-
-import java.util.List;
 
 @Getter
+@EqualsAndHashCode
 public class Block {
     private final String name;
-    private final Pair<String, List<Integer>> path;
+    private final BpmnPath path;
     private final BlockType type;
 
-    public Block(Pair<String, List<Integer>> path, String name, BlockType type) {
+    public Block(BpmnPath path, String name, BlockType type) {
         this.path = path;
         this.name = name;
         this.type = type;

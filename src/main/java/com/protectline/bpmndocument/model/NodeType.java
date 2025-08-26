@@ -1,6 +1,5 @@
 package com.protectline.bpmndocument.model;
 
-import org.w3c.dom.Node;
 
 public enum NodeType {
     START,
@@ -10,11 +9,11 @@ public enum NodeType {
     public static NodeType getType(Node node) {
         String nodeName = node.getNodeName().toString();
         switch (nodeName) {
-            case "bpmn:startEvent":
+            case "startEvent":
                 return START;
-            case "bpmn:serviceTask":
+            case "serviceTask":
                 return SERVICE_TASK;
-            case "bpmn:scriptTask":
+            case "scriptTask":
                 return SCRIPT;
             default:
                 throw new IllegalArgumentException("Type not support : " + nodeName);

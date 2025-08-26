@@ -1,6 +1,6 @@
-package com.protectline.tobpmn;
+package com.protectline.tobpmn.bpmnupdate;
 
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.model.block.Block;
 
 import java.util.List;
@@ -14,10 +14,10 @@ public class MainBpmnDocumentUpdater implements BpmnDocumentUpdater {
     }
 
     @Override
-    public void updateDocument(BpmnDocument bpmnDocument) {
+    public void updateDocument(BpmnCamundaDocument bpmnCamundaDocument) {
         for (Block block : blocks){
             BpmnDocumentUpdater updater = BpmnDocumentUpdaterFactory.getupdater(block);
-            updater.updateDocument(bpmnDocument);
+            updater.updateDocument(bpmnCamundaDocument);
         }
     }
 }

@@ -1,6 +1,6 @@
-package com.protectline.tojsproject;
+package com.protectline.tojsproject.block;
 
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.model.block.Block;
 
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ public class MainBlockBuilder implements BlockBuilder {
     }
 
     @Override
-    public List<Block> getBlocks(BpmnDocument bpmnDocument) {
+    public List<Block> getBlocks(BpmnCamundaDocument bpmnCamundaDocument) {
         List<Block> blocks = new ArrayList<>();
 
         for (BlockBuilder builder : builders){
-            blocks.addAll(builder.getBlocks(bpmnDocument));
+            blocks.addAll(builder.getBlocks(bpmnCamundaDocument));
         }
 
         return blocks;

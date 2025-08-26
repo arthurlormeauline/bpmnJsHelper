@@ -1,16 +1,16 @@
 package com.protectline.tojsproject.blockbuilder;
 
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.model.block.Block;
 
 import java.util.List;
 
 public class BlockBuilder {
     
-    private final BpmnDocument bpmnDocument;
+    private final BpmnCamundaDocument bpmnCamundaDocument;
     
-    public BlockBuilder(BpmnDocument bpmnDocument) {
-        this.bpmnDocument = bpmnDocument;
+    public BlockBuilder(BpmnCamundaDocument bpmnCamundaDocument) {
+        this.bpmnCamundaDocument = bpmnCamundaDocument;
     }
     
     public List<Block> buildBlocks() {

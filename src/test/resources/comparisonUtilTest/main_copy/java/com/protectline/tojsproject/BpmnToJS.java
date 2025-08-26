@@ -1,8 +1,9 @@
 package com.protectline.tojsproject;
 
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.JsProject;
 import com.protectline.jsproject.model.block.Block;
+import com.protectline.tojsproject.block.MainBlockBuilder;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -16,8 +17,8 @@ public class BpmnToJS {
     }
 
     public void createProject(String process) {
-        BpmnDocument bpmnDocument = new BpmnDocument(workingDirectory, process);
-        MainBlockBuilder mainBlockBuilder = new MainBlockBuilder(bpmnDocument);
+        BpmnCamundaDocument bpmnCamundaDocument = new BpmnCamundaDocument(workingDirectory, process);
+        MainBlockBuilder mainBlockBuilder = new MainBlockBuilder(bpmnCamundaDocument);
 
         List<Block> blocks = mainBlockBuilder.buildAllBlocks();
         JsProject jsProject = new JsProject(workingDirectory, process);

@@ -1,7 +1,7 @@
 package com.protectline.tobpmn;
 
 import com.protectline.tobpmn.elementbuilder.ElementBuilder;
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.JsProject;
 
 import java.nio.file.Path;
@@ -20,7 +20,7 @@ public class JsProjectToBpmn {
         List<Element> elements = elementBuilder.buildElements();
 
 
-        BpmnDocument bpmnDocument = new BpmnDocument(workingDirectory, process);
-        bpmnDocument.updateBpmn(elements);
+        BpmnCamundaDocument bpmnCamundaDocument = new BpmnCamundaDocument(workingDirectory, process);
+        bpmnCamundaDocument.updateBpmn(elements);
     }
 }

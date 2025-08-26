@@ -1,10 +1,10 @@
 package com.protectline.tojsproject.blockbuilder;
 
-import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
 import com.protectline.jsproject.model.block.Block;
-import com.protectline.tojsproject.BlockBuilder;
-import com.protectline.tojsproject.MainBlockBuilder;
-import com.protectline.tojsproject.functionblock.FunctionBlockBuilder;
+import com.protectline.tojsproject.block.BlockBuilder;
+import com.protectline.tojsproject.block.MainBlockBuilder;
+import com.protectline.tojsproject.block.functionblock.FunctionBlockBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,7 +38,7 @@ class MainBlockBuilderTest {
     void should_extract_all_blocks(List<BlockBuilder> builders) {
         // Given
         var process = "simplify";
-        var document = new BpmnDocument(workingdir, process);
+        var document = new BpmnCamundaDocument(workingdir, process);
 
         // When
         List<Block> actual = builder

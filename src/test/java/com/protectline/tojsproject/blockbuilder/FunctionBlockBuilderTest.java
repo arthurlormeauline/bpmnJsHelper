@@ -12,17 +12,18 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import static com.protectline.tojsproject.util.StubBlock.getExpectedBlock;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 class FunctionBlockBuilderTest {
 
-    FunctionBlockBuilder builder;
-    String testFolderName;
+   private FunctionBlockBuilder builder;
+   private String testFolderName;
 
-    Path resourcePath;
+   private Path resourcePath;
 
-    Path testWorkingDirectory;
+   private Path testWorkingDirectory;
 
     @BeforeEach
     void setup() throws URISyntaxException {
@@ -37,25 +38,18 @@ class FunctionBlockBuilderTest {
     @Test
     void should_get_function_block_from_document() {
         // Given
-        BpmnCamundaDocument bpmnCamundaDocument = new BpmnCamundaDocument(testWorkingDirectory, "simplify");
+        BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, "simplify");
 
         // When
-        var actual = builder.getBlocks(bpmnCamundaDocument);
+        var actual = builder.getBlocks(document);
 
         // Then
-        var expectedDelayDefinition = getExpectedBlock("Activity_0q6wfo8", "Delay definition_0", "delay definition script");
-        var expectedGetDeviceByName_0 = getExpectedBlock("Activity_0rwauzg", "Get device by name_0", "get device by name url script");
-        var expectedGetDeviceByName_1 = getExpectedBlock("Activity_0rwauzg", "Get device by name_1", "get device by name output script");
+        var expectedDelayDefinition = getExpectedBlock("Activity_0q6wfo8", "Delay_definition_0", "delay definition script");
+        var expectedGetDeviceByName_0 = getExpectedBlock("Activity_0rwauzg", "Get_device_by_name_0", "get device by name url script");
+        var expectedGetDeviceByName_1 = getExpectedBlock("Activity_0rwauzg", "Get_device_by_name_1", "get device by name output script");
         var expectedStartEvent = getExpectedBlock("Event_1u1d1qi", "Event_1u1d1qi_0", "start event script");
 
         assertThat(actual).isEqualTo(List.of(expectedDelayDefinition, expectedGetDeviceByName_0, expectedGetDeviceByName_1, expectedStartEvent));
-    }
-
-    private static FunctionBlock getExpectedBlock(String id, String name, String script) {
-        BpmnPath expectedPath = new BpmnPath(id);
-        String expectedName = name;
-        String expectedContent = script;
-        return new FunctionBlock(expectedPath, expectedName, expectedContent);
     }
 
 }

@@ -13,7 +13,7 @@ public class FunctionBlockUtil {
         String id = path.getId();
 
         if (id != null) {
-            var name = getName(node, id);
+            var name = getName(node, id).replace(" ", "_");
             var scripts = node.getScripts();
             List<Block> blocks = new ArrayList<>();
             for (int i = 0; i < scripts.size(); i++) {

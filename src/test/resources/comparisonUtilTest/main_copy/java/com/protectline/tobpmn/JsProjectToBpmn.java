@@ -3,7 +3,6 @@ package com.protectline.tobpmn;
 import com.protectline.tobpmn.elementbuilder.ElementBuilder;
 import com.protectline.bpmndocument.BpmnDocument;
 import com.protectline.jsproject.JsProject;
-import com.protectline.bpmndocument.model.element.Element;
 
 import java.nio.file.Path;
 import java.util.List;

@@ -19,4 +19,8 @@ public class JsProject {
     public void updateProject(List<Block> blocks) {
 
     }
+
+    public List<Block> getBlocks() {
+        return null;
+    }
 }

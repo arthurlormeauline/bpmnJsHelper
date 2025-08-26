@@ -1,7 +1,5 @@
 package com.protectline.bpmndocument;
 
-import com.protectline.bpmndocument.model.element.Element;
-
 import java.nio.file.Path;
 import java.util.List;
 

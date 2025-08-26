@@ -37,7 +37,6 @@ class BpmnToJSTest {
         inputPath = testWorkingDirectory.resolve("input");
     }
 
-
     @BeforeEach
     void setUp() throws Exception {
         backupPath = tempDir.resolve("backup");

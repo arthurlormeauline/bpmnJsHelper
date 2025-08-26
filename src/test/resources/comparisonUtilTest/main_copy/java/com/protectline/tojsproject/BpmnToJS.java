@@ -1,6 +1,5 @@
 package com.protectline.tojsproject;
 
-import com.protectline.tojsproject.blockbuilder.BlockBuilder;
 import com.protectline.bpmndocument.BpmnDocument;
 import com.protectline.jsproject.JsProject;
 import com.protectline.jsproject.model.block.Block;
@@ -18,9 +17,9 @@ public class BpmnToJS {
 
     public void createProject(String process) {
         BpmnDocument bpmnDocument = new BpmnDocument(workingDirectory, process);
-        BlockBuilder blockBuilder = new BlockBuilder(bpmnDocument);
+        MainBlockBuilder mainBlockBuilder = new MainBlockBuilder(bpmnDocument);
 
-        List<Block> blocks = blockBuilder.buildAllBlocks();
+        List<Block> blocks = mainBlockBuilder.buildAllBlocks();
         JsProject jsProject = new JsProject(workingDirectory, process);
         jsProject.updateProject(blocks);
     }

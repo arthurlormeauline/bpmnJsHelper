@@ -5,6 +5,7 @@ import com.protectline.bpmndocument.model.Node;
 import com.protectline.bpmndocument.model.ScriptNode;
 import com.protectline.bpmndocument.model.ServiceTaskNode;
 import com.protectline.bpmndocument.model.StartNode;
+import com.protectline.jsproject.model.block.Block;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ScriptTask;
@@ -35,6 +36,11 @@ public class BpmnCamundaDocument implements BpmnDocument {
         nodes.addAll(getStartNode());
 
         return nodes;
+    }
+
+    @Override
+    public Node getElement(String id) {
+        return modelInstance.getModelElementById(id);
     }
 
     private List<? extends StartNode> getStartNode() {

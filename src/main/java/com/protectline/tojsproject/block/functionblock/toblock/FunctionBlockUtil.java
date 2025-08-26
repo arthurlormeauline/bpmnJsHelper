@@ -18,7 +18,7 @@ public class FunctionBlockUtil {
             List<Block> blocks = new ArrayList<>();
             for (int i = 0; i < scripts.size(); i++) {
                 var script = scripts.get(i);
-                blocks.add(new FunctionBlock(path, name + "_" + i, script));
+                blocks.add(new FunctionBlock(path, name + "_" + i, script, node.getType()));
             }
             return blocks;
         } else {

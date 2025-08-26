@@ -8,4 +8,6 @@ public interface Node {
     String getAttributeValue(String id);
 
     List<String> getScripts();
+
+    NodeType getType();
 }

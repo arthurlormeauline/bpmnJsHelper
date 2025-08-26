@@ -1,13 +1,12 @@
 package com.protectline.bpmndocument.model.camundaadapter;
 
 import com.protectline.bpmndocument.model.Node;
-import org.camunda.bpm.model.xml.instance.DomElement;
+import com.protectline.bpmndocument.model.NodeType;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import static com.protectline.bpmndocument.model.NodeType.*;
 import static com.protectline.bpmndocument.model.camundaadapter.DomElementUtil.getScriptsFromDomElement;
 
 public class CamundaNode implements Node {
@@ -30,5 +29,20 @@ public class CamundaNode implements Node {
     @Override
     public List<String> getScripts() {
         return getScriptsFromDomElement(element.getDomElement());
+    }
+
+    @Override
+    public NodeType getType() {
+        String nodeName = getNodeName().toString();
+        switch (nodeName) {
+            case "startEvent":
+                return START;
+            case "serviceTask":
+                return SERVICE_TASK;
+            case "scriptTask":
+                return SCRIPT;
+            default:
+                throw new IllegalArgumentException("Type not support : " + nodeName);
+        }
     }
 }

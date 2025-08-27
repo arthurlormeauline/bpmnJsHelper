@@ -4,15 +4,19 @@ import com.protectline.bpmndocument.BpmnDocument;
 import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.common.block.Block;
 import com.protectline.application.tojsproject.bpmntoblocks.functionblock.FunctionBlockBuilder;
+import com.protectline.common.block.FunctionBlock;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class FromBpmnToBlock {
+import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.writeBlocksToFile;
+
+public class FromBpmnToBlocks {
     private final Path workingDirectory;
 
-    public FromBpmnToBlock(Path workingDirectory) throws IOException {
+    public FromBpmnToBlocks(Path workingDirectory) throws IOException {
         this.workingDirectory = workingDirectory;
     }
 
@@ -22,6 +26,15 @@ public class FromBpmnToBlock {
                 registerSubBlockBuilder(new FunctionBlockBuilder())
                 .getBlocks(document);
 
-        // persist blocks
+        blocks.forEach(block -> {
+            try {
+                Path blockDirectory = workingDirectory.resolve("blocks/" + process);
+                Files.createDirectories(blockDirectory);
+                Path blockFile = blockDirectory.resolve(block.getName() + ".json");
+                writeBlocksToFile((FunctionBlock) block, blockFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

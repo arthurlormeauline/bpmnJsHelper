@@ -9,12 +9,12 @@ import java.nio.file.Path;
 public class FunctionJsonBlockUtil {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static void writeToFile(FunctionBlock functionBlock, Path filePath) throws IOException {
+    public static void writeBlocksToFile(FunctionBlock functionBlock, Path filePath) throws IOException {
         FunctionJsonBlock jsonBlock = new FunctionJsonBlock(functionBlock);
         objectMapper.writeValue(filePath.toFile(), jsonBlock);
     }
 
-    public static FunctionBlock readFromFile(Path filePath) throws IOException {
+    public static FunctionBlock readBlocksFromFile(Path filePath) throws IOException {
         FunctionJsonBlock jsonBlock = objectMapper.readValue(filePath.toFile(), FunctionJsonBlock.class);
         return jsonBlock.toFunctionBlock();
     }

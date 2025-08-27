@@ -8,15 +8,13 @@ import java.util.List;
 public class JsProject {
 
     private final Path workingDirectory;
-    private final String process;
 
 
-    public JsProject(Path workingDirectory, String process) {
+    public JsProject(Path workingDirectory) {
         this.workingDirectory = workingDirectory;
-        this.process = process;
     }
 
-    public void updateProject(List<Block> blocks) {
+    public void updateProject(String process, List<Block> blocks) {
 
     }
 

@@ -26,15 +26,15 @@ public class FromBpmnToBlocks {
                 registerSubBlockBuilder(new FunctionBlockBuilder())
                 .getBlocks(document);
 
-        blocks.forEach(block -> {
-            try {
-                Path blockDirectory = workingDirectory.resolve("blocks/" + process);
-                Files.createDirectories(blockDirectory);
-                Path blockFile = blockDirectory.resolve(block.getName() + ".json");
-                writeBlocksToFile((FunctionBlock) block, blockFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        // Convertir tous les blocs en FunctionBlock
+        List<FunctionBlock> functionBlocks = blocks.stream()
+                .map(block -> (FunctionBlock) block)
+                .toList();
+
+        // Créer le répertoire et écrire tous les blocs dans un seul fichier JSON
+        Path blockDirectory = workingDirectory.resolve("blocks");
+        Files.createDirectories(blockDirectory);
+        Path blocksFile = blockDirectory.resolve(process + ".json");
+        writeBlocksToFile(functionBlocks, blocksFile);
     }
 }

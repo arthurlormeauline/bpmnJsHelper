@@ -1,5 +1,6 @@
 package com.protectline.util;
 
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
@@ -36,8 +37,15 @@ public class FileUtil {
 
     public static void compareBpmnFiles(Path bpmnFile, Path expectedModify) throws IOException {
         String modifiedContent = Files.readString(bpmnFile);
+
+        // back up expected file to restore at the end of comparison
+        var backUpExpected = Files.readString(expectedModify);
+
+        // change expected by a read write without changing it --> this add some attributes to XML without changing the process
+        var modelInstance = Bpmn.readModelFromFile(expectedModify.toFile());
+        Bpmn.writeModelToFile(expectedModify.toFile(), modelInstance);
+
         String expectedContent = Files.readString(expectedModify);
-        
 
         Diff myDiff = DiffBuilder.compare(expectedContent)
                 .withTest(modifiedContent)
@@ -56,6 +64,9 @@ public class FileUtil {
         }
 
         assertThat(size).isEqualTo(0);
+
+        // restore expected for other tests
+        Files.writeString(expectedModify, backUpExpected);
     }
 
 }

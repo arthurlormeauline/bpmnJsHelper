@@ -14,6 +14,9 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +78,9 @@ public class BpmnCamundaDocument implements BpmnDocument {
     }
 
     @Override
-    public void writeToFile(File file) {
+    public void writeToFile(File file) throws IOException {
        Bpmn.writeModelToFile(file, modelInstance);
+       String newContentWithoutEmptyLines = Files.readString(file.toPath()).replaceAll("\n\\s*\n", "\n");
+       Files.writeString(file.toPath(), newContentWithoutEmptyLines);
     }
 }

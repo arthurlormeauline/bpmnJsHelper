@@ -59,6 +59,7 @@ class MainBpmnDocumentUpdaterTest {
         // Then
         document.writeToFile(bpmnFile.toFile());
 
-        compareBpmnFiles(bpmnFile, testWorkingDirectory.resolve("expectedBpmnFile/simplify_expected_modify.bpmn"));
+        Path expectedModify = testWorkingDirectory.resolve("expectedBpmnFile/simplify_expected_modify.bpmn");
+        compareBpmnFiles(bpmnFile, expectedModify);
     }
 }

@@ -25,7 +25,6 @@ public class BpmnCamundaDocument implements BpmnDocument {
 
     public BpmnCamundaDocument(Path workingDirectory, String processName) {
         File processFile = workingDirectory.resolve("input").resolve(processName + ".bpmn").toFile();
-        var test = processFile.exists();
         this.modelInstance = Bpmn.readModelFromFile(processFile);
     }
 

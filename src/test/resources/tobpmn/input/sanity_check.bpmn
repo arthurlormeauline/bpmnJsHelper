@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0ql66o2" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.33.1">
+  <bpmn:error id="Error_0j5ifb1" />
+  <bpmn:error id="Error_1q2j438" name="errorPatch" errorCode="errorPatch" />
+  <bpmn:error id="Error_1h32sh3" name="Error_181l3vi" />
+  <bpmn:process id="tus.prc.actionCombine" name="tus.prc.actionCombine" isExecutable="true" camunda:versionTag="tus.prc.actionCombine_0.2.4">
+    <bpmn:startEvent id="Event_1u1d1qi">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="JavaScript">start event script</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_17xa2p8</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_17xa2p8" sourceRef="Event_1u1d1qi" targetRef="Activity_0rwauzg" />
+    <bpmn:endEvent id="Event_0081z3j" name="Fin">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1jtxx9v</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_098mg3t" />
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="Activity_0q6wfo8" name="Delay definition" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0p7iqz0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jtxx9v</bpmn:outgoing>
+      <bpmn:script>delay definition script</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1jtxx9v" sourceRef="Activity_0q6wfo8" targetRef="Event_0081z3j" />
+    <bpmn:serviceTask id="Activity_0rwauzg" name="Get device by name">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">get device by name url script</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="GetDeviceState">
+              <camunda:script scriptFormat="JavaScript">get device by name output script</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17xa2p8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0p7iqz0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0p7iqz0" sourceRef="Activity_0rwauzg" targetRef="Activity_0q6wfo8" />
+  </bpmn:process>
+  <bpmn:error id="Error_0geqh6f" name="testJH" errorCode="testJH" camunda:errorMessage="testJH" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="tus.prc.actionCombine">
+      <bpmndi:BPMNShape id="Event_1u1d1qi_di" bpmnElement="Event_1u1d1qi">
+        <dc:Bounds x="152" y="92" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1awmon4" bpmnElement="Event_0081z3j">
+        <dc:Bounds x="1222" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1232" y="325" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1c5o677" bpmnElement="Activity_0rwauzg">
+        <dc:Bounds x="390" y="400" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18o9u8t" bpmnElement="Activity_0q6wfo8">
+        <dc:Bounds x="660" y="400" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_17xa2p8_di" bpmnElement="Flow_17xa2p8">
+        <di:waypoint x="188" y="110" />
+        <di:waypoint x="420" y="110" />
+        <di:waypoint x="420" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jtxx9v_di" bpmnElement="Flow_1jtxx9v">
+        <di:waypoint x="760" y="440" />
+        <di:waypoint x="991" y="440" />
+        <di:waypoint x="991" y="300" />
+        <di:waypoint x="1222" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p7iqz0_di" bpmnElement="Flow_0p7iqz0">
+        <di:waypoint x="490" y="440" />
+        <di:waypoint x="660" y="440" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

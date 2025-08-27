@@ -1,8 +1,5 @@
 package com.protectline.tobpmn;
 
-import com.protectline.tojsproject.BpmnToJS;
-import com.protectline.util.DirectoryComparisonUtil;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,8 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
+import static com.protectline.util.FileUtil.compareBpmnFiles;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsProjectToBpmnTest {
@@ -20,51 +19,58 @@ class JsProjectToBpmnTest {
     @TempDir
     Path tempDir;
 
+    private Path testWorkingDirectory;
     private Path jsProjectOutputPath;
-    private Path backupPath;
 
     @BeforeEach
     void setUp() throws Exception {
-        jsProjectOutputPath = Path.of(Objects.requireNonNull(
-            getClass().getClassLoader().getResource("tobpmnTestData/output")).toURI());
+        // Copier toute la structure de test vers le répertoire temporaire
+        Path resourcesPath = Path.of(Objects.requireNonNull(
+                getClass().getClassLoader().getResource("tobpmn")).toURI());
         
-        backupPath = tempDir.resolve("backup");
-        Files.createDirectories(backupPath);
+        testWorkingDirectory = tempDir.resolve("testData");
+        Files.createDirectories(testWorkingDirectory);
+        
+        // Copier récursivement toute la structure
+        copyDirectory(resourcesPath, testWorkingDirectory);
+        
+        jsProjectOutputPath = testWorkingDirectory.resolve("output");
+    }
+    
+    private void copyDirectory(Path source, Path target) throws IOException {
+        Files.walk(source)
+                .forEach(sourcePath -> {
+                    try {
+                        Path targetPath = target.resolve(source.relativize(sourcePath));
+                        if (Files.isDirectory(sourcePath)) {
+                            Files.createDirectories(targetPath);
+                        } else {
+                            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     @Test
-    void should_create_bpmn_from_jsProject_and_create_jsProject_back_again() throws IOException {
-        Path resourcesPath = jsProjectOutputPath.getParent();
+    void should_update_bpmn_from_jsProject() throws IOException {
+        // Given
+        String processName = "simplify";
         
-        File[] jsProjectDirs = jsProjectOutputPath.toFile().listFiles(File::isDirectory);
+        File jsProjectDir = jsProjectOutputPath.resolve(processName).toFile();
         
-        if (jsProjectDirs == null || jsProjectDirs.length == 0) {
-            throw new RuntimeException("No JS project directories found in output resources");
+        if (!jsProjectDir.exists() || !jsProjectDir.isDirectory()) {
+            throw new RuntimeException("JS project directory not found: " + processName);
         }
 
-        for (File jsProjectDir : jsProjectDirs) {
-            String processName = jsProjectDir.getName();
-            
-            Path backupDir = backupPath.resolve(processName);
-            FileUtils.copyDirectory(jsProjectDir, backupDir.toFile());
-            
-            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(resourcesPath);
-            jsProjectToBpmn.updateBpmn(processName);
-            
-            FileUtils.deleteDirectory(jsProjectDir);
-            
-            BpmnToJS bpmnToJs = new BpmnToJS(resourcesPath);
-            bpmnToJs.createProject(processName);
-            
-            assertTrue(jsProjectDir.exists(),
-                "JS project directory should be recreated: " + processName);
-            
-            assertTrue(DirectoryComparisonUtil.areDirectoriesEqual(jsProjectDir.toPath(), backupDir),
-                "Recreated JS project should match original: " + processName);
-            
-            FileUtils.deleteDirectory(jsProjectDir);
-            FileUtils.copyDirectory(backupDir.toFile(), jsProjectDir);
-        }
+        // When
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(testWorkingDirectory);
+        jsProjectToBpmn.updateBpmn(processName);
+
+        // Then
+        Path bpmnFile = testWorkingDirectory.resolve("input/simplify.bpmn");
+        compareBpmnFiles(bpmnFile, testWorkingDirectory.resolve("expectedBpmnFile/simplify_expected_modify.bpmn"));
     }
 
 }

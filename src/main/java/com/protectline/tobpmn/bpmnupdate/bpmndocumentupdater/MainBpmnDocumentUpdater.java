@@ -15,10 +15,12 @@ public class MainBpmnDocumentUpdater implements BpmnDocumentUpdater {
 
     @Override
     public void updateDocument(BpmnDocument document) {
-        for (Block block : blocks){
-            BpmnDocumentUpdater updater = BpmnDocumentUpdaterFactory
-                    .getupdater(block);
-            updater.updateDocument(document);
+        if (blocks != null) {
+            for (Block block : blocks) {
+                BpmnDocumentUpdater updater = BpmnDocumentUpdaterFactory
+                        .getupdater(block);
+                updater.updateDocument(document);
+            }
         }
     }
 }

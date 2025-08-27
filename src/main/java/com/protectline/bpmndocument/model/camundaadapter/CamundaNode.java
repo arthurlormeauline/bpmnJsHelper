@@ -7,7 +7,6 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import java.util.List;
 
 import static com.protectline.bpmndocument.model.NodeType.*;
-import static com.protectline.bpmndocument.model.camundaadapter.DomElementUtil.getScriptsFromDomElement;
 
 public class CamundaNode implements Node {
     ModelElementInstance element;
@@ -28,7 +27,7 @@ public class CamundaNode implements Node {
 
     @Override
     public List<String> getScripts() {
-        return getScriptsFromDomElement(element.getDomElement());
+        return DomElementUtil.getScripts(element.getDomElement());
     }
 
     @Override

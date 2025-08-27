@@ -2,18 +2,19 @@ package com.protectline.tobpmn.bpmnupdate.fromblock;
 
 import com.protectline.bpmndocument.model.NodeType;
 import com.protectline.jsproject.model.block.Block;
+import com.protectline.jsproject.model.block.FunctionBlock;
 
-public class FromBlockFactory {
+public class FromFuntionBlockFactory {
 
-    public static FromBlock getFromBlock(Block block) {
+    public static FromFunctionBlock getFromBlock(FunctionBlock block) {
         NodeType type = block.getNodeType();
         switch (type) {
             case START:
-                return new UpdateStartFromBlock(block);
+                return new UpdateStartFromFunctionBlock(block);
             case SCRIPT:
-                return new UpdateScriptFromBlock(block);
+                return new UpdateScriptFromFunctionBlock(block);
             case SERVICE_TASK:
-                return new UpdateServiceTaskFromBlock(block);
+                return new UpdateServiceTaskFromFunctionBlock(block);
             default:
                 throw new IllegalArgumentException("Could not update document from node type : " + type);
         }

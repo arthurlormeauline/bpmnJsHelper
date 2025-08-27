@@ -1,46 +1,41 @@
-package com.protectline.tojsproject;
+package com.protectline.backandforth;
 
 import com.protectline.tobpmn.JsProjectToBpmn;
+import com.protectline.tojsproject.BpmnToJS;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
+import static com.protectline.util.FileUtil.compareBpmnFiles;
+import static com.protectline.util.FileUtil.copyDirectory;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BpmnToJSTest {
+class BackAndForthTest {
 
     @TempDir
-    Path tempDir;
-
-    private Path backupPath;
+    private Path tempDir;
     private Path testWorkingDirectory;
-    private String testFolderName;
-    private Path resourcePath;
     private Path inputPath;
-
-    BpmnToJSTest() throws URISyntaxException {
-        testFolderName = "tojsprojectTestData";
-
-        resourcePath = Path.of(Objects.requireNonNull(
-                BpmnToJSTest.class.getClassLoader().getResource(testFolderName)).toURI()).getParent();
-
-        testWorkingDirectory = resourcePath.resolve(testFolderName);
-
-        inputPath = testWorkingDirectory.resolve("input");
-    }
 
     @BeforeEach
     void setUp() throws Exception {
-        backupPath = tempDir.resolve("backup");
-        Files.createDirectories(backupPath);
+        // Copier toute la structure de test vers le répertoire temporaire
+        Path resourcesPath = Path.of(Objects.requireNonNull(
+                BackAndForthTest.class.getClassLoader().getResource("backAndForth")).toURI());
+
+        testWorkingDirectory = tempDir.resolve("testData");
+        Files.createDirectories(testWorkingDirectory);
+
+        // Copier récursivement toute la structure
+        copyDirectory(resourcesPath, testWorkingDirectory);
+
+        inputPath = testWorkingDirectory.resolve("input");
     }
 
     @Test
@@ -55,13 +50,13 @@ class BpmnToJSTest {
         for (File bpmnFile : bpmnFiles) {
             String processName = bpmnFile.getName().replace(".bpmn", "");
 
-            Path backupFile = backupPath.resolve(bpmnFile.getName());
-            Files.copy(bpmnFile.toPath(), backupFile, StandardCopyOption.REPLACE_EXISTING);
-
             BpmnToJS bpmnToJs = new BpmnToJS(testWorkingDirectory);
             bpmnToJs.createProject(processName);
 
-            Files.delete(bpmnFile.toPath());
+            // Vérifier que le projet JS a été créé
+            Path outputDir = testWorkingDirectory.resolve("output").resolve(processName);
+            assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
+            assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
             JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(testWorkingDirectory);
             jsProjectToBpmn.updateBpmn(processName);
@@ -69,31 +64,25 @@ class BpmnToJSTest {
             assertTrue(Files.exists(bpmnFile.toPath()),
                     "BPMN file should be recreated: " + bpmnFile.getName());
 
-            byte[] originalContent = Files.readAllBytes(backupFile);
-            byte[] recreatedContent = Files.readAllBytes(bpmnFile.toPath());
-
-            assertTrue(java.util.Arrays.equals(originalContent, recreatedContent),
-                    "Recreated BPMN file should match original: " + bpmnFile.getName());
-
-            Files.copy(backupFile, bpmnFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Path backupfile = testWorkingDirectory.resolve("backup").resolve(processName);
+            compareBpmnFiles(bpmnFile.toPath(), backupfile);
         }
     }
 
     @Test
     void should_create_jsProject_and_create_bpmn_back_again() throws IOException {
-
         var fileName = "tus.prc.actionCombine.bpmn";
 
         var bpmnFile = inputPath.resolve(fileName);
         String processName = bpmnFile.getFileName().toString().replace(".bpmn", "");
 
-        Path backupFile = backupPath.resolve(bpmnFile.getFileName().toString());
-        Files.copy(bpmnFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
-
         BpmnToJS bpmnToJs = new BpmnToJS(testWorkingDirectory);
         bpmnToJs.createProject(processName);
 
-        Files.delete(bpmnFile);
+        // Vérifier que le projet JS a été créé
+        Path outputDir = testWorkingDirectory.resolve("output").resolve(processName);
+        assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
+        assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
         JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(testWorkingDirectory);
         jsProjectToBpmn.updateBpmn(processName);
@@ -101,12 +90,7 @@ class BpmnToJSTest {
         assertTrue(Files.exists(bpmnFile),
                 "BPMN file should be recreated: " + bpmnFile.getFileName().toString());
 
-        byte[] originalContent = Files.readAllBytes(backupFile);
-        byte[] recreatedContent = Files.readAllBytes(bpmnFile);
-
-        assertTrue(java.util.Arrays.equals(originalContent, recreatedContent),
-                "Recreated BPMN file should match original: " + bpmnFile.getFileName().toString());
-
-        Files.copy(backupFile, bpmnFile, StandardCopyOption.REPLACE_EXISTING);
+      Path backupfile = testWorkingDirectory.resolve("backup").resolve(processName);
+            compareBpmnFiles(bpmnFile, backupfile);
     }
 }

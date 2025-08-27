@@ -31,7 +31,7 @@ public class MainBlockBuilder implements BlockBuilder {
     }
 
     public MainBlockBuilder registerSubBlockBuilders(List<BlockBuilder> builders) {
-        builders.addAll(builders);
+        this.builders.addAll(builders);
         return this;
     }
 }

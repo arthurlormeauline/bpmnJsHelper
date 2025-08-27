@@ -2,8 +2,6 @@ package com.protectline.tojsproject.blockbuilder;
 
 import com.protectline.bpmndocument.model.NodeType;
 import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
-import com.protectline.bpmndocument.model.BpmnPath;
-import com.protectline.jsproject.model.block.FunctionBlock;
 import com.protectline.tojsproject.block.functionblock.FunctionBlockBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +11,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import static com.protectline.tojsproject.util.StubBlock.getExpectedBlock;
+import static com.protectline.tojsproject.stub.StubBlock.getExpectedBlock;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -29,7 +27,7 @@ class FunctionBlockBuilderTest {
     @BeforeEach
     void setup() throws URISyntaxException {
         builder = new FunctionBlockBuilder();
-        testFolderName = "tests";
+        testFolderName = "toJsProject";
 
         resourcePath = Path.of(Objects.requireNonNull(
                 FunctionBlockBuilderTest.class.getClassLoader().getResource(testFolderName)).toURI()).getParent();

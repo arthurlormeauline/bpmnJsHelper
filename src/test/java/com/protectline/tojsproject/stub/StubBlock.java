@@ -1,4 +1,4 @@
-package com.protectline.tojsproject.util;
+package com.protectline.tojsproject.stub;
 
 import com.protectline.bpmndocument.model.BpmnPath;
 import com.protectline.bpmndocument.model.NodeType;

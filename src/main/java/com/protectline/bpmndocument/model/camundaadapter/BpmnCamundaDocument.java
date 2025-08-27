@@ -5,7 +5,6 @@ import com.protectline.bpmndocument.model.Node;
 import com.protectline.bpmndocument.model.ScriptNode;
 import com.protectline.bpmndocument.model.ServiceTaskNode;
 import com.protectline.bpmndocument.model.StartNode;
-import com.protectline.jsproject.model.block.Block;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ScriptTask;
@@ -19,11 +18,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.protectline.bpmndocument.model.camundaadapter.DomElementUtil.getScriptsAsDomElement;
+
 public class BpmnCamundaDocument implements BpmnDocument {
     private BpmnModelInstance modelInstance = null;
 
     public BpmnCamundaDocument(Path workingDirectory, String processName) {
         File processFile = workingDirectory.resolve("input").resolve(processName + ".bpmn").toFile();
+        var test = processFile.exists();
         this.modelInstance = Bpmn.readModelFromFile(processFile);
     }
 
@@ -36,11 +38,6 @@ public class BpmnCamundaDocument implements BpmnDocument {
         nodes.addAll(getStartNode());
 
         return nodes;
-    }
-
-    @Override
-    public Node getElement(String id) {
-        return modelInstance.getModelElementById(id);
     }
 
     private List<? extends StartNode> getStartNode() {
@@ -64,5 +61,22 @@ public class BpmnCamundaDocument implements BpmnDocument {
     private List<ModelElementInstance> getModelElementInstance(Class<? extends ModelElementInstance> aClass) {
         ModelElementType taskType = modelInstance.getModel().getType(aClass);
         return modelInstance.getModelElementsByType(taskType).stream().toList();
+    }
+
+    @Override
+    public Node getElement(String id) {
+        return modelInstance.getModelElementById(id);
+    }
+
+    @Override
+    public void setScript(String id, Integer scriptIndex, String content) {
+        getScriptsAsDomElement(modelInstance.getModelElementById(id).getDomElement())
+                .get(scriptIndex)
+                .setTextContent(content);
+    }
+
+    @Override
+    public void writeToFile(File file) {
+       Bpmn.writeModelToFile(file, modelInstance);
     }
 }

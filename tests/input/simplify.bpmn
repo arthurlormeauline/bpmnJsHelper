@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Camunda Modeler" exporterVersion="5.33.1" expressionLanguage="http://www.w3.org/1999/XPath" id="Definitions_0ql66o2" targetNamespace="http://bpmn.io/schema/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <bpmn:error id="Error_0j5ifb1"/>
+
+  <bpmn:error errorCode="errorPatch" id="Error_1q2j438" name="errorPatch"/>
+
+  <bpmn:error id="Error_1h32sh3" name="Error_181l3vi"/>
+
+  <bpmn:process camunda:versionTag="tus.prc.actionCombine_0.2.4" id="tus.prc.actionCombine" isClosed="false" isExecutable="true" name="tus.prc.actionCombine" processType="None">
+
+    <bpmn:startEvent id="Event_1u1d1qi" isInterrupting="true" parallelMultiple="false">
+
+      <bpmn:extensionElements>
+
+        <camunda:executionListener event="start">
+
+          <camunda:script scriptFormat="JavaScript">NEW : start event script</camunda:script>
+
+        </camunda:executionListener>
+
+      </bpmn:extensionElements>
+
+      <bpmn:outgoing>Flow_17xa2p8</bpmn:outgoing>
+
+    </bpmn:startEvent>
+
+    <bpmn:sequenceFlow id="Flow_17xa2p8" sourceRef="Event_1u1d1qi" targetRef="Activity_0rwauzg"/>
+
+    <bpmn:endEvent id="Event_0081z3j" name="Fin">
+
+      <bpmn:extensionElements/>
+
+      <bpmn:incoming>Flow_1jtxx9v</bpmn:incoming>
+
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_098mg3t"/>
+
+    </bpmn:endEvent>
+
+    <bpmn:scriptTask completionQuantity="1" id="Activity_0q6wfo8" isForCompensation="false" name="Delay definition" scriptFormat="javascript" startQuantity="1">
+
+      <bpmn:incoming>Flow_0p7iqz0</bpmn:incoming>
+
+      <bpmn:outgoing>Flow_1jtxx9v</bpmn:outgoing>
+
+      <bpmn:script>NEW : delay definition script</bpmn:script>
+
+    </bpmn:scriptTask>
+
+    <bpmn:sequenceFlow id="Flow_1jtxx9v" sourceRef="Activity_0q6wfo8" targetRef="Event_0081z3j"/>
+
+    <bpmn:serviceTask completionQuantity="1" id="Activity_0rwauzg" implementation="##WebService" isForCompensation="false" name="Get device by name" startQuantity="1">
+
+      <bpmn:extensionElements>
+
+        <camunda:connector>
+
+          <camunda:inputOutput>
+
+            <camunda:inputParameter name="url">
+
+              <camunda:script scriptFormat="JavaScript">NEW : get device by name url script</camunda:script>
+
+            </camunda:inputParameter>
+
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+
+            <camunda:inputParameter name="headers">
+
+              <camunda:map>
+
+                <camunda:entry key="accept">application/json</camunda:entry>
+
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+
+              </camunda:map>
+
+            </camunda:inputParameter>
+
+            <camunda:outputParameter name="GetDeviceState">
+
+              <camunda:script scriptFormat="JavaScript">NEW : get device by name output script</camunda:script>
+
+            </camunda:outputParameter>
+
+          </camunda:inputOutput>
+
+          <camunda:connectorId>http-connector</camunda:connectorId>
+
+        </camunda:connector>
+
+      </bpmn:extensionElements>
+
+      <bpmn:incoming>Flow_17xa2p8</bpmn:incoming>
+
+      <bpmn:outgoing>Flow_0p7iqz0</bpmn:outgoing>
+
+    </bpmn:serviceTask>
+
+    <bpmn:sequenceFlow id="Flow_0p7iqz0" sourceRef="Activity_0rwauzg" targetRef="Activity_0q6wfo8"/>
+
+  </bpmn:process>
+
+  <bpmn:error camunda:errorMessage="testJH" errorCode="testJH" id="Error_0geqh6f" name="testJH"/>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+
+    <bpmndi:BPMNPlane bpmnElement="tus.prc.actionCombine" id="BPMNPlane_1">
+
+      <bpmndi:BPMNShape bpmnElement="Event_1u1d1qi" id="Event_1u1d1qi_di">
+
+        <dc:Bounds height="36" width="36" x="152" y="92"/>
+
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape bpmnElement="Event_0081z3j" id="BPMNShape_1awmon4">
+
+        <dc:Bounds height="36" width="36" x="1222" y="282"/>
+
+        <bpmndi:BPMNLabel>
+
+          <dc:Bounds height="14" width="16" x="1232" y="325"/>
+
+        </bpmndi:BPMNLabel>
+
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape bpmnElement="Activity_0rwauzg" id="BPMNShape_1c5o677">
+
+        <dc:Bounds height="80" width="100" x="390" y="400"/>
+
+        <bpmndi:BPMNLabel/>
+
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape bpmnElement="Activity_0q6wfo8" id="BPMNShape_18o9u8t">
+
+        <dc:Bounds height="80" width="100" x="660" y="400"/>
+
+        <bpmndi:BPMNLabel/>
+
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge bpmnElement="Flow_17xa2p8" id="Flow_17xa2p8_di">
+
+        <di:waypoint x="188" y="110"/>
+
+        <di:waypoint x="420" y="110"/>
+
+        <di:waypoint x="420" y="400"/>
+
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge bpmnElement="Flow_1jtxx9v" id="Flow_1jtxx9v_di">
+
+        <di:waypoint x="760" y="440"/>
+
+        <di:waypoint x="991" y="440"/>
+
+        <di:waypoint x="991" y="300"/>
+
+        <di:waypoint x="1222" y="300"/>
+
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge bpmnElement="Flow_0p7iqz0" id="Flow_0p7iqz0_di">
+
+        <di:waypoint x="490" y="440"/>
+
+        <di:waypoint x="660" y="440"/>
+
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

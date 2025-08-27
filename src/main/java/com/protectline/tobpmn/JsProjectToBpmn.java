@@ -24,5 +24,6 @@ public class JsProjectToBpmn {
 
         var mainDocumentUpdater = new MainBpmnDocumentUpdater(blocks);
         mainDocumentUpdater.updateDocument(document);
+        document.writeToFile(workingDirectory.resolve("input").resolve(process).toFile());
     }
 }

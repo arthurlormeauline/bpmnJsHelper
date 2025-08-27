@@ -1,6 +1,7 @@
 package com.protectline.common.block.jsonblock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.protectline.common.block.Block;
 import com.protectline.common.block.FunctionBlock;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class FunctionJsonBlockUtil {
         objectMapper.writeValue(filePath.toFile(), blocksList);
     }
 
-    public static List<FunctionBlock> readBlocksFromFile(Path filePath) throws IOException {
+    public static List<Block> readBlocksFromFile(Path filePath) throws IOException {
         FunctionBlocksList blocksList = objectMapper.readValue(filePath.toFile(), FunctionBlocksList.class);
         return blocksList.toFunctionBlocks();
     }

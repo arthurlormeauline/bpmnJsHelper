@@ -14,7 +14,7 @@ public class JsProjectToBpmn {
     public JsProjectToBpmn(Path workingDirectory) {
         this.workingDirectory = workingDirectory;
         this.jsToBlocks = new FromJsProjectToBlocks(workingDirectory);
-        this.blocksToBpmn = new FromBlockToBpmn(workingDirectory);
+        this.blocksToBpmn = new FromBlockToBpmn();
     }
 
     public void updateBpmn(String process) throws IOException {

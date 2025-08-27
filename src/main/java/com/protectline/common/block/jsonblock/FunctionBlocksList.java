@@ -2,6 +2,7 @@ package com.protectline.common.block.jsonblock;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.protectline.common.block.Block;
 import com.protectline.common.block.FunctionBlock;
 import lombok.Getter;
 
@@ -24,7 +25,7 @@ public class FunctionBlocksList {
         this.blocks = blocks;
     }
 
-    public List<FunctionBlock> toFunctionBlocks() {
+    public List<Block> toFunctionBlocks() {
         return blocks.stream()
                 .map(FunctionJsonBlock::toFunctionBlock)
                 .collect(Collectors.toList());

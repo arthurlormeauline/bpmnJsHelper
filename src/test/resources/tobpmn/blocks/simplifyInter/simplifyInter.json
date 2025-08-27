@@ -8,7 +8,7 @@
       "type": "FUNCTION",
       "nodeType": "SCRIPT",
       "id": "880ed997-78b2-4ff6-bb02-9eeadfa6bcb7",
-      "content": "delay definition script",
+      "content": "NEW : delay definition script",
       "scriptIndex": 0
     },
     {
@@ -19,7 +19,7 @@
       "type": "FUNCTION",
       "nodeType": "SERVICE_TASK",
       "id": "74b70353-a19e-4ad7-9838-5251ab67d8a6",
-      "content": "get device by name url script",
+      "content": "NEW : get device by name url script",
       "scriptIndex": 0
     },
     {
@@ -30,7 +30,7 @@
       "type": "FUNCTION",
       "nodeType": "SERVICE_TASK",
       "id": "a96073f8-befb-430d-b8a0-466100ca5bc9",
-      "content": "get device by name output script",
+      "content": "NEW : get device by name output script",
       "scriptIndex": 1
     },
     {
@@ -41,7 +41,7 @@
       "type": "FUNCTION",
       "nodeType": "START",
       "id": "da508040-ebc4-4267-82fb-d7d4576e136e",
-      "content": "start event script",
+      "content": "NEW : start event script",
       "scriptIndex": 0
     }
   ]

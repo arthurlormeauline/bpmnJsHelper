@@ -9,19 +9,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+
 public class FromBlockToBpmn {
-
-    private final Path workingDirectory;
-
-    public FromBlockToBpmn(Path workingDirectory) {
-        this.workingDirectory = workingDirectory;
-    }
 
     public void updateBpmnFromBlocks(Path workingDirectory, String process) throws IOException {
         BpmnDocument document = new BpmnCamundaDocument(workingDirectory, process);
 
-        // get blocks from file
-        List<Block> blocks = null;
+        List<Block> blocks = readBlocksFromFile(workingDirectory.resolve("blocks/"+process));
 
         var bpmnDocumentUpdater = new BpmnDocumentUpdater(blocks);
         bpmnDocumentUpdater.updateDocument(document);

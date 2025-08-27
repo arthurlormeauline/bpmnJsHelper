@@ -1,7 +1,7 @@
 package com.protectline.tobpmn;
 
 import com.protectline.tobpmn.elementbuilder.ElementBuilder;
-import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
+import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.jsproject.JsProject;
 
 import java.nio.file.Path;

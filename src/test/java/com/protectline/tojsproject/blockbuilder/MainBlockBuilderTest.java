@@ -1,11 +1,11 @@
 package com.protectline.tojsproject.blockbuilder;
 
 import com.protectline.bpmndocument.model.NodeType;
-import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
-import com.protectline.jsproject.model.block.Block;
-import com.protectline.tojsproject.block.BlockBuilder;
-import com.protectline.tojsproject.block.MainBlockBuilder;
-import com.protectline.tojsproject.block.functionblock.FunctionBlockBuilder;
+import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
+import com.protectline.common.block.Block;
+import com.protectline.translate.frombpmntoblock.BlockBuilder;
+import com.protectline.translate.frombpmntoblock.MainBlockBuilder;
+import com.protectline.translate.frombpmntoblock.functionblock.FunctionBlockBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

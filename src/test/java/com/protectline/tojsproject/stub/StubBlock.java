@@ -2,7 +2,7 @@ package com.protectline.tojsproject.stub;
 
 import com.protectline.bpmndocument.model.BpmnPath;
 import com.protectline.bpmndocument.model.NodeType;
-import com.protectline.jsproject.model.block.FunctionBlock;
+import com.protectline.common.block.FunctionBlock;
 
 public class StubBlock {
     public static FunctionBlock getExpectedBlock(String id, String name, String script, NodeType nodeType) {

@@ -1,8 +1,8 @@
 package com.protectline.tojsproject;
 
-import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
+import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.jsproject.JsProject;
-import com.protectline.jsproject.model.block.Block;
+import com.protectline.common.block.Block;
 import com.protectline.tojsproject.block.MainBlockBuilder;
 
 import java.nio.file.Path;

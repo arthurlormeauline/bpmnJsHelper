@@ -1,7 +1,7 @@
 package com.protectline.tojsproject.blockbuilder;
 
-import com.protectline.bpmndocument.model.camundaadapter.BpmnCamundaDocument;
-import com.protectline.jsproject.model.block.Block;
+import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
+import com.protectline.common.block.Block;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.protectline.application;
 
 import com.google.common.io.Resources;
-import com.protectline.tobpmn.JsProjectToBpmn;
-import com.protectline.tojsproject.BpmnToJS;
+import com.protectline.application.tobpmn.JsProjectToBpmn;
+import com.protectline.application.tojsproject.BpmnToJS;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

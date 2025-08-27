@@ -1,5 +1,6 @@
 package com.protectline.tobpmn;
 
+import com.protectline.application.tobpmn.JsProjectToBpmn;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -8,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 import static com.protectline.util.FileUtil.compareBpmnFiles;

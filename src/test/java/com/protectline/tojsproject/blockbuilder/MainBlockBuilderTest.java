@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ class MainBlockBuilderTest {
 
     @ParameterizedTest
     @MethodSource("shouldExtractAllBlocksData")
-    void should_extract_all_blocks(List<BlockBuilder> builders) {
+    void should_extract_all_blocks(List<BlockBuilder> builders) throws IOException {
         // Given
         var process = "simplify";
         var document = new BpmnCamundaDocument(workingdir, process);

@@ -34,7 +34,7 @@ public class Application {
         toBpmn.updateBpmn(process);
     }
 
-    private static void toJsProject(String process) throws URISyntaxException {
+    private static void toJsProject(String process) throws URISyntaxException, IOException {
         System.out.println("Create js project from bpmn file");
         Path workingDirectory = Path.of(Resources.getResource("/").toURI());
         BpmnToJS toJs = new BpmnToJS(workingDirectory);

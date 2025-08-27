@@ -6,6 +6,7 @@ import com.protectline.tojsproject.block.functionblock.FunctionBlockBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
@@ -35,7 +36,7 @@ class FunctionBlockBuilderTest {
     }
 
     @Test
-    void should_get_function_block_from_document() {
+    void should_get_function_block_from_document() throws IOException {
         // Given
         BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, "simplify");
 

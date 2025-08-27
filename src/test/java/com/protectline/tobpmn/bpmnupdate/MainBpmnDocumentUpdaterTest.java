@@ -50,7 +50,8 @@ class MainBpmnDocumentUpdaterTest {
     @Test
     void should_update_bpmn_document() throws IOException {
         // Given
-        BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, "simplify");
+        String processName = "simplify";
+        BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, processName);
         Path bpmnFile = testWorkingDirectory.resolve("input/simplify.bpmn");
 
         // When

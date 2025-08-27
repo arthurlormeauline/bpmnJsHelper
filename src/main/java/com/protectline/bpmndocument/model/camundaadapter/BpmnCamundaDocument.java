@@ -26,8 +26,9 @@ import static com.protectline.bpmndocument.model.camundaadapter.DomElementUtil.g
 public class BpmnCamundaDocument implements BpmnDocument {
     private BpmnModelInstance modelInstance = null;
 
-    public BpmnCamundaDocument(Path workingDirectory, String processName) {
+    public BpmnCamundaDocument(Path workingDirectory, String processName) throws IOException {
         File processFile = workingDirectory.resolve("input").resolve(processName + ".bpmn").toFile();
+        formatBpmnFile(processFile);
         this.modelInstance = Bpmn.readModelFromFile(processFile);
     }
 
@@ -80,7 +81,11 @@ public class BpmnCamundaDocument implements BpmnDocument {
     @Override
     public void writeToFile(File file) throws IOException {
        Bpmn.writeModelToFile(file, modelInstance);
-       String newContentWithoutEmptyLines = Files.readString(file.toPath()).replaceAll("\n\\s*\n", "\n");
-       Files.writeString(file.toPath(), newContentWithoutEmptyLines);
+       formatBpmnFile(file);
+    }
+
+    private static void formatBpmnFile(File file) throws IOException {
+        String newContentWithoutEmptyLines = Files.readString(file.toPath()).replaceAll("\n\\s*\n", "\n");
+        Files.writeString(file.toPath(), newContentWithoutEmptyLines);
     }
 }

@@ -6,6 +6,7 @@ import com.protectline.jsproject.model.block.Block;
 import com.protectline.tojsproject.block.MainBlockBuilder;
 import com.protectline.tojsproject.block.functionblock.FunctionBlockBuilder;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class BpmnToJS {
         this.workingDirectory = workingDirectory;
     }
 
-    public void createProject(String process) {
+    public void createProject(String process) throws IOException {
         BpmnCamundaDocument bpmnCamundaDocument = new BpmnCamundaDocument(workingDirectory, process);
 
         List<Block> blocks = new MainBlockBuilder().

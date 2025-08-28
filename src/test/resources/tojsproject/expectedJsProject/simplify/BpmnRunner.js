@@ -62,7 +62,7 @@ class BpmnRunner {
         console.log(message);
     }
 
-    //<BT:MAIN>
+    //<MAIN>
 
     //<880ed997-78b2-4ff6-bb02-9eeadfa6bcb7>
     Delay_definition_0(){
@@ -89,7 +89,7 @@ class BpmnRunner {
     }
     //<da508040-ebc4-4267-82fb-d7d4576e136e/>
 
-    //<BT:MAIN/>
+    //<MAIN/>
 }
 
 module.exports = BpmnRunner;

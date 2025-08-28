@@ -16,7 +16,7 @@ public class FromFuntionBlockFactory {
             case SERVICE_TASK:
                 return new UpdateServiceTaskFromFunctionBlock(block);
             default:
-                throw new IllegalArgumentException("Could not update document from node type : " + type);
+                throw new IllegalArgumentException("No bpmn updater found for type : " + type);
         }
     }
 }

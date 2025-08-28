@@ -1,0 +1,12 @@
+[
+  {
+    "name": "MAIN",
+    "template": "//<MAIN>\n\n//<FUNCTIONS>\n\n//<MAIN/>\n",
+    "flag": "//<MAIN>"
+  },
+  {
+    "name": "FUNCTION",
+    "template": "//<**id**>\n**name**() {\n**content**\n}\n",
+    "flag": "//<FUNCTIONS>"
+  }
+]

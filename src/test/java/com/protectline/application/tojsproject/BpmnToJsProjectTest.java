@@ -67,6 +67,4 @@ class BpmnToJsProjectTest {
         // Then
         assertJsProjectIsEqualToExpected(fileUtil, process);
     }
-
-
 }

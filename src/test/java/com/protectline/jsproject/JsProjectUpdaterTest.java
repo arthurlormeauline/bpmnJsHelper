@@ -7,8 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
-import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedNewBlocks;
+import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
 import static com.protectline.util.FileUtil.getResourcePath;
 
 // WONT PASS
@@ -28,13 +29,17 @@ class JsProjectUpdaterTest {
     void should_update_project_from_blocks() throws IOException {
         // Given
         var process = "simplify";
-        var blocks = getExpectedNewBlocks();
+        var blocks = getExpectedBlocks();
+        var updaters= getUpdaters();
 
         // When
-        jsProjectUpdater.updateProject(process, blocks);
+        jsProjectUpdater.updateProject(process, blocks, updaters);
 
         // Then
         AssertUtil.assertJsProjectIsEqualToExpected(fileUtil, process);
     }
 
+    private List<JsUpdater> getUpdaters() {
+        return List.of();
+    }
 }

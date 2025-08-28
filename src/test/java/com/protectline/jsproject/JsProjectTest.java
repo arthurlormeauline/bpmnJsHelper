@@ -1,5 +1,6 @@
 package com.protectline.jsproject;
 
+import com.protectline.common.block.Block;
 import com.protectline.files.FileUtil;
 import com.protectline.util.AssertUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,8 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
-import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedNewBlocks;
+import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
+import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
 import static com.protectline.util.FileUtil.getResourcePath;
 
 // WONT PASS
@@ -29,7 +32,7 @@ class JsProjectTest {
     void updateProject() throws IOException {
         // Given
         var process = "simplify";
-        var blocks = getExpectedNewBlocks();
+        var blocks = getExpectedBlocks();
 
         // When
         jsProject.updateProject(process, blocks);

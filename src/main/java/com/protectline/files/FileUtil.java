@@ -10,6 +10,16 @@ import java.nio.file.Path;
 @Getter
 public class FileUtil {
 
+    private static final String INPUT = "input";
+    private static final String BLOCKS = "blocks";
+    private static final String OUTPUT = "output";
+    private static final String JS_TEMPLATE = "template";
+    private static final String UPDATER_TEMPLATE= "jsupdatertemplates";
+
+    public Path getWorkingDirectory() {
+        return workingDirectory;
+    }
+
     private final Path workingDirectory;
 
     public FileUtil(Path workingDirectory){
@@ -17,23 +27,27 @@ public class FileUtil {
     }
 
     public Path getBpmnFile(String processName) {
-        return workingDirectory.resolve("input").resolve(processName + ".bpmn");
+        return workingDirectory.resolve(INPUT).resolve(processName + ".bpmn");
     }
 
     public Path getBlocksFile(String process) {
-        return workingDirectory.resolve("blocks").resolve(process).resolve(process + ".json");
+        return workingDirectory.resolve(BLOCKS).resolve(process).resolve(process + ".json");
     }
 
     public Path getJsProjectDirectory(String processName) {
-        return workingDirectory.resolve("output").resolve(processName);
+        return workingDirectory.resolve(OUTPUT).resolve(processName);
+    }
+
+    public Path getUpdaterTemplateDirectory(String processName) {
+        return workingDirectory.resolve(UPDATER_TEMPLATE);
     }
 
     public Path getBpmnDirectory() {
-        return workingDirectory.resolve("input");
+        return workingDirectory.resolve(INPUT);
     }
 
     public Path getTemplateDirectory() {
-        return workingDirectory.resolve("template");
+        return workingDirectory.resolve(JS_TEMPLATE);
     }
 
     public void deleteJsDirectoryIfExists(String  process) throws IOException {
@@ -49,4 +63,7 @@ public class FileUtil {
         FileUtils.copyDirectory(templateSource.toFile(), destination.toFile());
     }
 
+    public Path getJsUpdaterTemplatesJsonFile() {
+        return workingDirectory.resolve("jsupdatertemplates.json");
+    }
 }

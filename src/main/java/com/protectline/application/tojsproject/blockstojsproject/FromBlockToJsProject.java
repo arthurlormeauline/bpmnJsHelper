@@ -1,5 +1,4 @@
 package com.protectline.application.tojsproject.blockstojsproject;
-
 import com.protectline.common.block.Block;
 import com.protectline.files.FileUtil;
 import com.protectline.jsproject.JsProject;
@@ -7,6 +6,7 @@ import com.protectline.jsproject.JsProject;
 import java.io.IOException;
 import java.util.List;
 
+import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
 
 public class FromBlockToJsProject {
 
@@ -19,8 +19,7 @@ public class FromBlockToJsProject {
     }
 
     public void updateJsProjectFromBlocks(String process) throws IOException {
-        // get blocks from file
-        List<Block> blocks = null;
+        List<Block> blocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
         jsProject.updateProject(process, blocks);
     }
 }

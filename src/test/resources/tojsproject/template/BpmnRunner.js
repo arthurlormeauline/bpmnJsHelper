@@ -62,7 +62,7 @@ class BpmnRunner {
         console.log(message);
     }
 
-    //<BT:MAIN/>
+    //<MAIN>
 }
 
 module.exports = BpmnRunner;

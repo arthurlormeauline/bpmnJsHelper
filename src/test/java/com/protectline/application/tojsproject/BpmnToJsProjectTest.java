@@ -9,9 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 
-import static com.protectline.util.DirectoryComparisonUtil.areDirectoriesEqual;
+import static com.protectline.util.AssertUtil.assertJsProjectIsCreated;
 import static com.protectline.util.FileUtil.getResourcePath;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,7 +25,7 @@ class BpmnToJsProjectTest {
     @BeforeEach
     void setUp() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
-        String testDirectory = "toJsProject";
+        String testDirectory = "tojsproject";
         Path resourcesPath = getResourcePath(BpmnToJsProjectTest.class, testDirectory);
 
         var testWorkingDirectory = tempDir.resolve("testData");
@@ -66,11 +65,8 @@ class BpmnToJsProjectTest {
         bpmnToJs.createProject(process);
 
         // Then
-        Path outputDir = fileUtil.getJsProjectDirectory(process);
-        assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
-        assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
-
-        Path expectedProject = fileUtil.getWorkingDirectory().resolve("expectedJsProject").resolve(process);
-        areDirectoriesEqual(outputDir, expectedProject);
+        assertJsProjectIsCreated(fileUtil, process);
     }
+
+
 }

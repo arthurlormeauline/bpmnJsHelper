@@ -9,14 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlock;
 import static com.protectline.util.FileUtil.getResourcePath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.setAllowComparingPrivateFields;
 
 
 class FunctionBlockBuilderTest {
@@ -27,7 +24,7 @@ class FunctionBlockBuilderTest {
     @BeforeEach
     void setup() throws URISyntaxException {
         builder = new FunctionBlockBuilder();
-        var testFolderName = "toJsProject";
+        var testFolderName = "tojsproject";
         var resourcePath = getResourcePath(FunctionBlockBuilderTest.class, testFolderName);
         fileUtil= new FileUtil(resourcePath);
     }

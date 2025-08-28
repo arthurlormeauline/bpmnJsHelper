@@ -4,14 +4,16 @@ import com.protectline.common.block.Block;
 import com.protectline.files.FileUtil;
 import com.protectline.jsproject.JsProject;
 
-import java.nio.file.Path;
 import java.util.List;
+
 
 public class FromBlockToJsProject {
 
     private final JsProject jsProject;
+    private final FileUtil fileUtil;
 
     public FromBlockToJsProject(FileUtil fileUtil) {
+        this.fileUtil = fileUtil;
         jsProject = new JsProject(fileUtil);
     }
 

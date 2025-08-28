@@ -18,7 +18,7 @@ class FromBpmnToBlocksTest {
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
-        var testDirectory = "toJsProject";
+        var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(FromBpmnToBlocksTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
         fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);

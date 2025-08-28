@@ -14,10 +14,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlock;
@@ -33,7 +31,7 @@ class MainBlockBuilderTest {
     @BeforeEach
     void setup() throws URISyntaxException {
         builder = new MainBlockBuilder();
-        var testDirectory = "toJsProject";
+        var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(MainBlockBuilderTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
     }

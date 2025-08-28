@@ -4,9 +4,7 @@ import com.protectline.application.tobpmn.blockstobpmn.FromBlockToBpmn;
 import com.protectline.application.tobpmn.jstoblocks.FromJsProjectToBlocks;
 import com.protectline.files.FileUtil;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class JsProjectToBpmn {
     private final FromJsProjectToBlocks jsToBlocks;
@@ -18,7 +16,7 @@ public class JsProjectToBpmn {
     }
 
     public void updateBpmn(String process) throws IOException {
-        jsToBlocks.createBlocksFromJsProject();
+        jsToBlocks.updateBlockFromJsProject(process);
         blocksToBpmn.updateBpmnFromBlocks(process);
     }
 }

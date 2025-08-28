@@ -62,7 +62,7 @@ class BpmnRunner {
         console.log(message);
     }
 
-    // Les méthodes générées seront ajoutées ici
+//<MAIN>
 }
 
 module.exports = BpmnRunner;

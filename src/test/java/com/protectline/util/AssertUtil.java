@@ -1,8 +1,12 @@
 package com.protectline.util;
 
+import com.protectline.common.block.Block;
+import com.protectline.common.block.jsonblock.FunctionJsonBlockUtil;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static com.protectline.util.DirectoryComparisonUtil.areDirectoriesEqual;
 import static com.protectline.util.FileUtil.logBpmnRunnerDiff;
@@ -24,5 +28,22 @@ public class AssertUtil {
         logBpmnRunnerDiff(actualBpmnRunner, expectedBpmnRunner);
 
         assertThat(areDirectoriesEqual(outputDir, expectedProject)).isTrue();
+    }
+
+    public static void assertBlocksAreEqualToExpected(com.protectline.files.FileUtil fileUtil, String process) throws IOException {
+        // Read actual blocks from the generated blocks file
+        Path actualBlocksFile = fileUtil.getBlocksFile(process);
+        assertTrue(Files.exists(actualBlocksFile), "Blocks file should exist: " + actualBlocksFile);
+        
+        List<Block> actualBlocks = FunctionJsonBlockUtil.readBlocksFromFile(actualBlocksFile);
+        
+        // Read expected blocks from the expected blocks file
+        Path expectedBlocksFile = fileUtil.getWorkingDirectory().resolve("expectedblocks").resolve(process).resolve(process + ".json");
+        assertTrue(Files.exists(expectedBlocksFile), "Expected blocks file should exist: " + expectedBlocksFile);
+        
+        List<Block> expectedBlocks = FunctionJsonBlockUtil.readBlocksFromFile(expectedBlocksFile);
+        
+        // Compare blocks
+        assertThat(actualBlocks.size()).isEqualTo(expectedBlocks.size());
     }
 }

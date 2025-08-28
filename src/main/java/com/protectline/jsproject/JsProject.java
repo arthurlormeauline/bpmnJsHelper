@@ -15,10 +15,10 @@ public class JsProject {
     }
 
     public void updateProject(String process, List<Block> blocks) {
-
+        // todo
     }
 
-    public List<Block> getBlocks() {
+    public List<Block> updateBlocks() {
         return null;
     }
 }

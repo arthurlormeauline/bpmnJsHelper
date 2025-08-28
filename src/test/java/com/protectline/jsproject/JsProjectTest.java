@@ -41,7 +41,7 @@ class JsProjectTest {
 
 
     @Test
-    void getBlocks() {
+    void updateBlocks() {
         // todo
     }
 }

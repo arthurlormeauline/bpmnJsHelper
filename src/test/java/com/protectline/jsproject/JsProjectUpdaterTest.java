@@ -5,7 +5,6 @@ import com.protectline.util.AssertUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -13,34 +12,29 @@ import static com.protectline.application.tojsproject.stub.StubBlock.getExpected
 import static com.protectline.util.FileUtil.getResourcePath;
 
 // WONT PASS
-class JsProjectTest {
+class JsProjectUpdaterTest {
 
-    private JsProject jsProject;
+    private JsProjectUpdater jsProjectUpdater;
     private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws URISyntaxException {
         var testDirectory = "tojsproject";
-        fileUtil = new FileUtil(getResourcePath(JsProjectTest.class, testDirectory));
-        jsProject = new JsProject(fileUtil);
+        fileUtil = new FileUtil(getResourcePath(JsProjectUpdaterTest.class, testDirectory));
+        jsProjectUpdater = new JsProjectUpdater(fileUtil);
     }
 
     @Test
-    void updateProject() throws IOException {
+    void should_update_project_from_blocks() throws IOException {
         // Given
         var process = "simplify";
         var blocks = getExpectedNewBlocks();
 
         // When
-        jsProject.updateProject(process, blocks);
+        jsProjectUpdater.updateProject(process, blocks);
 
         // Then
         AssertUtil.assertJsProjectIsEqualToExpected(fileUtil, process);
     }
 
-
-    @Test
-    void updateBlocks() {
-        // todo
-    }
 }

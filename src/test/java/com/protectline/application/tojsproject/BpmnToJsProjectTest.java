@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import static com.protectline.util.AssertUtil.assertJsProjectIsCreated;
+import static com.protectline.util.AssertUtil.assertJsProjectIsEqualToExpected;
 import static com.protectline.util.FileUtil.getResourcePath;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -65,7 +65,7 @@ class BpmnToJsProjectTest {
         bpmnToJs.createProject(process);
 
         // Then
-        assertJsProjectIsCreated(fileUtil, process);
+        assertJsProjectIsEqualToExpected(fileUtil, process);
     }
 
 

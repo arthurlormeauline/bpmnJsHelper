@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static com.protectline.util.AssertUtil.assertJsProjectIsCreated;
+import static com.protectline.util.AssertUtil.assertJsProjectIsEqualToExpected;
 import static com.protectline.util.FileUtil.getResourcePath;
 
 // WONT PASS
@@ -31,7 +31,7 @@ class FromBlockToJsProjectTest {
         fromBlockToJsProject.updateJsProjectFromBlocks(process);
 
         // Then
-        assertJsProjectIsCreated(fileUtil, process);
+        assertJsProjectIsEqualToExpected(fileUtil, process);
     }
 
 }

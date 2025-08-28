@@ -1,8 +1,10 @@
 package com.protectline.files;
 
 import lombok.Getter;
+import org.apache.commons.io.FileUtils;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
@@ -28,6 +30,23 @@ public class FileUtil {
 
     public Path getBpmnDirectory() {
         return workingDirectory.resolve("input");
+    }
+
+    public Path getTemplateDirectory() {
+        return workingDirectory.resolve("template");
+    }
+
+    public void deleteJsDirectoryIfExists(String  process) throws IOException {
+        var directory = getJsProjectDirectory(process);
+        if (Files.exists(directory)) {
+            FileUtils.deleteDirectory(directory.toFile());
+        }
+    }
+
+    public void copyTemplateToJsDirectory(String process) throws IOException {
+        var templateSource= getTemplateDirectory();
+        var destination = getJsProjectDirectory(process);
+        FileUtils.copyDirectory(templateSource.toFile(), destination.toFile());
     }
 
 }

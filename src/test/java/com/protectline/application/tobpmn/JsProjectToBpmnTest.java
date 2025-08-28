@@ -1,5 +1,6 @@
 package com.protectline.application.tobpmn;
 
+import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,23 +19,19 @@ class JsProjectToBpmnTest {
 
     @TempDir
     private Path tempDir;
-
-    private Path testWorkingDirectory;
-    private Path jsProjectOutputPath;
-
+    private FileUtil fileUtil;
     @BeforeEach
     void setUp() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
         Path resourcesPath = Path.of(Objects.requireNonNull(
                 JsProjectToBpmnTest.class.getClassLoader().getResource("tobpmn")).toURI());
 
-        testWorkingDirectory = tempDir.resolve("testData");
+        var testWorkingDirectory = tempDir.resolve("testData");
+        fileUtil = new FileUtil(testWorkingDirectory);
         Files.createDirectories(testWorkingDirectory);
 
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
-        
-        jsProjectOutputPath = testWorkingDirectory.resolve("output");
     }
     
 
@@ -42,9 +39,10 @@ class JsProjectToBpmnTest {
     void should_update_bpmn_from_jsProject() throws IOException {
         // Given
         String processName = "simplify";
+        var testWorkingDirectory = fileUtil.getWorkingDirectory();
         Path bpmnFile = testWorkingDirectory.resolve("input/simplify.bpmn");
 
-        File jsProjectDir = jsProjectOutputPath.resolve(processName).toFile();
+        File jsProjectDir = fileUtil.getJsProjectDirectory(processName).toFile();
 
         if (!jsProjectDir.exists() || !jsProjectDir.isDirectory()) {
             throw new RuntimeException("JS project directory not found: " + processName);

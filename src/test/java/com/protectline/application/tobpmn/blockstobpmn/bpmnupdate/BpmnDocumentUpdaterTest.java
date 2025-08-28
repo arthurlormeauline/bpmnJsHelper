@@ -3,6 +3,7 @@ package com.protectline.application.tobpmn.blockstobpmn.bpmnupdate;
 import com.protectline.bpmndocument.model.NodeType;
 import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.application.tobpmn.blockstobpmn.bpmnupdater.BpmnDocumentUpdater;
+import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +24,8 @@ class BpmnDocumentUpdaterTest {
 
     @TempDir
     private Path tempDir;
-    private Path testWorkingDirectory;
-
     private BpmnDocumentUpdater mainUpdater;
+    private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
@@ -33,7 +33,8 @@ class BpmnDocumentUpdaterTest {
         Path resourcesPath = Path.of(Objects.requireNonNull(
                 BpmnDocumentUpdaterTest.class.getClassLoader().getResource("tobpmn")).toURI());
 
-        testWorkingDirectory = tempDir.resolve("testData");
+        var testWorkingDirectory = tempDir.resolve("testData");
+        fileUtil = new FileUtil(testWorkingDirectory);
         Files.createDirectories(testWorkingDirectory);
 
         // Copier récursivement toute la structure
@@ -51,8 +52,9 @@ class BpmnDocumentUpdaterTest {
     void should_update_bpmn_document() throws IOException {
         // Given
         String processName = "simplify";
+        var testWorkingDirectory = fileUtil.getWorkingDirectory();
         BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, processName);
-        Path bpmnFile = testWorkingDirectory.resolve("input/simplify.bpmn");
+        Path bpmnFile = fileUtil.getBpmnFile(processName);
 
         // When
         mainUpdater.updateDocument(document);

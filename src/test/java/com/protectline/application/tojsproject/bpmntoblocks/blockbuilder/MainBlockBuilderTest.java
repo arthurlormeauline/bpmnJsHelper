@@ -6,6 +6,7 @@ import com.protectline.common.block.Block;
 import com.protectline.application.tojsproject.bpmntoblocks.BlockBuilder;
 import com.protectline.application.tojsproject.bpmntoblocks.MainBlockBuilder;
 import com.protectline.application.tojsproject.bpmntoblocks.functionblock.FunctionBlockBuilder;
+import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,17 +26,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class MainBlockBuilderTest {
 
     private MainBlockBuilder builder;
-    private String testFolderName;
-    private Path resourcePath;
-    private Path workingdir;
+    private FileUtil fileUtil;
+
 
     @BeforeEach
     void setup() throws URISyntaxException {
         builder = new MainBlockBuilder();
-        testFolderName = "toJsProject";
-        resourcePath = Path.of(Objects.requireNonNull(
+        var testFolderName = "toJsProject";
+        var resourcePath = Path.of(Objects.requireNonNull(
                 MainBlockBuilderTest.class.getClassLoader().getResource(testFolderName)).toURI()).getParent();
-        workingdir = resourcePath.resolve(testFolderName);
+        fileUtil = new FileUtil(resourcePath.resolve(testFolderName));
     }
 
     @ParameterizedTest
@@ -43,6 +43,7 @@ class MainBlockBuilderTest {
     void should_extract_all_blocks(List<BlockBuilder> builders) throws IOException {
         // Given
         var process = "simplify";
+        var workingdir = fileUtil.getWorkingDirectory();
         var document = new BpmnCamundaDocument(workingdir, process);
 
         // When

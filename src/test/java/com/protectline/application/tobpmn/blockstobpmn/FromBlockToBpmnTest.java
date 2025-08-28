@@ -1,5 +1,6 @@
 package com.protectline.application.tobpmn.blockstobpmn;
 
+import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -16,9 +17,8 @@ import static com.protectline.util.FileUtil.copyDirectory;
 class FromBlockToBpmnTest {
     @TempDir
     private Path tempDir;
-    private Path testWorkingDirectory;
-
     private FromBlockToBpmn fromBlockToBpmn;
+    private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
@@ -26,7 +26,8 @@ class FromBlockToBpmnTest {
         Path resourcesPath = Path.of(Objects.requireNonNull(
                 FromBlockToBpmnTest.class.getClassLoader().getResource("tobpmn")).toURI());
 
-        testWorkingDirectory = tempDir.resolve("testData");
+        var testWorkingDirectory = tempDir.resolve("testData");
+        fileUtil = new FileUtil(testWorkingDirectory);
         Files.createDirectories(testWorkingDirectory);
 
         // Copier récursivement toute la structure
@@ -39,6 +40,7 @@ class FromBlockToBpmnTest {
     void should_update_bpmn_document() throws IOException {
         // Given
         String processName = "simplifyInter";
+        var testWorkingDirectory = fileUtil.getWorkingDirectory();
         Path bpmnFile = testWorkingDirectory.resolve("input/simplifyInter.bpmn");
 
         // When

@@ -7,10 +7,12 @@ import org.xmlunit.diff.Difference;
 import org.xmlunit.diff.DifferenceEvaluator;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
+import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -69,4 +71,8 @@ public class FileUtil {
         Files.writeString(expectedModify, backUpExpected);
     }
 
+    public static Path getResourcePath(Class<?> resourceClass, String resource) throws URISyntaxException {
+        return Path.of(Objects.requireNonNull(
+                resourceClass.getClassLoader().getResource(resource)).toURI());
+    }
 }

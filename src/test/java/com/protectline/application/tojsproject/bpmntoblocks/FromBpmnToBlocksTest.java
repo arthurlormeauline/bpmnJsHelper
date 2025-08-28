@@ -3,6 +3,7 @@ package com.protectline.application.tojsproject.bpmntoblocks;
 import com.protectline.application.tobpmn.blockstobpmn.FromBlockToBpmn;
 import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.application.tojsproject.bpmntoblocks.functionblock.FunctionBlockBuilder;
+import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,23 +19,20 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
-import static com.protectline.files.FileUtil.getBlocksFile;
+import static com.protectline.util.FileUtil.getResourcePath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class FromBpmnToBlocksTest {
 
     private FromBpmnToBlocks fromBpmnToBlocks;
-    private String testFolderName;
-    private Path resourcePath;
-    private Path workingdir;
+    private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
-        testFolderName = "toJsProject";
-        resourcePath = Path.of(Objects.requireNonNull(
-                FromBpmnToBlocksTest.class.getClassLoader().getResource(testFolderName)).toURI()).getParent();
-        workingdir = resourcePath.resolve(testFolderName);
-        fromBpmnToBlocks = new FromBpmnToBlocks(workingdir);
+        var testFolderName = "toJsProject";
+        var resourcePath = getResourcePath(FromBpmnToBlocksTest.class, testFolderName);
+        fileUtil = new FileUtil(resourcePath.resolve(testFolderName));
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil.getWorkingDirectory());
     }
 
 
@@ -42,13 +40,13 @@ class FromBpmnToBlocksTest {
     void should_extract_all_blocks() throws IOException {
         // Given
         var process = "simplify";
-
+        var workingdir = fileUtil.getWorkingDirectory();
         // When
         fromBpmnToBlocks.createBlocksFromBpmn(process);
 
         // Then
         var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks").resolve(process).resolve(process+".json"));
-        var actualBlocks = readBlocksFromFile(getBlocksFile(workingdir, process));
+        var actualBlocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
         assertThat(actualBlocks).isEqualTo(expectedBlock);
     }
 }

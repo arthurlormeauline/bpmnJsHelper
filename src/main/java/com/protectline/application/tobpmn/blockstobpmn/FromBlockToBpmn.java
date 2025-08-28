@@ -4,32 +4,33 @@ import com.protectline.bpmndocument.BpmnDocument;
 import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.common.block.Block;
 import com.protectline.application.tobpmn.blockstobpmn.bpmnupdater.BpmnDocumentUpdater;
+import com.protectline.files.FileUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
-import static com.protectline.files.FileUtil.getBlocksFile;
 
 public class FromBlockToBpmn {
 
-    private final Path workingDirectory;
+    private final FileUtil fileUtil;
 
-    public FromBlockToBpmn(Path workingDirectory) {
-        this.workingDirectory = workingDirectory;
+    public FromBlockToBpmn(FileUtil fileUtil) {
+        this.fileUtil = fileUtil;
     }
 
     public void updateBpmnFromBlocks(String process) throws IOException {
-        BpmnDocument document = new BpmnCamundaDocument(workingDirectory, process);
+        File bpmnFile = fileUtil.getBpmnFile(process).toFile();
+        BpmnDocument document = new BpmnCamundaDocument(bpmnFile);
 
-        List<Block> blocks = readBlocksFromFile(getBlocksFile(workingDirectory, process));
+        List<Block> blocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
 
         var bpmnDocumentUpdater = new BpmnDocumentUpdater(blocks);
         bpmnDocumentUpdater.updateDocument(document);
 
-        String fileName = "input/" + process + ".bpmn";
-        document.writeToFile(workingDirectory.resolve(fileName).toFile());
+        document.writeToFile(bpmnFile);
     }
 
 }

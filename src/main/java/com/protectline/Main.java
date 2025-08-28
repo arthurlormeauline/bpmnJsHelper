@@ -2,6 +2,7 @@ package com.protectline;
 
 import com.protectline.application.Application;
 import com.protectline.application.tojsproject.bpmntoblocks.FromBpmnToBlocks;
+import com.protectline.files.FileUtil;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,8 +14,8 @@ public class Main {
 //       Application.run(args);
 
         var testFolderName = "toJsProject";
-        var workingdir = Path.of(testFolderName);
-        var fromBpmnToBlocks = new FromBpmnToBlocks(workingdir);
+        var fileUtil = new FileUtil(Path.of(testFolderName));
+        var fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);
         var process = "simplify";
 
         // When

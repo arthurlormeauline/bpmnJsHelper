@@ -11,20 +11,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import static com.protectline.util.FileUtil.compareBpmnFiles;
-import static com.protectline.util.FileUtil.copyDirectory;
+import static com.protectline.util.FileUtil.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// WONT PASS
 class JsProjectToBpmnTest {
 
     @TempDir
     private Path tempDir;
     private FileUtil fileUtil;
+
     @BeforeEach
     void setUp() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = Path.of(Objects.requireNonNull(
-                JsProjectToBpmnTest.class.getClassLoader().getResource("tobpmn")).toURI());
+        String testDirectory = "tobpmn";
+        Path resourcesPath = getResourcePath(JsProjectToBpmnTest.class, testDirectory);
 
         var testWorkingDirectory = tempDir.resolve("testData");
         fileUtil = new FileUtil(testWorkingDirectory);
@@ -49,7 +50,7 @@ class JsProjectToBpmnTest {
         }
 
         // When
-        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(testWorkingDirectory);
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
         jsProjectToBpmn.updateBpmn(processName);
 
         // Then

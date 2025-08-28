@@ -2,7 +2,9 @@ package com.protectline.application.tobpmn;
 
 import com.protectline.application.tobpmn.blockstobpmn.FromBlockToBpmn;
 import com.protectline.application.tobpmn.jstoblocks.FromJsProjectToBlocks;
+import com.protectline.files.FileUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -10,9 +12,9 @@ public class JsProjectToBpmn {
     private final FromJsProjectToBlocks jsToBlocks;
     private final FromBlockToBpmn blocksToBpmn;
 
-    public JsProjectToBpmn(Path workingDirectory) {
-        this.jsToBlocks = new FromJsProjectToBlocks(workingDirectory);
-        this.blocksToBpmn = new FromBlockToBpmn(workingDirectory);
+    public JsProjectToBpmn(FileUtil fileUtil) {
+        this.jsToBlocks = new FromJsProjectToBlocks(fileUtil);
+        this.blocksToBpmn = new FromBlockToBpmn(fileUtil);
     }
 
     public void updateBpmn(String process) throws IOException {

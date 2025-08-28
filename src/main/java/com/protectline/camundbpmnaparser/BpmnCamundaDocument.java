@@ -6,6 +6,7 @@ import com.protectline.bpmndocument.model.Node;
 import com.protectline.bpmndocument.model.ScriptNode;
 import com.protectline.bpmndocument.model.ServiceTaskNode;
 import com.protectline.bpmndocument.model.StartNode;
+import com.protectline.files.FileUtil;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ScriptTask;
@@ -22,13 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.protectline.camundbpmnaparser.DomElementUtil.getScriptsAsDomElement;
-import static com.protectline.files.FileUtil.getBpmnFile;
 
 public class BpmnCamundaDocument implements BpmnDocument {
     private BpmnModelInstance modelInstance = null;
 
-    public BpmnCamundaDocument(Path workingDirectory, String processName) throws IOException {
-        File processFile = getBpmnFile(workingDirectory, processName);
+    public BpmnCamundaDocument(File processFile) throws IOException {
         formatBpmnFile(processFile);
         this.modelInstance = Bpmn.readModelFromFile(processFile);
     }

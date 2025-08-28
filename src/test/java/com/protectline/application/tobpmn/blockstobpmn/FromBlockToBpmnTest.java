@@ -11,8 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import static com.protectline.util.FileUtil.compareBpmnFiles;
-import static com.protectline.util.FileUtil.copyDirectory;
+import static com.protectline.util.FileUtil.*;
 
 class FromBlockToBpmnTest {
     @TempDir
@@ -23,8 +22,8 @@ class FromBlockToBpmnTest {
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
         // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = Path.of(Objects.requireNonNull(
-                FromBlockToBpmnTest.class.getClassLoader().getResource("tobpmn")).toURI());
+        String testDirectory = "tobpmn";
+        Path resourcesPath = getResourcePath(FromBlockToBpmnTest.class, testDirectory);
 
         var testWorkingDirectory = tempDir.resolve("testData");
         fileUtil = new FileUtil(testWorkingDirectory);
@@ -33,7 +32,7 @@ class FromBlockToBpmnTest {
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
 
-        fromBlockToBpmn = new FromBlockToBpmn(testWorkingDirectory);
+        fromBlockToBpmn = new FromBlockToBpmn(fileUtil);
     }
 
     @Test

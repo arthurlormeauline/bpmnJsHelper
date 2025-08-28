@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlock;
+import static com.protectline.util.FileUtil.getResourcePath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class MainBlockBuilderTest {
@@ -32,10 +33,9 @@ class MainBlockBuilderTest {
     @BeforeEach
     void setup() throws URISyntaxException {
         builder = new MainBlockBuilder();
-        var testFolderName = "toJsProject";
-        var resourcePath = Path.of(Objects.requireNonNull(
-                MainBlockBuilderTest.class.getClassLoader().getResource(testFolderName)).toURI()).getParent();
-        fileUtil = new FileUtil(resourcePath.resolve(testFolderName));
+        var testDirectory = "toJsProject";
+        var resourcePath = getResourcePath(MainBlockBuilderTest.class, testDirectory);
+        fileUtil = new FileUtil(resourcePath);
     }
 
     @ParameterizedTest
@@ -43,8 +43,7 @@ class MainBlockBuilderTest {
     void should_extract_all_blocks(List<BlockBuilder> builders) throws IOException {
         // Given
         var process = "simplify";
-        var workingdir = fileUtil.getWorkingDirectory();
-        var document = new BpmnCamundaDocument(workingdir, process);
+        var document = new BpmnCamundaDocument(fileUtil.getBpmnFile(process).toFile());
 
         // When
         List<Block> actual = builder

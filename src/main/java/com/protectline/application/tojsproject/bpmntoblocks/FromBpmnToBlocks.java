@@ -5,6 +5,7 @@ import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.common.block.Block;
 import com.protectline.application.tojsproject.bpmntoblocks.functionblock.FunctionBlockBuilder;
 import com.protectline.common.block.FunctionBlock;
+import com.protectline.files.FileUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,14 +15,14 @@ import java.util.List;
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.writeBlocksToFile;
 
 public class FromBpmnToBlocks {
-    private final Path workingDirectory;
+    private final FileUtil fileUtil;
 
-    public FromBpmnToBlocks(Path workingDirectory) throws IOException {
-        this.workingDirectory = workingDirectory;
+    public FromBpmnToBlocks(FileUtil fileUtil) throws IOException {
+        this.fileUtil = fileUtil;
     }
 
     public void createBlocksFromBpmn(String process) throws IOException {
-        BpmnDocument document = new BpmnCamundaDocument(workingDirectory, process);
+        BpmnDocument document = new BpmnCamundaDocument(fileUtil.getBpmnFile(process).toFile());
         List<Block> blocks = new MainBlockBuilder().
                 registerSubBlockBuilder(new FunctionBlockBuilder())
                 .getBlocks(document);
@@ -32,9 +33,8 @@ public class FromBpmnToBlocks {
                 .toList();
 
         // Créer le répertoire et écrire tous les blocs dans un seul fichier JSON
-        Path blockDirectory = workingDirectory.resolve("blocks").resolve(process);
-        Files.createDirectories(blockDirectory);
-        Path blocksFile = blockDirectory.resolve(process + ".json");
+        Path blocksFile = fileUtil.getBlocksFile(process);
+        Files.createDirectories(blocksFile.getParent());
         writeBlocksToFile(functionBlocks, blocksFile);
     }
 }

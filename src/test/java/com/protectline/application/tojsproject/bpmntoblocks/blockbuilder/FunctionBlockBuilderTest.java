@@ -29,15 +29,14 @@ class FunctionBlockBuilderTest {
         builder = new FunctionBlockBuilder();
         var testFolderName = "toJsProject";
         var resourcePath = getResourcePath(FunctionBlockBuilderTest.class, testFolderName);
-        var testWorkingDirectory = resourcePath.resolve(testFolderName);
-        fileUtil= new FileUtil(testWorkingDirectory);
+        fileUtil= new FileUtil(resourcePath);
     }
 
     @Test
     void should_get_function_block_from_document() throws IOException {
         // Given
-        var testWorkingDirectory = fileUtil.getWorkingDirectory();
-        BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, "simplify");
+        var process = "simplify";
+        BpmnCamundaDocument document = new BpmnCamundaDocument(fileUtil.getBpmnFile(process).toFile());
 
         // When
         var actual = builder.getBlocks(document);

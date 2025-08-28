@@ -9,14 +9,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import static com.protectline.util.FileUtil.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// WONT PASS
 class BackAndForthTest {
 
     @TempDir
@@ -26,7 +25,8 @@ class BackAndForthTest {
     @BeforeEach
     void setUp() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = getResourcePath(BackAndForthTest.class, "backAndForth");
+        String testDirectory = "backAndForth";
+        Path resourcesPath = getResourcePath(BackAndForthTest.class, testDirectory);
 
         var testWorkingDirectory = tempDir.resolve("testData");
         Files.createDirectories(testWorkingDirectory);
@@ -35,7 +35,6 @@ class BackAndForthTest {
         copyDirectory(resourcesPath, testWorkingDirectory);
         this.fileUtil = new FileUtil(testWorkingDirectory);
     }
-
 
 
     @Test
@@ -53,7 +52,7 @@ class BackAndForthTest {
         for (File bpmnFile : bpmnFiles) {
             String processName = bpmnFile.getName().replace(".bpmn", "");
 
-            BpmnToJS bpmnToJs = new BpmnToJS(workDir);
+            BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
             bpmnToJs.createProject(processName);
 
             // Vérifier que le projet JS a été créé
@@ -61,7 +60,7 @@ class BackAndForthTest {
             assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
             assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(workDir);
+            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
             jsProjectToBpmn.updateBpmn(processName);
 
             assertTrue(Files.exists(bpmnFile.toPath()),
@@ -79,7 +78,7 @@ class BackAndForthTest {
         var bpmnFile = fileUtil.getBpmnFile(process);
         var workDir = fileUtil.getWorkingDirectory();
 
-        BpmnToJS bpmnToJs = new BpmnToJS(workDir);
+        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
         bpmnToJs.createProject(process);
 
         // Vérifier que le projet JS a été créé
@@ -87,13 +86,13 @@ class BackAndForthTest {
         assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
         assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(workDir);
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
         jsProjectToBpmn.updateBpmn(process);
 
         assertTrue(Files.exists(bpmnFile),
                 "BPMN file should be recreated: " + bpmnFile.getFileName().toString());
 
-      Path backupfile = workDir.resolve("backup").resolve(process);
-            compareBpmnFiles(bpmnFile, backupfile);
+        Path backupfile = workDir.resolve("backup").resolve(process);
+        compareBpmnFiles(bpmnFile, backupfile);
     }
 }

@@ -3,6 +3,7 @@ package com.protectline.application;
 import com.google.common.io.Resources;
 import com.protectline.application.tobpmn.JsProjectToBpmn;
 import com.protectline.application.tojsproject.BpmnToJS;
+import com.protectline.files.FileUtil;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,15 +30,15 @@ public class Application {
 
     private static void toBpmn(String process) throws URISyntaxException, IOException {
         System.out.println("Update bpmn file from js project");
-        Path workingDirectory = Path.of(Resources.getResource("/").toURI());
-        JsProjectToBpmn toBpmn = new JsProjectToBpmn(workingDirectory);
+        FileUtil fileUtil = new FileUtil(Path.of(Resources.getResource("/").toURI()));
+        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil);
         toBpmn.updateBpmn(process);
     }
 
     private static void toJsProject(String process) throws URISyntaxException, IOException {
         System.out.println("Create js project from bpmn file");
         Path workingDirectory = Path.of(Resources.getResource("/").toURI());
-        BpmnToJS toJs = new BpmnToJS(workingDirectory);
+        BpmnToJS toJs = new BpmnToJS(new FileUtil(workingDirectory));
         toJs.createProject(process);
     }
 }

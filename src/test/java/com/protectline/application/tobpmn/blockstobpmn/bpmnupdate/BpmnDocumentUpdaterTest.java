@@ -15,9 +15,8 @@ import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.io.TempDir;
 
-import static com.protectline.util.FileUtil.compareBpmnFiles;
-import static com.protectline.util.FileUtil.copyDirectory;
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlock;
+import static com.protectline.util.FileUtil.*;
 
 
 class BpmnDocumentUpdaterTest {
@@ -30,8 +29,8 @@ class BpmnDocumentUpdaterTest {
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
          // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = Path.of(Objects.requireNonNull(
-                BpmnDocumentUpdaterTest.class.getClassLoader().getResource("tobpmn")).toURI());
+        var testDirectory = "tobpmn";
+        Path resourcesPath = getResourcePath(BpmnDocumentUpdaterTest.class, testDirectory);
 
         var testWorkingDirectory = tempDir.resolve("testData");
         fileUtil = new FileUtil(testWorkingDirectory);
@@ -53,7 +52,7 @@ class BpmnDocumentUpdaterTest {
         // Given
         String processName = "simplify";
         var testWorkingDirectory = fileUtil.getWorkingDirectory();
-        BpmnCamundaDocument document = new BpmnCamundaDocument(testWorkingDirectory, processName);
+        BpmnCamundaDocument document = new BpmnCamundaDocument(fileUtil.getBpmnFile(processName).toFile());
         Path bpmnFile = fileUtil.getBpmnFile(processName);
 
         // When
@@ -62,7 +61,7 @@ class BpmnDocumentUpdaterTest {
         // Then
         document.writeToFile(bpmnFile.toFile());
 
-        Path expectedModify = testWorkingDirectory.resolve("expectedBpmnFile/simplify_expected_modify.bpmn");
+        Path expectedModify = testWorkingDirectory.resolve("expectedBpmnFile").resolve("simplify_expected_modify.bpmn");
         compareBpmnFiles(bpmnFile, expectedModify);
     }
 }

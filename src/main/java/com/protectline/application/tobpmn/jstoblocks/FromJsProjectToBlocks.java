@@ -1,12 +1,12 @@
 package com.protectline.application.tobpmn.jstoblocks;
 
-import java.nio.file.Path;
+import com.protectline.files.FileUtil;
 
 public class FromJsProjectToBlocks {
-    private final Path workingDirectory;
+    private final FileUtil fileUtil;
 
-    public FromJsProjectToBlocks(Path workingDirectory) {
-        this.workingDirectory = workingDirectory;
+    public FromJsProjectToBlocks(FileUtil fileUtil) {
+        this.fileUtil = fileUtil;
     }
 
     public void createBlocksFromJsProject(){

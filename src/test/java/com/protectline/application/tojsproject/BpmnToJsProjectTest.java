@@ -1,5 +1,6 @@
 package com.protectline.application.tojsproject;
 
+import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,31 +12,31 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 import static com.protectline.util.DirectoryComparisonUtil.areDirectoriesEqual;
+import static com.protectline.util.FileUtil.getResourcePath;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// WONT PASS
 class BpmnToJsProjectTest {
 
     @TempDir
     Path tempDir;
+    private FileUtil fileUtil;
 
-    private Path testWorkingDirectory;
-    private Path inputPath;
 
     @BeforeEach
     void setUp() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = Path.of(Objects.requireNonNull(
-                BpmnToJsProjectTest.class.getClassLoader().getResource("toJsProject")).toURI());
-        
-        testWorkingDirectory = tempDir.resolve("testData");
+        String testDirectory = "toJsProject";
+        Path resourcesPath = getResourcePath(BpmnToJsProjectTest.class, testDirectory);
+
+        var testWorkingDirectory = tempDir.resolve("testData");
+        fileUtil = new FileUtil(testWorkingDirectory);
         Files.createDirectories(testWorkingDirectory);
-        
+
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
-        
-        inputPath = testWorkingDirectory.resolve("input");
     }
-    
+
     private void copyDirectory(Path source, Path target) throws IOException {
         try (var walk = Files.walk(source)) {
             walk.forEach(sourcePath -> {
@@ -61,15 +62,15 @@ class BpmnToJsProjectTest {
         var process = "simplify";
 
         // When
-        BpmnToJS bpmnToJs = new BpmnToJS(testWorkingDirectory);
+        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
         bpmnToJs.createProject(process);
 
         // Then
-        Path outputDir = testWorkingDirectory.resolve("output").resolve(process);
+        Path outputDir = fileUtil.getJsProjectDirectory(process);
         assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
         assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-        Path expectedProject = testWorkingDirectory.resolve("expectedJsProject").resolve(process);
+        Path expectedProject = fileUtil.getWorkingDirectory().resolve("expectedJsProject").resolve(process);
         areDirectoriesEqual(outputDir, expectedProject);
     }
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class JsUpdaterTemplateUtil {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static List<JsUpdaterTemplate> readTemplatesFromFile(FileUtil fileUtil) throws IOException {
+    public static List<JsUpdaterTemplate> readJsUpdaterTemplatesFromFile(FileUtil fileUtil) throws IOException {
         Path templatesFile = fileUtil.getJsUpdaterTemplatesJsonFile();
         List<JsUpdaterTemplateJson> jsonTemplates = objectMapper.readValue(
             templatesFile.toFile(), 

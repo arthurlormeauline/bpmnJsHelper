@@ -1,6 +1,9 @@
 package com.protectline.jsproject;
 
 import com.protectline.files.FileUtil;
+import com.protectline.jsproject.jsupdater.FunctionUpdater;
+import com.protectline.jsproject.jsupdater.MainUpdater;
+import com.protectline.jsproject.updatertemplate.JsUpdaterTemplate;
 import com.protectline.util.AssertUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
+import static com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
 import static com.protectline.util.FileUtil.getResourcePath;
 
 // WONT PASS
@@ -39,7 +43,16 @@ class JsProjectUpdaterTest {
         AssertUtil.assertJsProjectIsEqualToExpected(fileUtil, process);
     }
 
-    private List<JsUpdater> getUpdaters() {
-        return List.of();
+    private List<JsUpdater> getUpdaters() throws IOException {
+        var templates=readJsUpdaterTemplatesFromFile(fileUtil);
+        var mainUpdaterTemplate = templates.stream()
+                .filter(template -> template.getName().equals("MAIN"))
+                .findFirst()
+                .get();
+        var functionUpdaterTemplate = templates.stream()
+                .filter(template -> template.getName().equals("FUNCTION"))
+                .findFirst()
+                .get();
+        return List.of(new MainUpdater(mainUpdaterTemplate), new FunctionUpdater(functionUpdaterTemplate));
     }
 }

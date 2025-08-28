@@ -64,6 +64,6 @@ public class FileUtil {
     }
 
     public Path getJsUpdaterTemplatesJsonFile() {
-        return workingDirectory.resolve("jsupdatertemplates.json");
+        return workingDirectory.resolve("jsupdatertemplates/jsupdatertemplates.json");
     }
 }

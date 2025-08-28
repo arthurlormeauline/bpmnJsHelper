@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.protectline.jsproject.jsupdater.JsUpdaterFactory.getJsUpdaters;
-import static com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil.readTemplatesFromFile;
+import static com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
 
 public class JsProject {
 
@@ -22,7 +22,7 @@ public class JsProject {
     public void updateProject(String process, List<Block> blocks) throws IOException {
         fileUtil.deleteJsDirectoryIfExists(process);
         fileUtil.copyTemplateToJsDirectory(process);
-        var jsUpdaterTemplates = readTemplatesFromFile(fileUtil);
+        var jsUpdaterTemplates = readJsUpdaterTemplatesFromFile(fileUtil);
         var updaters = getJsUpdaters(blocks, jsUpdaterTemplates);
         jsProjectUpdater.updateProject(process, blocks, updaters);
     }

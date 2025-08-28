@@ -12,7 +12,7 @@ public class FunctionUpdater implements JsUpdater {
 
     private final JsUpdaterTemplate template;
 
-    FunctionUpdater(JsUpdaterTemplate template) {
+    public FunctionUpdater(JsUpdaterTemplate template) {
         this.template = template;
     }
 
@@ -24,10 +24,14 @@ public class FunctionUpdater implements JsUpdater {
 
     private String buildFunctions(List<Block> blocks) {
         StringBuilder allFunction = new StringBuilder();
-        blocks.stream()
-                .filter(block -> block.getType().equals(BlockType.FUNCTION))
-                .map(block -> buildFunction((FunctionBlock) block))
-                .map(function -> allFunction.append(function));
+        blocks.forEach(block ->
+        {
+            if (block.getType().equals(BlockType.FUNCTION)) {
+                var function = buildFunction((FunctionBlock) block);
+                allFunction.append(function);
+            }
+        });
+
         return allFunction.toString();
     }
 

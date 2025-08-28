@@ -6,7 +6,7 @@
   },
   {
     "name": "FUNCTION",
-    "template": "//<**id**>\n**name**() {\n**content**\n}\n",
+    "template": "//<**id**>\n**name**() {\n**content**\n}\n\n",
     "flag": "//<FUNCTIONS>"
   }
 ]

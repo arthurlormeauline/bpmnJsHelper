@@ -1,6 +1,8 @@
 package com.protectline;
 
 import com.protectline.application.Application;
+import com.protectline.application.tobpmn.JsProjectToBpmn;
+import com.protectline.application.tojsproject.BpmnToJS;
 import com.protectline.application.tojsproject.bpmntoblocks.FromBpmnToBlocks;
 import com.protectline.files.FileUtil;
 
@@ -13,12 +15,13 @@ public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException {
 //       Application.run(args);
 
-        var testFolderName = "toJsProject";
+        var testFolderName = "test";
         var fileUtil = new FileUtil(Path.of(testFolderName));
-        var fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);
+        var bpmnToJs = new BpmnToJS(fileUtil);
+        var jsToBpmn = new JsProjectToBpmn(fileUtil);
         var process = "simplify";
 
-        // When
-        fromBpmnToBlocks.createBlocksFromBpmn(process);
+//        bpmnToJs.createProject(process);
+        jsToBpmn.updateBpmn(process);
     }
 }

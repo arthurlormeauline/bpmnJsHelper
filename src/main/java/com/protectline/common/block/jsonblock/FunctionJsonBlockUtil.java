@@ -16,8 +16,8 @@ public class FunctionJsonBlockUtil {
         objectMapper.writeValue(filePath.toFile(), blocksList);
     }
 
-    public static List<Block> readBlocksFromFile(Path filePath) throws IOException {
-        FunctionBlocksList blocksList = objectMapper.readValue(filePath.toFile(), FunctionBlocksList.class);
+    public static List<Block> readBlocksFromFile(Path blocksfile) throws IOException {
+        FunctionBlocksList blocksList = objectMapper.readValue(blocksfile.toFile(), FunctionBlocksList.class);
         return blocksList.toFunctionBlocks();
     }
 

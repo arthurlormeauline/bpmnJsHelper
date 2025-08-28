@@ -46,7 +46,6 @@ class FromBpmnToBlocksTest {
         fromBpmnToBlocks.createBlocksFromBpmn(process);
 
         // Then
-        // todo
 //        var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks/"+process));
         var actualBlocks = readBlocksFromFile(workingdir.resolve("blocks/"+process));
        // assertThat(actualBlocks).isEqualTo(expectedBlock);

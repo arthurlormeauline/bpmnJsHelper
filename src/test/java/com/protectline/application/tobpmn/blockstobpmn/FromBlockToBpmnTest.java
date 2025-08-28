@@ -38,7 +38,6 @@ class FromBlockToBpmnTest {
     @Test
     void should_update_bpmn_document() throws IOException {
         // Given
-        // todo
         String processName = "simplifyInter";
         Path bpmnFile = testWorkingDirectory.resolve("input/simplifyInter.bpmn");
 

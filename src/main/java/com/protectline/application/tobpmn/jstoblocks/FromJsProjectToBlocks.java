@@ -1,6 +1,13 @@
 package com.protectline.application.tobpmn.jstoblocks;
 
+import com.protectline.common.block.Block;
+import com.protectline.common.block.jsonblock.FunctionJsonBlockUtil;
 import com.protectline.files.FileUtil;
+
+import java.io.IOException;
+import java.util.List;
+
+import static com.protectline.application.tobpmn.jstoblocks.BlockUpdaterFromJsFactory.getUpdater;
 
 public class FromJsProjectToBlocks {
     private final FileUtil fileUtil;
@@ -9,10 +16,40 @@ public class FromJsProjectToBlocks {
         this.fileUtil = fileUtil;
     }
 
-    public void updateBlockFromJsProject(String process){
-        // get blocks : with fileUtil and readBlocksFrom file ; should be present
-        // parse js project : build all blocks (let implementation for latter for now)
-        // compare blocks from file, from blocks from js project, should have same number of block with same Id's
-        // for all block from js project, use a factory based on block type to get a BlockUpdaterFromJs object that take as parameter : blocks from file, and given block from js project. For "FUNCTION" block the FunctionBlockUpdaterFromJs project implementation would replace the content of the block from file with uuid equals uuid from the given block with the content of the given block from js project
+    public void updateBlockFromJsProject(String process) throws IOException {
+        List<Block> blocksFromFile = FunctionJsonBlockUtil.readBlocksFromFile(fileUtil.getBlocksFile(process));
+
+        JsProjectParser parser = new JsProjectParser();
+        List<Block> blocksFromJsProject = parser.getBlocksFromJsProject(fileUtil.getJsProjectDirectory(process));
+
+        checkBlocksAreSimilar(blocksFromFile, blocksFromJsProject);
+
+        for (Block blockFromJs : blocksFromJsProject) {
+            BlockUpdaterFromJs updater = getUpdater(blockFromJs.getType());
+            updater.updateBlockContent(blocksFromFile, blockFromJs);
+        }
+
+        FunctionJsonBlockUtil.writeBlocksToFile(blocksFromFile.stream()
+                .map(block -> (com.protectline.common.block.FunctionBlock) block)
+                .toList(), fileUtil.getBlocksFile(process));
+    }
+
+    private static void checkBlocksAreSimilar(List<Block> blocksFromFile, List<Block> blocksFromJsProject) {
+        if (!blockAreSimilar(blocksFromFile, blocksFromJsProject)) {
+            throw new IllegalStateException("Number of blocks from file (" + blocksFromFile.size() +
+                    ") does not match blocks from JS project (" + blocksFromJsProject.size() + ")");
+        }
+    }
+
+    private static boolean blockAreSimilar(List<Block> blocksFromFile, List<Block> blocksFromJsProject) {
+        if (blocksFromFile.size() != blocksFromJsProject.size())
+            return false;
+        if (!blocksFromFile.stream().map(block -> block.getId()).toList()
+                .containsAll(blocksFromJsProject.stream().map(block -> block.getId()).toList())
+            ||
+        !blocksFromJsProject.stream().map(block -> block.getId()).toList()
+                .containsAll(blocksFromFile.stream().map(block -> block.getId()).toList()))
+            return false;
+        return true;
     }
 }

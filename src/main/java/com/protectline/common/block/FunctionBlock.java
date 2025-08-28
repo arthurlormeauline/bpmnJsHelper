@@ -10,8 +10,8 @@ import static com.protectline.common.block.BlockType.FUNCTION;
 @EqualsAndHashCode
 @Getter
 public class FunctionBlock extends Block {
-    String content;
-    Integer scriptIndex;
+   private String content;
+   private Integer scriptIndex;
 
     public FunctionBlock(BpmnPath path, String name, String content, NodeType nodeType) {
         super(path, name, FUNCTION, nodeType);
@@ -31,5 +31,9 @@ public class FunctionBlock extends Block {
         int length = splitName.length;
         Integer last = Integer.valueOf(splitName[length-1]);
         return last;
+    }
+
+    public void setContent(String content) {
+        this.content=content;
     }
 }

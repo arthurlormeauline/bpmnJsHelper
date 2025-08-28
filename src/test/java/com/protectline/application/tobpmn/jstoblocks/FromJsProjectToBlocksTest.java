@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption;
 import static com.protectline.util.AssertUtil.assertBlocksAreEqualToExpected;
 import static com.protectline.util.FileUtil.getResourcePath;
 
-class FromJsProjectToBlockTest {
+class FromJsProjectToBlocksTest {
 
     public static final String TEST_DIRECTORY = "tobpmn";
 
@@ -26,7 +26,7 @@ class FromJsProjectToBlockTest {
     @BeforeEach
     void setUp() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = getResourcePath(FromJsProjectToBlockTest.class, TEST_DIRECTORY);
+        Path resourcesPath = getResourcePath(FromJsProjectToBlocksTest.class, TEST_DIRECTORY);
 
         var testWorkingDirectory = tempDir.resolve("testData");
         fileUtil = new FileUtil(testWorkingDirectory);

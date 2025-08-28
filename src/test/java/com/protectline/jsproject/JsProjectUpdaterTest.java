@@ -17,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
+import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
 import static com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
 import static com.protectline.util.FileUtil.getResourcePath;
 
@@ -83,7 +84,7 @@ class JsProjectUpdaterTest {
     void should_update_project_from_blocks() throws IOException {
         // Given
         var process = "simplify";
-        var blocks = getExpectedBlocks();
+        var blocks = getExpectedBlocksWithUUID();
         var updaters= getUpdaters();
         fileUtil.deleteJsDirectoryIfExists(process);
         fileUtil.copyTemplateToJsDirectory(process);

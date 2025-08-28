@@ -46,6 +46,7 @@ public class DirectoryComparisonUtil {
                     return false;
                 }
                 if (!areFilesEqual(file1, file2)) {
+                    System.out.println("file : "+ file1.getFileName()+" is different");
                     return false;
                 }
             }

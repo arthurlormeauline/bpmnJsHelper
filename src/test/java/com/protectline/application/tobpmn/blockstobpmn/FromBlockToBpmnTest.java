@@ -1,8 +1,5 @@
 package com.protectline.application.tobpmn.blockstobpmn;
 
-import com.protectline.application.tobpmn.blockstobpmn.bpmnupdater.BpmnDocumentUpdater;
-import com.protectline.bpmndocument.model.NodeType;
-import com.protectline.camundbpmnaparser.BpmnCamundaDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,10 +8,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
-import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlock;
 import static com.protectline.util.FileUtil.compareBpmnFiles;
 import static com.protectline.util.FileUtil.copyDirectory;
 
@@ -37,7 +32,7 @@ class FromBlockToBpmnTest {
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
 
-        fromBlockToBpmn = new FromBlockToBpmn();
+        fromBlockToBpmn = new FromBlockToBpmn(testWorkingDirectory);
     }
 
     @Test
@@ -48,7 +43,7 @@ class FromBlockToBpmnTest {
         Path bpmnFile = testWorkingDirectory.resolve("input/simplifyInter.bpmn");
 
         // When
-        fromBlockToBpmn.updateBpmnFromBlocks(testWorkingDirectory, processName);
+        fromBlockToBpmn.updateBpmnFromBlocks(processName);
 
         // Then
         Path expectedModify = testWorkingDirectory.resolve("expectedBpmnFile/simplify_expected_modify.bpmn");

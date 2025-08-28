@@ -13,10 +13,16 @@ import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readB
 
 public class FromBlockToBpmn {
 
-    public void updateBpmnFromBlocks(Path workingDirectory, String process) throws IOException {
+    private final Path workingDirectory;
+
+    public FromBlockToBpmn(Path workingDirectory) {
+        this.workingDirectory = workingDirectory;
+    }
+
+    public void updateBpmnFromBlocks(String process) throws IOException {
         BpmnDocument document = new BpmnCamundaDocument(workingDirectory, process);
 
-        List<Block> blocks = readBlocksFromFile(workingDirectory.resolve("blocks/"+process));
+        List<Block> blocks = readBlocksFromFile(workingDirectory.resolve("blocks").resolve(process).resolve(process+".json"));
 
         var bpmnDocumentUpdater = new BpmnDocumentUpdater(blocks);
         bpmnDocumentUpdater.updateDocument(document);

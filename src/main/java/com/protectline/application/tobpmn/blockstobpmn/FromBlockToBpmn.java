@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.files.FileUtil.getBlocksFile;
 
 public class FromBlockToBpmn {
 
@@ -22,7 +23,7 @@ public class FromBlockToBpmn {
     public void updateBpmnFromBlocks(String process) throws IOException {
         BpmnDocument document = new BpmnCamundaDocument(workingDirectory, process);
 
-        List<Block> blocks = readBlocksFromFile(workingDirectory.resolve("blocks").resolve(process).resolve(process+".json"));
+        List<Block> blocks = readBlocksFromFile(getBlocksFile(workingDirectory, process));
 
         var bpmnDocumentUpdater = new BpmnDocumentUpdater(blocks);
         bpmnDocumentUpdater.updateDocument(document);
@@ -30,4 +31,5 @@ public class FromBlockToBpmn {
         String fileName = "input/" + process + ".bpmn";
         document.writeToFile(workingDirectory.resolve(fileName).toFile());
     }
+
 }

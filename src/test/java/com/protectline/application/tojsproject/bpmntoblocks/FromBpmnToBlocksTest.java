@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.files.FileUtil.getBlocksFile;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class FromBpmnToBlocksTest {
@@ -46,8 +47,8 @@ class FromBpmnToBlocksTest {
         fromBpmnToBlocks.createBlocksFromBpmn(process);
 
         // Then
-//        var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks/"+process));
-        var actualBlocks = readBlocksFromFile(workingdir.resolve("blocks/"+process));
-       // assertThat(actualBlocks).isEqualTo(expectedBlock);
+        var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks").resolve(process).resolve(process+".json"));
+        var actualBlocks = readBlocksFromFile(getBlocksFile(workingdir, process));
+        assertThat(actualBlocks).isEqualTo(expectedBlock);
     }
 }

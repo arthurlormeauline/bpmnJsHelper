@@ -32,7 +32,7 @@ public class FromBpmnToBlocks {
                 .toList();
 
         // Créer le répertoire et écrire tous les blocs dans un seul fichier JSON
-        Path blockDirectory = workingDirectory.resolve("blocks");
+        Path blockDirectory = workingDirectory.resolve("blocks").resolve(process);
         Files.createDirectories(blockDirectory);
         Path blocksFile = blockDirectory.resolve(process + ".json");
         writeBlocksToFile(functionBlocks, blocksFile);

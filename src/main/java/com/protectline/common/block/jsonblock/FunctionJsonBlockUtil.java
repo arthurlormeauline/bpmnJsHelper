@@ -20,14 +20,4 @@ public class FunctionJsonBlockUtil {
         FunctionBlocksList blocksList = objectMapper.readValue(blocksfile.toFile(), FunctionBlocksList.class);
         return blocksList.toFunctionBlocks();
     }
-
-//    public static String toJsonString(List<FunctionBlock> functionBlocks) throws IOException {
-//        FunctionBlocksList blocksList = new FunctionBlocksList(functionBlocks, 0);
-//        return objectMapper.writeValueAsString(blocksList);
-//    }
-//
-//    public static List<FunctionBlock> fromJsonString(String jsonString) throws IOException {
-//        FunctionBlocksList blocksList = objectMapper.readValue(jsonString, FunctionBlocksList.class);
-//        return blocksList.toFunctionBlocks();
-//    }
 }

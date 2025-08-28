@@ -22,15 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.protectline.camundbpmnaparser.DomElementUtil.getScriptsAsDomElement;
+import static com.protectline.files.FileUtil.getBpmnFile;
 
 public class BpmnCamundaDocument implements BpmnDocument {
     private BpmnModelInstance modelInstance = null;
 
     public BpmnCamundaDocument(Path workingDirectory, String processName) throws IOException {
-        File processFile = workingDirectory.resolve("input").resolve(processName + ".bpmn").toFile();
+        File processFile = getBpmnFile(workingDirectory, processName);
         formatBpmnFile(processFile);
         this.modelInstance = Bpmn.readModelFromFile(processFile);
     }
+
 
     @Override
     public List<Node> getFirstLevelElements() {

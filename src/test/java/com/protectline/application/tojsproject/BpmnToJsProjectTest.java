@@ -12,7 +12,6 @@ import java.nio.file.StandardCopyOption;
 
 import static com.protectline.util.FileUtil.getResourcePath;
 
-// WONT PASS
 class BpmnToJsProjectTest {
 
     @TempDir

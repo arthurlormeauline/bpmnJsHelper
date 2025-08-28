@@ -9,12 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import static com.protectline.util.FileUtil.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// WONT PASS
 class JsProjectToBpmnTest {
 
     @TempDir
@@ -34,7 +31,7 @@ class JsProjectToBpmnTest {
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
     }
-    
+
 
     @Test
     void should_update_bpmn_from_jsProject() throws IOException {

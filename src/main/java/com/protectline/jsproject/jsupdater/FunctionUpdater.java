@@ -7,6 +7,7 @@ import com.protectline.jsproject.JsUpdater;
 import com.protectline.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class FunctionUpdater implements JsUpdater {
 
@@ -19,7 +20,7 @@ public class FunctionUpdater implements JsUpdater {
     @Override
     public String update(String input, List<Block> blocks) {
         var functions = buildFunctions(blocks);
-        return input.replaceAll(template.getFlag(), functions);
+        return input.replace(template.getFlag(), functions);
     }
 
     private String buildFunctions(List<Block> blocks) {

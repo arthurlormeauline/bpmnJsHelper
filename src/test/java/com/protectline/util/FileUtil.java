@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -76,5 +77,33 @@ public class FileUtil {
                 resourceClass.getClassLoader().getResource(resource)).toURI());
     }
 
+    public static void logBpmnRunnerDiff(Path actualFile, Path expectedFile) throws IOException {
+        if (!Files.exists(actualFile) || !Files.exists(expectedFile)) {
+            System.out.println("=== DIFF: One or both BpmnRunner.js files don't exist ===");
+            System.out.println("Actual exists: " + Files.exists(actualFile));
+            System.out.println("Expected exists: " + Files.exists(expectedFile));
+            return;
+        }
+
+        List<String> actualLines = Files.readAllLines(actualFile);
+        List<String> expectedLines = Files.readAllLines(expectedFile);
+
+        System.out.println("=== BpmnRunner.js DIFF ===");
+        System.out.println("Actual lines: " + actualLines.size() + ", Expected lines: " + expectedLines.size());
+
+        int maxLines = Math.max(actualLines.size(), expectedLines.size());
+        
+        for (int i = 0; i < maxLines; i++) {
+            String actualLine = i < actualLines.size() ? actualLines.get(i) : "<MISSING>";
+            String expectedLine = i < expectedLines.size() ? expectedLines.get(i) : "<MISSING>";
+
+            if (!actualLine.equals(expectedLine)) {
+                System.out.printf("Line %d DIFF:%n", i + 1);
+                System.out.printf("  Expected: %s%n", expectedLine);
+                System.out.printf("  Actual  : %s%n", actualLine);
+            }
+        }
+        System.out.println("=== END DIFF ===");
+    }
 
 }

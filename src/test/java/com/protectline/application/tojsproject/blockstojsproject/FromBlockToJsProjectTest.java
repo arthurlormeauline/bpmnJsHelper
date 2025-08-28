@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import static com.protectline.util.AssertUtil.assertJsProjectIsEqualToExpected;
 import static com.protectline.util.FileUtil.getResourcePath;
 
-// WONT PASS
 class FromBlockToJsProjectTest {
 
     private FromBlockToJsProject fromBlockToJsProject;

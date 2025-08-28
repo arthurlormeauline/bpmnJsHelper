@@ -17,12 +17,12 @@ public class AssertUtil {
         assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
         Path expectedProject = fileUtil.getWorkingDirectory().resolve("expectedJsProject").resolve(process);
-        
+
         // Log line-by-line diff for BpmnRunner.js
         Path actualBpmnRunner = outputDir.resolve("BpmnRunner.js");
         Path expectedBpmnRunner = expectedProject.resolve("BpmnRunner.js");
         logBpmnRunnerDiff(actualBpmnRunner, expectedBpmnRunner);
-        
+
         assertThat(areDirectoriesEqual(outputDir, expectedProject)).isTrue();
     }
 }

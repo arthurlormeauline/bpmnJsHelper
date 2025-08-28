@@ -12,10 +12,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
+import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
 import static com.protectline.util.FileUtil.getResourcePath;
 
-// WONT PASS
 class JsProjectTest {
 
     private JsProject jsProject;
@@ -32,7 +32,7 @@ class JsProjectTest {
     void updateProject() throws IOException {
         // Given
         var process = "simplify";
-        var blocks = getExpectedBlocks();
+        var blocks = getExpectedBlocksWithUUID();
 
         // When
         jsProject.updateProject(process, blocks);

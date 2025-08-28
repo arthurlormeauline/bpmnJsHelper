@@ -16,12 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
 import static com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
 import static com.protectline.util.FileUtil.getResourcePath;
 
-// WONT PASS
 class JsProjectUpdaterTest {
 
     public static final String TEST_DIRECTORY = "tojsproject";

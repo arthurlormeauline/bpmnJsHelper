@@ -48,7 +48,7 @@ public class JsUpdaterFactory {
         var blockTypes = blocks.stream().map(block -> block.getType()).collect(Collectors.toSet());
         getBlockTypeInOrder()
                 .forEach(type -> {
-                    if (blockTypes.contains(type.name()))
+                    if (blockTypes.contains(type))
                         updaters.add(JsUpdaterFactory.getUpdater(type, jsUpdaterTemplates));
                 });
     }

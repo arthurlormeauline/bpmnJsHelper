@@ -2,6 +2,7 @@ package com.protectline.jsproject;
 
 import com.protectline.common.block.Block;
 import com.protectline.files.FileUtil;
+import com.protectline.jsproject.parser.JsProjectParser;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,8 +30,7 @@ public class JsProject {
 
     public List<Block> getBlocks(String process) throws IOException {
         var parser = new JsProjectParser();
-        java.nio.file.Path bpmnRunnerFile = fileUtil.getJsProjectDirectory(process).resolve("BpmnRunner.js");
-        String jsContent = java.nio.file.Files.readString(bpmnRunnerFile);
+        var jsContent = fileUtil.getJsRunnerFileContent(process);
         return parser.parseJsToBlocks(jsContent);
     }
 }

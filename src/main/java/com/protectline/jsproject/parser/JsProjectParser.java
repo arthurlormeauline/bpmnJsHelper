@@ -1,11 +1,10 @@
-package com.protectline.jsproject;
+package com.protectline.jsproject.parser;
 
 import com.protectline.bpmndocument.model.BpmnPath;
 import com.protectline.bpmndocument.model.NodeType;
 import com.protectline.common.block.Block;
 import com.protectline.common.block.FunctionBlock;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

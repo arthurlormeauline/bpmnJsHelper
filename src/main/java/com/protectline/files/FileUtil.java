@@ -37,6 +37,9 @@ public class FileUtil {
     public Path getJsProjectDirectory(String processName) {
         return workingDirectory.resolve(OUTPUT).resolve(processName);
     }
+    public String getJsRunnerFileContent(String process) throws IOException {
+       return Files.readString(getJsProjectDirectory(process).resolve("BpmnRunner.js"));
+    }
 
     public Path getUpdaterTemplateDirectory(String processName) {
         return workingDirectory.resolve(UPDATER_TEMPLATE);

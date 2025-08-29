@@ -27,8 +27,10 @@ public class JsProject {
         jsProjectUpdater.updateProject(process, blocks, updaters);
     }
 
-    public List<Block> updateBlocks() {
-        // todo
-        return List.of();
+    public List<Block> getBlocks(String process) throws IOException {
+        var parser = new JsProjectParser();
+        java.nio.file.Path bpmnRunnerFile = fileUtil.getJsProjectDirectory(process).resolve("BpmnRunner.js");
+        String jsContent = java.nio.file.Files.readString(bpmnRunnerFile);
+        return parser.parseJsToBlocks(jsContent);
     }
 }

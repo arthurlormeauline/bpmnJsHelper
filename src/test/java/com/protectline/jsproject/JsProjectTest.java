@@ -24,7 +24,7 @@ class JsProjectTest {
     }
 
     @Test
-    void updateProject() throws IOException {
+    void should_update_project() throws IOException {
         // Given
         var process = "simplify";
         var blocks = getExpectedBlocksWithUUID();
@@ -38,7 +38,7 @@ class JsProjectTest {
 
 
     @Test
-    void updateBlocks() {
+    void should_get_blocks_from_project() {
         // todo
     }
 }

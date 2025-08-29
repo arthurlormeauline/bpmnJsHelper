@@ -1,4 +1,4 @@
-package com.protectline.application.tobpmn.jstoblocks;
+package com.protectline.jsproject;
 
 import com.protectline.bpmndocument.model.BpmnPath;
 import com.protectline.bpmndocument.model.NodeType;
@@ -22,12 +22,6 @@ public class JsProjectParser {
         Pattern.DOTALL
     );
 
-    public List<Block> getBlocksFromJsProject(Path jsProjectDirectory) throws java.io.IOException {
-        java.nio.file.Path bpmnRunnerFile = jsProjectDirectory.resolve("BpmnRunner.js");
-        String jsContent = java.nio.file.Files.readString(bpmnRunnerFile);
-        return parseJsToBlocks(jsContent);
-    }
-    
     public List<Block> parseJsToBlocks(String jsContent) {
         List<Block> blocks = new ArrayList<>();
         

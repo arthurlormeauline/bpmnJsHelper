@@ -3,6 +3,7 @@ package com.protectline.application.tobpmn.jstoblocks;
 import com.protectline.common.block.Block;
 import com.protectline.common.block.jsonblock.FunctionJsonBlockUtil;
 import com.protectline.files.FileUtil;
+import com.protectline.jsproject.JsProject;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,8 +20,8 @@ public class FromJsProjectToBlocks {
     public void updateBlockFromJsProject(String process) throws IOException {
         List<Block> blocksFromFile = FunctionJsonBlockUtil.readBlocksFromFile(fileUtil.getBlocksFile(process));
 
-        JsProjectParser parser = new JsProjectParser();
-        List<Block> blocksFromJsProject = parser.getBlocksFromJsProject(fileUtil.getJsProjectDirectory(process));
+        JsProject jsProject = new JsProject(fileUtil);
+        List<Block> blocksFromJsProject = jsProject.getBlocks(process);
 
         checkBlocksAreSimilar(blocksFromFile, blocksFromJsProject);
 

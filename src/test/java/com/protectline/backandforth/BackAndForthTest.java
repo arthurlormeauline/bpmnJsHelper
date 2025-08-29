@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import static com.protectline.util.FileUtil.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// WONT PASS :
 class BackAndForthTest {
 
     @TempDir

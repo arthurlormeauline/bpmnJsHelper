@@ -15,12 +15,12 @@ class JsProjectParserTest {
     JsProjectParser jsProjectParser;
 
     @BeforeEach
-    void setup() throws IOException {
-        jsProjectParser = new JsProjectParser();
+    void setup() throws IOException, URISyntaxException {
+        FileUtil files = new FileUtil(com.protectline.util.FileUtil.getResourcePath(JsProjectParserTest.class, "tobpmn"));
+        jsProjectParser = new JsProjectParser(files);
     }
 
 
-    // parser dead
     @Test
     void should_parse_js_file() throws URISyntaxException, IOException {
         // Given

@@ -1,6 +1,7 @@
 package com.protectline.jsproject.parser;
 
 import com.protectline.common.block.Block;
+import com.protectline.files.FileUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,23 +16,20 @@ public class JsProjectParser {
     private final TokenParser tokenParser;
     private final JsParserFactory parserFactory;
     
-    public JsProjectParser() throws IOException {
+    public JsProjectParser(FileUtil fileUtil) throws IOException {
         this.lexer = new Lexer();
         this.tokenParser = new TokenParser();
-        this.parserFactory = new JsParserFactory();
+        this.parserFactory = new JsParserFactory(fileUtil);
     }
 
     /**
      * Parse le contenu JS en blocs selon l'architecture lexer/parser
      */
     public List<Block> parseJsToBlocks(String jsContent) {
-        // Étape 1: Lexer - Transformer le string en tokens
         List<Token> tokens = lexer.tokenize(jsContent);
         
-        // Étape 2: TokenParser - Transformer les tokens en éléments
         List<Element> elements = tokenParser.parseTokensToElements(tokens);
         
-        // Étape 3: Pour chaque élément, utiliser la factory pour créer le bon parser
         List<Block> allBlocks = new ArrayList<>();
         
         for (Element element : elements) {

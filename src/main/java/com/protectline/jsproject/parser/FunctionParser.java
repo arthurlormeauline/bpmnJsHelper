@@ -4,6 +4,7 @@ import com.protectline.bpmndocument.model.BpmnPath;
 import com.protectline.bpmndocument.model.NodeType;
 import com.protectline.common.block.Block;
 import com.protectline.common.block.FunctionBlock;
+import com.protectline.jsproject.updatertemplate.TemplateForParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +14,10 @@ import java.util.regex.Pattern;
 
 public class FunctionParser implements JsParser {
     
-    private final Template template;
+    private final TemplateForParser template;
     private static final Pattern TEMPLATE_PLACEHOLDER_PATTERN = Pattern.compile("\\*\\*([^*]+)\\*\\*");
     
-    public FunctionParser(Template template) {
+    public FunctionParser(TemplateForParser template) {
         this.template = template;
     }
     

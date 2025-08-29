@@ -56,16 +56,15 @@ class FromJsProjectToBlocksTest {
         }
     }
 
-    // parser dead
     @Test
     void should_create_blocks_from_js_project() throws IOException {
-//        // Given
-//        var process = "simplify";
-//
-//        // When
-//        fromJsProjectToBlocks.updateBlockFromJsProject(process);
-//
-//        // Then
-//        assertBlocksAreEqualToExpected(fileUtil, process);
+        // Given
+        var process = "simplify";
+
+        // When
+        fromJsProjectToBlocks.updateBlockFromJsProject(process);
+
+        // Then
+        assertBlocksAreEqualToExpected(fileUtil, process);
     }
 }

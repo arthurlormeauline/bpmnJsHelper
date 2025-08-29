@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocks;
 import static com.protectline.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
-import static com.protectline.util.AssertUtil.assertBlocksAreEqualToExpected;
 import static com.protectline.util.FileUtil.getResourcePath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -42,17 +40,16 @@ class JsProjectTest {
     }
 
 
-    // parser dead
     @Test
     void should_get_blocks_from_project() throws IOException {
-//        // Given
-//        var process = "simplify";
-//
-//        // When
-//        var actualBlocks = jsProject.getBlocks(process);
-//
-//        // Then
-//        List<Block> expectedBlocksWithUUID = getExpectedBlocksWithUUID();
-//        assertThat(actualBlocks.containsAll(expectedBlocksWithUUID)).isTrue();
+        // Given
+        var process = "simplify";
+
+        // When
+        var actualBlocks = jsProject.getBlocks(process);
+
+        // Then
+        List<Block> expectedBlocksWithUUID = getExpectedBlocksWithUUID();
+        assertThat(actualBlocks.containsAll(expectedBlocksWithUUID)).isTrue();
     }
 }

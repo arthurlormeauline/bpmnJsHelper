@@ -66,6 +66,7 @@ public class FileUtil {
             size++;
         }
 
+        System.out.println(bpmnFile);
         assertThat(size).isEqualTo(0);
 
         // restore expected for other tests

@@ -29,7 +29,7 @@ public class JsProject {
     }
 
     public List<Block> getBlocks(String process) throws IOException {
-        var parser = new JsProjectParser();
+        var parser = new JsProjectParser(fileUtil);
         var jsContent = fileUtil.getJsRunnerFileContent(process);
         return parser.parseJsToBlocks(jsContent);
     }

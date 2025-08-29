@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  targetNamespace="http://camunda.org/test">
+  <bpmn:process id="test-process" isExecutable="true">
+    <bpmn:scriptTask id="Activity_test" name="test script" scriptFormat="JavaScript">
+      <bpmn:script>line1
+
+line2
+
+
+line3
+
+// empty line above
+line4</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+</bpmn:definitions>

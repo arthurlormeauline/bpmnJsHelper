@@ -1,0 +1,15 @@
+{
+  "blocks": [
+    {
+      "name": "script with empty lines_0",
+      "path": {
+        "id": "Activity_with_empty_lines"
+      },
+      "type": "FUNCTION",
+      "nodeType": "SCRIPT",
+      "id": "Activity_with_empty_lines",
+      "content": "console.log('line1');\n\nconsole.log('line2');\n\n\nconsole.log('line3');\n\n// comment with empty line above\nconsole.log('line4');",
+      "scriptIndex": 0
+    }
+  ]
+}

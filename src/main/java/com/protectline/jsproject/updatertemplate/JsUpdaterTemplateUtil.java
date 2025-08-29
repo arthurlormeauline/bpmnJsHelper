@@ -14,12 +14,23 @@ public class JsUpdaterTemplateUtil {
 
     public static List<JsUpdaterTemplate> readJsUpdaterTemplatesFromFile(FileUtil fileUtil) throws IOException {
         Path templatesFile = fileUtil.getJsUpdaterTemplatesJsonFile();
-        List<JsUpdaterTemplateJson> jsonTemplates = objectMapper.readValue(
+        List<TemplateJson> jsonTemplates = objectMapper.readValue(
             templatesFile.toFile(), 
-            new TypeReference<List<JsUpdaterTemplateJson>>() {}
+            new TypeReference<List<TemplateJson>>() {}
         );
         return jsonTemplates.stream()
-            .map(JsUpdaterTemplateJson::toJsUpdaterTemplate)
+            .map(TemplateJson::toJsUpdaterTemplate)
+            .collect(Collectors.toList());
+    }
+    
+    public static List<TemplateForParser> readTemplatesForParserFromFile(FileUtil fileUtil) throws IOException {
+        Path templatesFile = fileUtil.getJsUpdaterTemplatesJsonFile();
+        List<TemplateJson> jsonTemplates = objectMapper.readValue(
+            templatesFile.toFile(), 
+            new TypeReference<List<TemplateJson>>() {}
+        );
+        return jsonTemplates.stream()
+            .map(TemplateJson::toTemplateForParser)
             .collect(Collectors.toList());
     }
 }

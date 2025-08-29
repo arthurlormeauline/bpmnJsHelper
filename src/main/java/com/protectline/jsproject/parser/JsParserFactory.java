@@ -1,13 +1,18 @@
 package com.protectline.jsproject.parser;
 
+import com.protectline.files.FileUtil;
+import com.protectline.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil;
+
 import java.io.IOException;
+import java.util.List;
 
 public class JsParserFactory {
     
-    private final TemplateLoader templateLoader;
+    private final List<TemplateForParser> templates;
     
-    public JsParserFactory() throws IOException {
-        this.templateLoader = TemplateLoader.getInstance();
+    public JsParserFactory(FileUtil fileUtil) throws IOException {
+        this.templates = JsUpdaterTemplateUtil.readTemplatesForParserFromFile(fileUtil);
     }
     
     /**
@@ -16,11 +21,7 @@ public class JsParserFactory {
      * @return le parser approprié
      */
     public JsParser createParser(String element) {
-        Template template = templateLoader.getTemplateByElement(element);
-        
-        if (template == null) {
-            throw new IllegalArgumentException("No template found for element: " + element);
-        }
+        TemplateForParser template = getTemplateByElement(element);
         
         switch (element) {
             case "main":
@@ -30,5 +31,12 @@ public class JsParserFactory {
             default:
                 throw new UnsupportedOperationException("Parser not implemented for element: " + element);
         }
+    }
+    
+    private TemplateForParser getTemplateByElement(String elementName) {
+        return templates.stream()
+            .filter(template -> template.getElement().equals(elementName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No template found for element: " + elementName));
     }
 }

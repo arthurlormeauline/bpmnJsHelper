@@ -81,7 +81,7 @@ public class BpmnCamundaDocument implements BpmnDocument {
     }
 
     private static void formatBpmnFile(File file) throws IOException {
-        String newContentWithoutEmptyLines = Files.readString(file.toPath()).replaceAll("\n\\s*\n", "\n");
+        String newContentWithoutEmptyLines = Files.readString(file.toPath());
         Files.writeString(file.toPath(), newContentWithoutEmptyLines);
     }
 }

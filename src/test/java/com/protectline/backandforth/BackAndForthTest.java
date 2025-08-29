@@ -16,7 +16,6 @@ import static com.protectline.util.FileUtil.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // WONT PASS :
-// parser dead
 class BackAndForthTest {
 
     @TempDir
@@ -40,60 +39,60 @@ class BackAndForthTest {
 
     @Test
     void should_create_jsProject_and_create_bpmn_back_again_for_all_files() throws IOException {
-//        var inputPath = fileUtil.getBpmnDirectory();
-//        var workDir = fileUtil.getWorkingDirectory();
-//
-//        File[] bpmnFiles = inputPath.toFile().listFiles(
-//                (dir, name) -> name.toLowerCase().endsWith(".bpmn"));
-//
-//        if (bpmnFiles == null || bpmnFiles.length == 0) {
-//            throw new RuntimeException("No BPMN files found in input resources");
-//        }
-//
-//        for (File bpmnFile : bpmnFiles) {
-//            String processName = bpmnFile.getName().replace(".bpmn", "");
-//
-//            BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
-//            bpmnToJs.createProject(processName);
-//
-//            // Vérifier que le projet JS a été créé
-//            Path outputDir = fileUtil.getJsProjectDirectory(processName);
-//            assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
-//            assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
-//
-//            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
-//            jsProjectToBpmn.updateBpmn(processName);
-//
-//            assertTrue(Files.exists(bpmnFile.toPath()),
-//                    "BPMN file should be recreated: " + bpmnFile.getName());
-//
-//            Path backupfile = workDir.resolve("backup").resolve(processName);
-//            compareBpmnFiles(bpmnFile.toPath(), backupfile);
-//        }
+        var inputPath = fileUtil.getBpmnDirectory();
+        var workDir = fileUtil.getWorkingDirectory();
+
+        File[] bpmnFiles = inputPath.toFile().listFiles(
+                (dir, name) -> name.toLowerCase().endsWith(".bpmn"));
+
+        if (bpmnFiles == null || bpmnFiles.length == 0) {
+            throw new RuntimeException("No BPMN files found in input resources");
+        }
+
+        for (File bpmnFile : bpmnFiles) {
+            String processName = bpmnFile.getName().replace(".bpmn", "");
+
+            BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
+            bpmnToJs.createProject(processName);
+
+            // Vérifier que le projet JS a été créé
+            Path outputDir = fileUtil.getJsProjectDirectory(processName);
+            assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
+            assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
+
+            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
+            jsProjectToBpmn.updateBpmn(processName);
+
+            assertTrue(Files.exists(bpmnFile.toPath()),
+                    "BPMN file should be recreated: " + bpmnFile.getName());
+
+            Path backupfile = workDir.resolve("backup").resolve(processName+".bpmn");
+            compareBpmnFiles(bpmnFile.toPath(), backupfile);
+        }
     }
 
 
     @Test
     void should_create_jsProject_and_create_bpmn_back_again() throws IOException {
-//        var process = "tus.prc.actionCombine";
-//        var bpmnFile = fileUtil.getBpmnFile(process);
-//        var workDir = fileUtil.getWorkingDirectory();
-//
-//        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
-//        bpmnToJs.createProject(process);
-//
-//        // Vérifier que le projet JS a été créé
-//        Path outputDir = fileUtil.getJsProjectDirectory(process);
-//        assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
-//        assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
-//
-//        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
-//        jsProjectToBpmn.updateBpmn(process);
-//
-//        assertTrue(Files.exists(bpmnFile),
-//                "BPMN file should be recreated: " + bpmnFile.getFileName().toString());
-//
-//        Path backupfile = workDir.resolve("backup").resolve(process);
-//        compareBpmnFiles(bpmnFile, backupfile);
+        var process = "interventionPlanif-tf";
+        var bpmnFile = fileUtil.getBpmnFile(process);
+        var workDir = fileUtil.getWorkingDirectory();
+
+        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
+        bpmnToJs.createProject(process);
+
+        // Vérifier que le projet JS a été créé
+        Path outputDir = fileUtil.getJsProjectDirectory(process);
+        assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
+        assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
+
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
+        jsProjectToBpmn.updateBpmn(process);
+
+        assertTrue(Files.exists(bpmnFile),
+                "BPMN file should be recreated: " + bpmnFile.getFileName().toString());
+
+        Path backupfile = workDir.resolve("backup").resolve(process+".bpmn");
+        compareBpmnFiles(bpmnFile, backupfile);
     }
 }

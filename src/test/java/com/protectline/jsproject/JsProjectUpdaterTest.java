@@ -3,7 +3,6 @@ package com.protectline.jsproject;
 import com.protectline.files.FileUtil;
 import com.protectline.jsproject.jsupdater.FunctionUpdater;
 import com.protectline.jsproject.jsupdater.MainUpdater;
-import com.protectline.jsproject.updatertemplate.JsUpdaterTemplate;
 import com.protectline.util.AssertUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

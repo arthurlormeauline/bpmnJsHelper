@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  targetNamespace="http://camunda.org/test">
+  <bpmn:process id="empty-lines-process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="Activity_with_empty_lines" name="script with empty lines" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+      <bpmn:script>console.log('line1');
+
+console.log('line2');
+
+
+console.log('line3');
+
+// comment with empty line above
+console.log('line4');</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="EndEvent_1">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Activity_with_empty_lines" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Activity_with_empty_lines" targetRef="EndEvent_1" />
+  </bpmn:process>
+</bpmn:definitions>

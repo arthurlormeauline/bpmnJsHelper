@@ -1,11 +1,16 @@
 package com.protectline.application.tojsproject.bpmntoblocks;
 
+import com.protectline.bpmndocument.BpmnDocument;
+import com.protectline.bpmndocument.model.Node;
+import com.protectline.common.block.Block;
+import com.protectline.common.block.FunctionBlock;
 import com.protectline.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static com.protectline.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
 import static com.protectline.util.FileUtil.getResourcePath;

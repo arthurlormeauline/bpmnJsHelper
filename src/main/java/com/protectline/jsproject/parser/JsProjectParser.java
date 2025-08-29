@@ -1,64 +1,50 @@
 package com.protectline.jsproject.parser;
 
-import com.protectline.bpmndocument.model.BpmnPath;
-import com.protectline.bpmndocument.model.NodeType;
 import com.protectline.common.block.Block;
-import com.protectline.common.block.FunctionBlock;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+/**
+ * Parser principal utilisant l'architecture Lexer -> TokenParser -> JsParser
+ */
 public class JsProjectParser {
+    
+    private final Lexer lexer;
+    private final TokenParser tokenParser;
+    private final JsParserFactory parserFactory;
+    
+    public JsProjectParser() throws IOException {
+        this.lexer = new Lexer();
+        this.tokenParser = new TokenParser();
+        this.parserFactory = new JsParserFactory();
+    }
 
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(
-        "//<([^>]+)>\\s*\\n" +  // UUID comment
-        "([\\w_]+)\\(\\)\\s*\\{\\s*\\n" +  // Function name
-        "(.*?)\\n" +  // Function content
-        "\\}\\s*\\n" +  // End of function
-        "//<\\1/>",  // Closing UUID comment
-        Pattern.DOTALL
-    );
-
+    /**
+     * Parse le contenu JS en blocs selon l'architecture lexer/parser
+     */
     public List<Block> parseJsToBlocks(String jsContent) {
-        List<Block> blocks = new ArrayList<>();
+        // Étape 1: Lexer - Transformer le string en tokens
+        List<Token> tokens = lexer.tokenize(jsContent);
         
-        Matcher matcher = FUNCTION_PATTERN.matcher(jsContent);
+        // Étape 2: TokenParser - Transformer les tokens en éléments
+        List<Element> elements = tokenParser.parseTokensToElements(tokens);
         
-        while (matcher.find()) {
-            String uuid = matcher.group(1);
-            String functionName = matcher.group(2);
-            String content = matcher.group(3).trim();
-            
-            // Extract ID from function name (remove suffix like _0, _1)
-            String id = extractIdFromFunctionName(functionName);
-            
-            // Determine node type based on function name patterns
-            NodeType nodeType = determineNodeType(functionName);
-            
-            BpmnPath path = new BpmnPath(id);
-            FunctionBlock block = new FunctionBlock(path, functionName, content, nodeType, uuid);
-            blocks.add(block);
+        // Étape 3: Pour chaque élément, utiliser la factory pour créer le bon parser
+        List<Block> allBlocks = new ArrayList<>();
+        
+        for (Element element : elements) {
+            try {
+                JsParser parser = parserFactory.createParser(element.getElementName());
+                JsParser.ParseResult result = parser.parse(element.getContent(), element.getAttributes());
+                allBlocks.addAll(result.getBlocks());
+            } catch (Exception e) {
+                // Si pas de parser pour cet élément, on l'ignore pour l'instant
+                System.err.println("No parser found for element: " + element.getElementName());
+            }
         }
         
-        return blocks;
-    }
-    
-    private String extractIdFromFunctionName(String functionName) {
-        // Remove trailing _0, _1, etc. to get the base ID
-        return functionName.replaceAll("_\\d+$", "");
-    }
-    
-    private NodeType determineNodeType(String functionName) {
-        // Simple heuristic based on function name patterns
-        if (functionName.toLowerCase().contains("event")) {
-            return NodeType.START;
-        } else if (functionName.toLowerCase().contains("script") || 
-                   functionName.toLowerCase().contains("delay")) {
-            return NodeType.SCRIPT;
-        } else {
-            return NodeType.SERVICE_TASK;
-        }
+        return allBlocks;
     }
 }

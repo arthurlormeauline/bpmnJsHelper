@@ -15,7 +15,7 @@ class JsProjectParserTest {
     JsProjectParser jsProjectParser;
 
     @BeforeEach
-    void setup(){
+    void setup() throws IOException {
         jsProjectParser = new JsProjectParser();
     }
 
@@ -23,15 +23,15 @@ class JsProjectParserTest {
     // parser dead
     @Test
     void should_parse_js_file() throws URISyntaxException, IOException {
-//        // Given
-//        FileUtil files =new FileUtil(com.protectline.util.FileUtil.getResourcePath(JsProjectParserTest.class, "tobpmn"));
-//        var content = files.getJsRunnerFileContent("tus.prc.actionCombine");
-//
-//        // When
-//        var blocksFromProject = jsProjectParser.parseJsToBlocks(content);
-//
-//        // Then
-//        assertThat(blocksFromProject.size()).isEqualTo(20);
+        // Given
+        FileUtil files =new FileUtil(com.protectline.util.FileUtil.getResourcePath(JsProjectParserTest.class, "tobpmn"));
+        var content = files.getJsRunnerFileContent("tus.prc.actionCombine");
+
+        // When
+        var blocksFromProject = jsProjectParser.parseJsToBlocks(content);
+
+        // Then
+        assertThat(blocksFromProject.size()).isEqualTo(20);
     }
 
 }

@@ -62,34 +62,34 @@ class BpmnRunner {
         console.log(message);
     }
 
-//<MAIN>
+//<main>
 
-//<880ed997-78b2-4ff6-bb02-9eeadfa6bcb7>
+//<function id=880ed997-78b2-4ff6-bb02-9eeadfa6bcb7>
 Delay_definition_0() {
 delay definition script
 }
-//<880ed997-78b2-4ff6-bb02-9eeadfa6bcb7/>
+//<function/>
 
-//<74b70353-a19e-4ad7-9838-5251ab67d8a6>
+//<function id=74b70353-a19e-4ad7-9838-5251ab67d8a6>
 Get_device_by_name_0() {
 get device by name url script
 }
-//<74b70353-a19e-4ad7-9838-5251ab67d8a6/>
+//<function/>
 
-//<a96073f8-befb-430d-b8a0-466100ca5bc9>
+//<function id=a96073f8-befb-430d-b8a0-466100ca5bc9>
 Get_device_by_name_1() {
 get device by name output script
 }
-//<a96073f8-befb-430d-b8a0-466100ca5bc9/>
+//<function/>
 
-//<da508040-ebc4-4267-82fb-d7d4576e136e>
+//<function id=da508040-ebc4-4267-82fb-d7d4576e136e>
 Event_1u1d1qi_0() {
 start event script
 }
-//<da508040-ebc4-4267-82fb-d7d4576e136e/>
+//<function/>
 
 
-//<MAIN/>
+//<main/>
 }
 
 module.exports = BpmnRunner;

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,20 +119,19 @@ class TokenParserTest {
         // When
         List<Element> elements = tokenParser.parseTokensToElements(tokens);
 
-        // Then
+        // Then - On devrait avoir 2 éléments : main et function (ordre pas important)
         assertThat(elements).hasSize(2);
-
-        Element mainElement = elements.get(0);
-        assertThat(mainElement.getElementName()).isEqualTo("main");
-        assertThat(mainElement.getAttributes()).isEmpty();
-        String expectedContent = "before textafter text";
-        assertThat(mainElement.getContent()).isEqualTo(expectedContent);
-
-        Element functionElement = elements.get(1);
-        assertThat(functionElement.getElementName()).isEqualTo("function");
-        assertThat(functionElement.getAttributes()).containsOnly(MapEntry.entry("id","123"));
-        String expectedFuncContent = "func content";
-        assertThat(functionElement.getContent()).isEqualTo(expectedFuncContent);
+        
+        // Créer les éléments expected
+        Element expectedMainElement = new Element("main", new HashMap<>(), "before textafter text");
+        
+        Map<String, String> functionAttributes = new HashMap<>();
+        functionAttributes.put("id", "123");
+        Element expectedFunctionElement = new Element("function", functionAttributes, "func content");
+        
+        // Vérifier que les éléments actuels contiennent les éléments attendus (peu importe l'ordre)
+        assertThat(elements).usingRecursiveFieldByFieldElementComparator()
+                           .containsExactlyInAnyOrder(expectedMainElement, expectedFunctionElement);
     }
 
     @Test

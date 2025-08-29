@@ -67,4 +67,16 @@ class FromJsProjectToBlocksTest {
         // Then
         assertBlocksAreEqualToExpected(fileUtil, process);
     }
+
+    @Test
+    void should_create_blocks_from_js_project_with_backslash() throws IOException {
+        // Given
+        var process = "simplify-with-backslash";
+
+        // When
+        fromJsProjectToBlocks.updateBlockFromJsProject(process);
+
+        // Then
+        assertBlocksAreEqualToExpected(fileUtil, process);
+    }
 }

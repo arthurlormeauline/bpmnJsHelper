@@ -46,4 +46,23 @@ class FunctionBlockBuilderTest {
 
         assertThat(actual).isEqualTo(List.of(expectedDelayDefinition, expectedGetDeviceByName_0, expectedGetDeviceByName_1, expectedStartEvent));
     }
+
+    @Test
+    void should_get_function_block_from_document_with_backslash() throws IOException {
+        // Given
+        var process = "simplify-with-backslash";
+        BpmnCamundaDocument document = new BpmnCamundaDocument(fileUtil.getBpmnFile(process).toFile());
+
+        // When
+        var actual = builder.getBlocks(document);
+
+        // Then
+        var expectedDelayDefinition = getExpectedBlock("Activity_0q6wfo8", "Delay_definition_0", "delay definition script", NodeType.SCRIPT);
+        var expectedGetDeviceByName_0 = getExpectedBlock("Activity_0rwauzg", "Get_device_by_name_0", "get device by name url script", NodeType.SERVICE_TASK);
+        var expectedGetDeviceByName_1 = getExpectedBlock("Activity_0rwauzg", "Get_device_by_name_1", "get device by name output script", NodeType.SERVICE_TASK);
+        var expectedStartEvent = getExpectedBlock("Event_1u1d1qi", "Event_1u1d1qi_0", "start event / script", NodeType.START);
+
+        assertThat(actual).isEqualTo(List.of(expectedDelayDefinition, expectedGetDeviceByName_0, expectedGetDeviceByName_1, expectedStartEvent));
+    }
+
 }

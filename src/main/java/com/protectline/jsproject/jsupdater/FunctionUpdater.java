@@ -39,9 +39,9 @@ public class FunctionUpdater implements JsUpdater {
 
     private String buildFunction(FunctionBlock block) {
         var function = template.getTemplate();
-        function = function.replaceAll("\\*\\*id\\*\\*", block.getId().toString());
-        function = function.replaceAll("\\*\\*name\\*\\*", normalizeJavaScriptFunctionName(block.getName().toString()));
-        function = function.replaceAll("\\*\\*content\\*\\*", block.getContent().toString());
+        function = function.replace("**id**", block.getId().toString());
+        function = function.replace("**name**", normalizeJavaScriptFunctionName(block.getName().toString()));
+        function = function.replace("**content**", block.getContent().toString());
         return function;
     }
     

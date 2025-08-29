@@ -10,55 +10,24 @@ import java.util.Map;
  */
 public class TokenParser {
     
+    private final TokenSimplifier tokenSimplifier;
+    
+    public TokenParser() {
+        this.tokenSimplifier = new TokenSimplifier();
+    }
+    
     /**
      * Parse une liste de tokens en éléments de façon récursive
      */
     public List<Element> parseTokensToElements(List<Token> tokens) {
         // Étape 1: Transformer les tokens de base en OPEN_MARK/CONTENT/CLOSE_MARK
-        List<Token> simplifiedTokens = simplifyTokens(tokens);
+        List<Token> simplifiedTokens = tokenSimplifier.simplifyTokens(tokens);
         
         // Étape 2: Parser récursivement les OPEN_MARK en éléments
         List<Element> elements = new ArrayList<>();
         parseElementsRecursively(simplifiedTokens, 0, elements);
         
         return elements;
-    }
-    
-    /**
-     * Étape 1: Transforme [//][<][ELEMENT]...en [OPEN_MARK][CONTENT][CLOSE_MARK]
-     */
-    public List<Token> simplifyTokens(List<Token> tokens) {
-        List<Token> result = new ArrayList<>();
-        int i = 0;
-        
-        while (i < tokens.size()) {
-            // Vérifier d'abord CLOSE_MARK car il est plus spécifique (a le / avant >)
-            if (isCloseMarkPattern(tokens, i)) {
-                // Chercher pattern CloseMark: [//][<][ELEMENT][/][>]
-                CloseMarkResult closeMark = parseCloseMark(tokens, i);
-                result.add(new Token(TOKEN_TYPE.CLOSE_MARK, closeMark.closeMark));
-                i = closeMark.nextIndex;
-                
-            } else if (isOpenMarkPattern(tokens, i)) {
-                // Chercher pattern OpenMark: [//][<][ELEMENT]([STRING][=][STRING])*[>]
-                OpenMarkResult openMark = parseOpenMark(tokens, i);
-                result.add(new Token(TOKEN_TYPE.OPEN_MARK, openMark.openMark));
-                i = openMark.nextIndex;
-                
-            } else {
-                // Collecter les tokens restants comme CONTENT
-                StringBuilder content = new StringBuilder();
-                while (i < tokens.size() && !isOpenMarkPattern(tokens, i) && !isCloseMarkPattern(tokens, i)) {
-                    content.append(tokens.get(i).getValue());
-                    i++;
-                }
-                if (content.length() > 0) {
-                    result.add(new Token(TOKEN_TYPE.CONTENT, content.toString()));
-                }
-            }
-        }
-        
-        return result;
     }
     
     /**
@@ -113,81 +82,5 @@ public class TokenParser {
         }
         
         return i;
-    }
-    
-    private boolean isOpenMarkPattern(List<Token> tokens, int index) {
-        return index + 2 < tokens.size() &&
-               tokens.get(index).getType() == TOKEN_TYPE.SLASH_SLASH &&
-               tokens.get(index + 1).getType() == TOKEN_TYPE.OPEN &&
-               tokens.get(index + 2).getType() == TOKEN_TYPE.ELEMENT;
-    }
-    
-    private boolean isCloseMarkPattern(List<Token> tokens, int index) {
-        // Nous devons pouvoir accéder à index+4, donc index+4 < tokens.size()
-        if (index + 4 >= tokens.size()) {
-            return false;
-        }
-        return tokens.get(index).getType() == TOKEN_TYPE.SLASH_SLASH &&
-               tokens.get(index + 1).getType() == TOKEN_TYPE.OPEN &&
-               tokens.get(index + 2).getType() == TOKEN_TYPE.ELEMENT &&
-               tokens.get(index + 3).getType() == TOKEN_TYPE.SLASH &&
-               tokens.get(index + 4).getType() == TOKEN_TYPE.CLOSE;
-    }
-    
-    private OpenMarkResult parseOpenMark(List<Token> tokens, int startIndex) {
-        String elementName = tokens.get(startIndex + 2).getStringValue();
-        int i = startIndex + 3;
-        
-        // Parser les attributs jusqu'au >
-        Map<String, String> attributes = new HashMap<>();
-        while (i < tokens.size() && tokens.get(i).getType() != TOKEN_TYPE.CLOSE) {
-            if (tokens.get(i).getType() == TOKEN_TYPE.STRING &&
-                i + 2 < tokens.size() &&
-                tokens.get(i + 1).getType() == TOKEN_TYPE.EQUALS &&
-                tokens.get(i + 2).getType() == TOKEN_TYPE.STRING) {
-                
-                String attrName = tokens.get(i).getStringValue().trim();
-                String attrValue = tokens.get(i + 2).getStringValue().trim();
-                attributes.put(attrName, attrValue);
-                i += 3;
-            } else {
-                i++;
-            }
-        }
-        
-        if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.CLOSE) {
-            i++; // Skip >
-        }
-        
-        OpenMark openMark = new OpenMark(elementName, attributes);
-        return new OpenMarkResult(openMark, i);
-    }
-    
-    private CloseMarkResult parseCloseMark(List<Token> tokens, int startIndex) {
-        String elementName = tokens.get(startIndex + 2).getStringValue();
-        int nextIndex = startIndex + 5; // Skip [//][<][ELEMENT][/][>]
-        
-        CloseMark closeMark = new CloseMark(elementName);
-        return new CloseMarkResult(closeMark, nextIndex);
-    }
-    
-    private static class OpenMarkResult {
-        final OpenMark openMark;
-        final int nextIndex;
-        
-        OpenMarkResult(OpenMark openMark, int nextIndex) {
-            this.openMark = openMark;
-            this.nextIndex = nextIndex;
-        }
-    }
-    
-    private static class CloseMarkResult {
-        final CloseMark closeMark;
-        final int nextIndex;
-        
-        CloseMarkResult(CloseMark closeMark, int nextIndex) {
-            this.closeMark = closeMark;
-            this.nextIndex = nextIndex;
-        }
     }
 }

@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.jsproject.blocksfactory;
 
 import java.util.Map;
 
-public interface JsParser {
+public interface BlockFromElementBuilder {
     
     /**
      * Parse le contenu avec les attributs fournis
@@ -11,9 +11,5 @@ public interface JsParser {
      * @param attributes les attributs extraits de la balise (ex: {"id": "230"})
      * @return le résultat du parsing
      */
-    ParseResult parse(String content, Map<String, String> attributes);
-    
-    /**
-     * Résultat du parsing contenant les blocks créés et le contenu nettoyé
-     */
+    BlockFromElementResult parse(String content, Map<String, String> attributes);
 }

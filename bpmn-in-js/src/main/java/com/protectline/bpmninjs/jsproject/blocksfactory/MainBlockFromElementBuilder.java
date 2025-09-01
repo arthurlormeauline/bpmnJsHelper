@@ -7,17 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class MainParser implements JsParser {
+class MainBlockFromElementBuilder implements BlockFromElementBuilder {
     
     private final TemplateForParser template;
     
-    MainParser(TemplateForParser template) {
+    MainBlockFromElementBuilder(TemplateForParser template) {
         this.template = template;
     }
     
     @Override
-    public ParseResult parse(String content, Map<String, String> attributes) {
+    public BlockFromElementResult parse(String content, Map<String, String> attributes) {
         List<Block> blocks = new ArrayList<>();
-        return new ParseResult(blocks, content);
+        return new BlockFromElementResult(blocks, content);
     }
 }

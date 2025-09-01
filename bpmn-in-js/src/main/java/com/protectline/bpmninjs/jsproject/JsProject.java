@@ -2,7 +2,7 @@ package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectParser;
+import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectBlocksBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +29,7 @@ public class JsProject {
     }
 
     public List<Block> getBlocks(String process) throws IOException {
-        var parser = new JsProjectParser(fileUtil);
+        var parser = new JsProjectBlocksBuilder(fileUtil);
         var jsContent = fileUtil.getJsRunnerFileContent(process);
         return parser.parseJsToBlocks(jsContent);
     }

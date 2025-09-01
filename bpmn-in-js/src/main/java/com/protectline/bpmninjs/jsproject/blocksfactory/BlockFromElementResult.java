@@ -4,21 +4,17 @@ import com.protectline.bpmninjs.common.block.Block;
 
 import java.util.List;
 
-class ParseResult {
+class BlockFromElementResult {
     private final List<Block> blocks;
     private final String cleanedContent;
 
-    public ParseResult(List<Block> blocks, String cleanedContent) {
+    public BlockFromElementResult(List<Block> blocks, String cleanedContent) {
         this.blocks = blocks;
         this.cleanedContent = cleanedContent;
     }
 
     public List<Block> getBlocks() {
         return blocks;
-    }
-
-    public String getCleanedContent() {
-        return cleanedContent;
     }
 }
 

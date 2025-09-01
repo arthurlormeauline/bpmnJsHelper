@@ -14,22 +14,19 @@ import java.util.List;
 /**
  * Parser principal utilisant l'architecture Lexer -> TokenParser -> JsParser
  */
-public class JsProjectParser implements JsProjectParserInterface {
+public class JsProjectBlocksBuilder {
     
     private final Lexer lexer;
     private final TokenParser tokenParser;
-    private final JsParserFactory parserFactory;
+    private final BlockFromElementFactory parserFactory;
     
-    public JsProjectParser(FileUtil fileUtil) throws IOException {
+    public JsProjectBlocksBuilder(FileUtil fileUtil) throws IOException {
         this.lexer = new Lexer();
         this.tokenParser = new TokenParser();
-        this.parserFactory = new JsParserFactory(fileUtil);
+        this.parserFactory = new BlockFromElementFactory(fileUtil);
     }
 
-    /**
-     * Parse le contenu JS en blocs selon l'architecture lexer/parser
-     */
-    @Override
+
     public List<Block> parseJsToBlocks(String jsContent) {
         List<Token> tokens = lexer.tokenize(jsContent);
         
@@ -39,11 +36,10 @@ public class JsProjectParser implements JsProjectParserInterface {
         
         for (Element element : elements) {
             try {
-                JsParser parser = parserFactory.createParser(element.getElementName());
-                ParseResult result = parser.parse(element.getContent(), element.getAttributes());
+                BlockFromElementBuilder parser = parserFactory.getBlockBuilder(element.getElementName());
+                BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {
-                // Si pas de parser pour cet élément, on l'ignore pour l'instant
                 System.err.println("No parser found for element: " + element.getElementName());
             }
         }

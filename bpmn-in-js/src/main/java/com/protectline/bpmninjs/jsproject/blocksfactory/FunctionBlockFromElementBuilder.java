@@ -12,17 +12,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class FunctionParser implements JsParser {
+class FunctionBlockFromElementBuilder implements BlockFromElementBuilder {
     
     private final TemplateForParser template;
     private static final Pattern TEMPLATE_PLACEHOLDER_PATTERN = Pattern.compile("\\*\\*([^*]+)\\*\\*");
     
-    FunctionParser(TemplateForParser template) {
+    FunctionBlockFromElementBuilder(TemplateForParser template) {
         this.template = template;
     }
     
     @Override
-    public ParseResult parse(String content, Map<String, String> attributes) {
+    public BlockFromElementResult parse(String content, Map<String, String> attributes) {
         List<Block> blocks = new ArrayList<>();
         
         // Template FUNCTION: "//<function id=**id**>\n**name**() {\n**content**\n}\n//<function/>\n\n"
@@ -42,7 +42,7 @@ class FunctionParser implements JsParser {
         }
         
         // Retourner une chaîne vide car tout le contenu a été parsé en bloc
-        return new ParseResult(blocks, "");
+        return new BlockFromElementResult(blocks, "");
     }
     
     private String extractFunctionName(String content) {

@@ -7,27 +7,22 @@ import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
 import java.io.IOException;
 import java.util.List;
 
-class JsParserFactory {
+class BlockFromElementFactory {
     
     private final List<TemplateForParser> templates;
     
-    JsParserFactory(FileUtil fileUtil) throws IOException {
+    BlockFromElementFactory(FileUtil fileUtil) throws IOException {
         this.templates = JsUpdaterTemplateUtil.readTemplatesForParserFromFile(fileUtil);
     }
     
-    /**
-     * Crée un parser basé sur l'élément fourni
-     * @param element l'élément à parser (ex: "main", "function")
-     * @return le parser approprié
-     */
-    JsParser createParser(String element) {
+    BlockFromElementBuilder getBlockBuilder(String element) {
         TemplateForParser template = getTemplateByElement(element);
         
         switch (element) {
             case "main":
-                return new MainParser(template);
+                return new MainBlockFromElementBuilder(template);
             case "function":
-                return new FunctionParser(template);
+                return new FunctionBlockFromElementBuilder(template);
             default:
                 throw new UnsupportedOperationException("Parser not implemented for element: " + element);
         }

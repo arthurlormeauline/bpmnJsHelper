@@ -1,7 +1,11 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.jsproject.blocksfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.xmlparser.Lexer;
+import com.protectline.bpmninjs.xmlparser.Token;
+import com.protectline.bpmninjs.xmlparser.TokenParser;
+import com.protectline.bpmninjs.xmlparser.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +40,7 @@ public class JsProjectParser implements JsProjectParserInterface {
         for (Element element : elements) {
             try {
                 JsParser parser = parserFactory.createParser(element.getElementName());
-                JsParser.ParseResult result = parser.parse(element.getContent(), element.getAttributes());
+                ParseResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {
                 // Si pas de parser pour cet élément, on l'ignore pour l'instant

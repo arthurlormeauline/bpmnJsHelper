@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.jsproject.blocksfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;

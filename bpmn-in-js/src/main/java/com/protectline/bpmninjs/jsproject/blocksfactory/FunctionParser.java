@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.jsproject.blocksfactory;
 
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;

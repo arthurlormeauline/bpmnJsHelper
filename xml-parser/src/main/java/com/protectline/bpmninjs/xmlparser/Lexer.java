@@ -1,11 +1,11 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.xmlparser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class Lexer {
+public class Lexer {
     
-    List<Token> tokenize(String content) {
+    public List<Token> tokenize(String content) {
         List<Token> tokens = new ArrayList<>();
         int i = 0;
         

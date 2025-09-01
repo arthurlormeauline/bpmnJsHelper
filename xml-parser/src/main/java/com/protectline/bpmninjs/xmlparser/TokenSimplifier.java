@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.xmlparser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 
-class TokenSimplifier {
+public class TokenSimplifier {
     
-    List<Token> simplifyTokens(List<Token> tokens) {
+    public List<Token> simplifyTokens(List<Token> tokens) {
         List<Token> result = new ArrayList<>();
         int i = 0;
         

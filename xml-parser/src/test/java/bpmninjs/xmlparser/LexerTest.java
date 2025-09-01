@@ -1,5 +1,8 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package bpmninjs.xmlparser;
 
+import com.protectline.bpmninjs.xmlparser.Lexer;
+import com.protectline.bpmninjs.xmlparser.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

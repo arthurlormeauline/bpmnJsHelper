@@ -1,10 +1,10 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.xmlparser;
 
-class Token {
+public class Token {
     private final TOKEN_TYPE type;
     private final Object value;
     
-    Token(TOKEN_TYPE type, String value) {
+    public Token(TOKEN_TYPE type, String value) {
         this.type = type;
         this.value = value;
     }
@@ -14,7 +14,7 @@ class Token {
         this.value = value;
     }
     
-    TOKEN_TYPE getType() {
+    public TOKEN_TYPE getType() {
         return type;
     }
     
@@ -26,21 +26,21 @@ class Token {
         return value;
     }
     
-    OpenMark getOpenMark() {
+    public OpenMark getOpenMark() {
         if (type == TOKEN_TYPE.OPEN_MARK && value instanceof OpenMark) {
             return (OpenMark) value;
         }
         throw new IllegalStateException("Token is not an OPEN_MARK");
     }
     
-    CloseMark getCloseMark() {
+    public CloseMark getCloseMark() {
         if (type == TOKEN_TYPE.CLOSE_MARK && value instanceof CloseMark) {
             return (CloseMark) value;
         }
         throw new IllegalStateException("Token is not a CLOSE_MARK");
     }
     
-    String getStringValue() {
+    public String getStringValue() {
         if (value instanceof String) {
             return (String) value;
         }

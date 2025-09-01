@@ -1,6 +1,6 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.xmlparser;
 
-enum TOKEN_TYPE {
+public enum TOKEN_TYPE {
     // Tokens de base (lexer)
     SLASH_SLASH,  // //
     OPEN,         // < (anciennement OPEN)

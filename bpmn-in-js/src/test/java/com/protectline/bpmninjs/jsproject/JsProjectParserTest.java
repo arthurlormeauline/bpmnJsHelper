@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.parser.JsProjectParser;
+import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,11 +1,11 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.xmlparser;
 
 import java.util.Map;
 
 /**
  * Représente une balise ouvrante avec ses attributs
  */
-class OpenMark {
+public class OpenMark {
     private final String elementName;
     private final Map<String, String> attributes;
     
@@ -14,11 +14,11 @@ class OpenMark {
         this.attributes = attributes;
     }
     
-    String getElementName() {
+    public String getElementName() {
         return elementName;
     }
     
-    Map<String, String> getAttributes() {
+    public Map<String, String> getAttributes() {
         return attributes;
     }
     

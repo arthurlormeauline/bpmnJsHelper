@@ -1,18 +1,18 @@
-package com.protectline.bpmninjs.jsproject.parser;
+package com.protectline.bpmninjs.xmlparser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-class TokenParser {
+public class TokenParser {
 
     private final TokenSimplifier tokenSimplifier;
 
-    TokenParser() {
+    public TokenParser() {
         this.tokenSimplifier = new TokenSimplifier();
     }
 
-    List<Element> parseTokensToElements(List<Token> tokens) {
+    public List<Element> parseTokensToElements(List<Token> tokens) {
         List<Token> simplifiedTokens = tokenSimplifier.simplifyTokens(tokens);
         List<Element> elements = new ArrayList<>();
         int indexOfFirstOpenMark = getIndexOfFirstOpenMark(simplifiedTokens);

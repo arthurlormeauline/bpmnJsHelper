@@ -1,6 +1,6 @@
 package com.protectline.jsproject.parser;
 
-public enum TOKEN_TYPE {
+enum TOKEN_TYPE {
     // Tokens de base (lexer)
     SLASH_SLASH,  // //
     OPEN,         // < (anciennement OPEN)

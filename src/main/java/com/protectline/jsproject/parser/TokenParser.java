@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TokenParser {
+class TokenParser {
 
     private final TokenSimplifier tokenSimplifier;
 
-    public TokenParser() {
+    TokenParser() {
         this.tokenSimplifier = new TokenSimplifier();
     }
 
-    public List<Element> parseTokensToElements(List<Token> tokens) {
+    List<Element> parseTokensToElements(List<Token> tokens) {
         List<Token> simplifiedTokens = tokenSimplifier.simplifyTokens(tokens);
         List<Element> elements = new ArrayList<>();
         int indexOfFirstOpenMark = getIndexOfFirstOpenMark(simplifiedTokens);

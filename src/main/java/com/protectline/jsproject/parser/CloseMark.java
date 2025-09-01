@@ -3,14 +3,14 @@ package com.protectline.jsproject.parser;
 /**
  * Représente une balise fermante
  */
-public class CloseMark {
+class CloseMark {
     private final String elementName;
     
-    public CloseMark(String elementName) {
+    CloseMark(String elementName) {
         this.elementName = elementName;
     }
     
-    public String getElementName() {
+    String getElementName() {
         return elementName;
     }
     

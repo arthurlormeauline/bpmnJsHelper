@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MainParser implements JsParser {
+class MainParser implements JsParser {
     
     private final TemplateForParser template;
     
-    public MainParser(TemplateForParser template) {
+    MainParser(TemplateForParser template) {
         this.template = template;
     }
     

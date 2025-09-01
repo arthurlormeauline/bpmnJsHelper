@@ -5,26 +5,26 @@ import java.util.Map;
 /**
  * Représente un élément parsé (une balise avec ses attributs et son contenu)
  */
-public class Element {
+class Element {
     private final String elementName;
     private final Map<String, String> attributes;
     private final String content;
     
-    public Element(String elementName, Map<String, String> attributes, String content) {
+    Element(String elementName, Map<String, String> attributes, String content) {
         this.elementName = elementName;
         this.attributes = attributes;
         this.content = content;
     }
     
-    public String getElementName() {
+    String getElementName() {
         return elementName;
     }
     
-    public Map<String, String> getAttributes() {
+    Map<String, String> getAttributes() {
         return attributes;
     }
     
-    public String getContent() {
+    String getContent() {
         return content;
     }
     

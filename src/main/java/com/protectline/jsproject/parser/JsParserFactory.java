@@ -7,11 +7,11 @@ import com.protectline.jsproject.updatertemplate.JsUpdaterTemplateUtil;
 import java.io.IOException;
 import java.util.List;
 
-public class JsParserFactory {
+class JsParserFactory {
     
     private final List<TemplateForParser> templates;
     
-    public JsParserFactory(FileUtil fileUtil) throws IOException {
+    JsParserFactory(FileUtil fileUtil) throws IOException {
         this.templates = JsUpdaterTemplateUtil.readTemplatesForParserFromFile(fileUtil);
     }
     
@@ -20,7 +20,7 @@ public class JsParserFactory {
      * @param element l'élément à parser (ex: "main", "function")
      * @return le parser approprié
      */
-    public JsParser createParser(String element) {
+    JsParser createParser(String element) {
         TemplateForParser template = getTemplateByElement(element);
         
         switch (element) {

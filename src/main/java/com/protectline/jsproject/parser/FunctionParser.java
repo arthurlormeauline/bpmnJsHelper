@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FunctionParser implements JsParser {
+class FunctionParser implements JsParser {
     
     private final TemplateForParser template;
     private static final Pattern TEMPLATE_PLACEHOLDER_PATTERN = Pattern.compile("\\*\\*([^*]+)\\*\\*");
     
-    public FunctionParser(TemplateForParser template) {
+    FunctionParser(TemplateForParser template) {
         this.template = template;
     }
     

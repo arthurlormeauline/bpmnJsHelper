@@ -3,9 +3,9 @@ package com.protectline.jsproject.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lexer {
+class Lexer {
     
-    public List<Token> tokenize(String content) {
+    List<Token> tokenize(String content) {
         List<Token> tokens = new ArrayList<>();
         int i = 0;
         

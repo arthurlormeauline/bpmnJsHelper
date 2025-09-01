@@ -5,20 +5,20 @@ import java.util.Map;
 /**
  * Représente une balise ouvrante avec ses attributs
  */
-public class OpenMark {
+class OpenMark {
     private final String elementName;
     private final Map<String, String> attributes;
     
-    public OpenMark(String elementName, Map<String, String> attributes) {
+    OpenMark(String elementName, Map<String, String> attributes) {
         this.elementName = elementName;
         this.attributes = attributes;
     }
     
-    public String getElementName() {
+    String getElementName() {
         return elementName;
     }
     
-    public Map<String, String> getAttributes() {
+    Map<String, String> getAttributes() {
         return attributes;
     }
     

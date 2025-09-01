@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Parser principal utilisant l'architecture Lexer -> TokenParser -> JsParser
  */
-public class JsProjectParser {
+public class JsProjectParser implements JsProjectParserInterface {
     
     private final Lexer lexer;
     private final TokenParser tokenParser;
@@ -25,6 +25,7 @@ public class JsProjectParser {
     /**
      * Parse le contenu JS en blocs selon l'architecture lexer/parser
      */
+    @Override
     public List<Block> parseJsToBlocks(String jsContent) {
         List<Token> tokens = lexer.tokenize(jsContent);
         

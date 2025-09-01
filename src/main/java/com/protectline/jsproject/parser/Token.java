@@ -1,46 +1,46 @@
 package com.protectline.jsproject.parser;
 
-public class Token {
+class Token {
     private final TOKEN_TYPE type;
     private final Object value;
     
-    public Token(TOKEN_TYPE type, String value) {
+    Token(TOKEN_TYPE type, String value) {
         this.type = type;
         this.value = value;
     }
     
-    public Token(TOKEN_TYPE type, Object value) {
+    Token(TOKEN_TYPE type, Object value) {
         this.type = type;
         this.value = value;
     }
     
-    public TOKEN_TYPE getType() {
+    TOKEN_TYPE getType() {
         return type;
     }
     
-    public String getValue() {
+    String getValue() {
         return value.toString();
     }
     
-    public Object getObjectValue() {
+    Object getObjectValue() {
         return value;
     }
     
-    public OpenMark getOpenMark() {
+    OpenMark getOpenMark() {
         if (type == TOKEN_TYPE.OPEN_MARK && value instanceof OpenMark) {
             return (OpenMark) value;
         }
         throw new IllegalStateException("Token is not an OPEN_MARK");
     }
     
-    public CloseMark getCloseMark() {
+    CloseMark getCloseMark() {
         if (type == TOKEN_TYPE.CLOSE_MARK && value instanceof CloseMark) {
             return (CloseMark) value;
         }
         throw new IllegalStateException("Token is not a CLOSE_MARK");
     }
     
-    public String getStringValue() {
+    String getStringValue() {
         if (value instanceof String) {
             return (String) value;
         }

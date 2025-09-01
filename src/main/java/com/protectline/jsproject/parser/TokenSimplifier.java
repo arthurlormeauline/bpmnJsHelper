@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 
-public class TokenSimplifier {
+class TokenSimplifier {
     
-    public List<Token> simplifyTokens(List<Token> tokens) {
+    List<Token> simplifyTokens(List<Token> tokens) {
         List<Token> result = new ArrayList<>();
         int i = 0;
         

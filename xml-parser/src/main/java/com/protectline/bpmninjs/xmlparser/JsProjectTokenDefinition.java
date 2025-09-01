@@ -15,11 +15,24 @@ public class JsProjectTokenDefinition implements TokenDefinition {
         
         switch (tokenType) {
             case OPEN:
-                // Vérifie si on a "//<"
-                return current == '/' && 
-                       position + 2 < content.length() && 
-                       content.charAt(position + 1) == '/' && 
-                       content.charAt(position + 2) == '<';
+                // Vérifie si on a "//<" (ouverture normale) ou "//< / " (fermeture qui précède souvent une ouverture)
+                if (current == '/' && position + 2 < content.length() && 
+                    content.charAt(position + 1) == '/' && 
+                    content.charAt(position + 2) == '<') {
+                    // Si c'est une fermeture "//</", on ne considère pas ça comme OPEN
+                    if (position + 3 < content.length() && content.charAt(position + 3) == '/') {
+                        return false;
+                    }
+                    return true;
+                }
+                // Vérifie si on a "//</":
+                if (current == '/' && position + 3 < content.length() && 
+                    content.charAt(position + 1) == '/' && 
+                    content.charAt(position + 2) == '<' &&
+                    content.charAt(position + 3) == '/') {
+                    return true;
+                }
+                return false;
                 
             case CLOSE:
                 return current == '>';

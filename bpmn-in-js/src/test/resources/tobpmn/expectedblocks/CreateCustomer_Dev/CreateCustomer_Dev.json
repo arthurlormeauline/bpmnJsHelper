@@ -1,30 +1,6 @@
 {
   "blocks": [
-    {"name": "Return_to_Last_Task_0", "path": {"id": "Return_to_Last_Task"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "46cf3a65-d793-4841-b8b1-e1889e9a9a1d", "content": "placeholder", "scriptIndex": 0},
     {"name": "retries_1_0", "path": {"id": "retries_1"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "32cb633b-0bb2-4c27-89fd-8812410863c6", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_Billing_Account_0", "path": {"id": "Create_Billing_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "f15c404f-979e-440d-bbf0-04c98580d03b", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_Billing_Account_1", "path": {"id": "Create_Billing_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "681dae6a-c400-4582-971a-eaf63d3af4df", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_Billing_Account_2", "path": {"id": "Create_Billing_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "45dadd4e-a5bc-4b80-9843-5d48ff20f80d", "content": "placeholder", "scriptIndex": 2},
-    {"name": "Create_User_Account_0", "path": {"id": "Create_User_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "29f6386a-84b8-42ed-bc09-0f5e81dffa6c", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_User_Account_1", "path": {"id": "Create_User_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "d1a9f1d0-23d5-40b6-877b-c7eb92032c11", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_User_Account_2", "path": {"id": "Create_User_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "71938128-416d-4500-8b83-f5d47e40a42c", "content": "placeholder", "scriptIndex": 2},
-    {"name": "Apply_discount_0", "path": {"id": "Apply_discount"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "6e3cc2d0-39fb-48ea-bb0e-9fa3d964dd14", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Apply_discount_1", "path": {"id": "Apply_discount"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "e9ce7121-aab2-4c47-a0be-ddbcb34d863c", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Apply_discount_2", "path": {"id": "Apply_discount"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "135db922-b959-46a2-8ee3-203aa9c33a93", "content": "placeholder", "scriptIndex": 2},
-    {"name": "Refresh_Token_0", "path": {"id": "Refresh_Token"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "8405558f-9726-4018-8e53-9d513bb4d4e8", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Refresh_Token_1", "path": {"id": "Refresh_Token"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "2e4a5a5b-3912-43f1-90cb-fcc23e0ca26e", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_Method_Of_Payment_0", "path": {"id": "Create_Method_Of_Payment"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "ddde7429-6274-4bc3-a8b8-b883ef079d0a", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_Method_Of_Payment_1", "path": {"id": "Create_Method_Of_Payment"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "8aa7bb64-6c56-4a10-88fa-7590fbee0bd7", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_Method_Of_Payment_2", "path": {"id": "Create_Method_Of_Payment"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "44e66867-f215-4e26-91f9-e6e8ba235cd9", "content": "placeholder", "scriptIndex": 2},
-    {"name": "Create_Method_Of_Payment_3", "path": {"id": "Create_Method_Of_Payment"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "8707715d-c6c9-4b8a-9db3-7b7e3c0c7935", "content": "placeholder", "scriptIndex": 3},
-    {"name": "Create_Keycloak_Account_0", "path": {"id": "Create_Keycloak_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "9e430d3d-d7a7-440c-9823-7d2164fe01fd", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_Keycloak_Account_1", "path": {"id": "Create_Keycloak_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "ddf3bf50-54b6-4591-8587-a083693c12f0", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_Keycloak_Account_2", "path": {"id": "Create_Keycloak_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "bb888e2b-fba8-44f3-9dff-9475f24947aa", "content": "placeholder", "scriptIndex": 2},
-    {"name": "Create_customer_0", "path": {"id": "Create_customer"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "8785eb71-d317-4674-88d7-a1f4e22e0d9c", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_customer_1", "path": {"id": "Create_customer"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "55282276-ab4b-4a86-97e3-e48209bc5165", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_customer_2", "path": {"id": "Create_customer"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "3acb3e8a-feb0-452c-a20d-c08e405779c5", "content": "placeholder", "scriptIndex": 2},
-    {"name": "Create_Customer_Account_0", "path": {"id": "Create_Customer_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "7aa22ad8-031f-47ed-8abe-29da37f8319f", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_Customer_Account_1", "path": {"id": "Create_Customer_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "d04a2515-5601-4534-8074-6babcb689335", "content": "placeholder", "scriptIndex": 1},
-    {"name": "Create_Customer_Account_2", "path": {"id": "Create_Customer_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "3ea0492d-500f-4c53-b8fa-628d7e259c85", "content": "placeholder", "scriptIndex": 2}
+    {"name": "Create_Billing_Account_0", "path": {"id": "Create_Billing_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "f15c404f-979e-440d-bbf0-04c98580d03b", "content": "placeholder", "scriptIndex": 0}
   ]
 }

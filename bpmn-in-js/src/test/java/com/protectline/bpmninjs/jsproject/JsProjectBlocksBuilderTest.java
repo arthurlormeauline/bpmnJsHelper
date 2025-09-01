@@ -34,4 +34,26 @@ class JsProjectBlocksBuilderTest {
         assertThat(blocksFromProject.size()).isEqualTo(20);
     }
 
+    @Test
+    void should_parse_minimal_two_function_js_content() throws URISyntaxException, IOException {
+        // Given - Read minimal JS content from file
+        FileUtil files = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
+        var content = files.getJsRunnerFileContent("CreateCustomer_Dev_minimal");
+
+
+        // When - Parse the JS content directly
+        var blocksFromProject = jsProjectBlocksBuilder.parseJsToBlocks(content);
+
+        // Then - Should parse 2 functions but currently only parses 1
+        System.out.println("=== TEST RESULT ===");
+        System.out.println("Expected blocks: 2");
+        System.out.println("Actual blocks: " + blocksFromProject.size());
+        for (int i = 0; i < blocksFromProject.size(); i++) {
+            var block = blocksFromProject.get(i);
+            System.out.println("Block " + i + ": " + block.getName() + " (ID: " + block.getId() + ")");
+        }
+        
+        assertThat(blocksFromProject.size()).isEqualTo(2);
+    }
+
 }

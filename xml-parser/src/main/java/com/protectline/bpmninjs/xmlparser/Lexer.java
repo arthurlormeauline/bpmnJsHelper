@@ -1,5 +1,8 @@
 package com.protectline.bpmninjs.xmlparser;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,169 +19,239 @@ public class Lexer {
     }
     
     public List<Token> tokenize(String content) {
+        List<Token> basicTokens = tokenizeToWordsAndBlanks(content);
+        List<Token> semanticTokens = analyzeSemanticTokens(basicTokens);
+        return mergeAdjacentStringTokens(semanticTokens);
+    }
+
+    private List<Token> tokenizeToWordsAndBlanks(String content) {
         List<Token> tokens = new ArrayList<>();
         int i = 0;
-        insideTag = false;
         
         while (i < content.length()) {
-            // Essayer de matcher chaque type de token dans l'ordre de priorité
-            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
-            
-            boolean tokenFound = false;
-            
-            for (TOKEN_TYPE tokenType : tokenTypes) {
-                if (tokenDefinition.matches(content, i, tokenType)) {
-                    int consumedChars = tokenDefinition.getTokenLength(tokenType);
-                    String tokenString = tokenDefinition.extractTokenString(content, i, consumedChars);
-                    tokens.add(new Token(tokenType, tokenString));
-                    i += consumedChars;
-                    
-                    // Gérer le contexte des balises
-                    if (tokenType == TOKEN_TYPE.OPEN) {
-                        insideTag = true;
-                        parseElement(content, i, tokens);
-                        // Avancer jusqu'après l'élément
-                        i = skipToNextNonElementChar(content, i);
-                    }
-                    else if (tokenType == TOKEN_TYPE.CLOSE) {
-                        insideTag = false;
-                    }
-                    // Si c'est un END_SYMBOL, parser l'élément qui suit aussi
-                    else if (tokenType == TOKEN_TYPE.END_SYMBOL) {
-                        parseElement(content, i, tokens);
-                        // Avancer jusqu'après l'élément
-                        i = skipToNextNonElementChar(content, i);
-                    }
-                    
-                    tokenFound = true;
-                    break;
+            char c = content.charAt(i);
+
+            if (Character.isWhitespace(c)) {
+                // Collecter tous les espaces consécutifs
+                StringBuilder blankBuilder = new StringBuilder();
+                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
+                    blankBuilder.append(content.charAt(i));
+                    i++;
                 }
-            }
-            
-            if (!tokenFound) {
-                // Collecter le contenu string jusqu'au prochain token reconnu
-                i = parseStringContent(content, i, tokens);
+                tokens.add(new Token(TOKEN_TYPE.BLANK, blankBuilder.toString()));
+            } else {
+                // Collecter tous les caractères non-blancs consécutifs
+                StringBuilder wordBuilder = new StringBuilder();
+                while (i < content.length() && !Character.isWhitespace(content.charAt(i))) {
+                    wordBuilder.append(content.charAt(i));
+                    i++;
+                }
+                tokens.add(new Token(TOKEN_TYPE.WORD, wordBuilder.toString()));
             }
         }
         
         return tokens;
     }
-    
-    private void parseElement(String content, int startPos, List<Token> tokens) {
-        StringBuilder elementBuilder = new StringBuilder();
-        int i = startPos;
+
+    @AllArgsConstructor
+    @Getter
+    class WordParsingResult{
+        Token wordsAtBeginning;
+        List<Token> specializedToken;
+        Token wordsAtTheEnd;
+    }
+
+    private List<Token> analyzeSemanticTokens(List<Token> basicTokens) {
+        List<Token> semanticTokens = new ArrayList<>();
         
-        while (i < content.length()) {
-            char c = content.charAt(i);
-            if (Character.isWhitespace(c) || c == '>' || c == '/') {
-                break;
+        for (Token token : basicTokens) {
+            if (token.getType() == TOKEN_TYPE.WORD) {
+                // Parser le WORD pour identifier les tokens spéciaux
+                List<Token> parsedTokens = parseWordToTokens(token);
+                semanticTokens.addAll(parsedTokens);
+            } else if (token.getType() == TOKEN_TYPE.BLANK) {
+                // Convertir BLANK en STRING
+                semanticTokens.add(new Token(TOKEN_TYPE.STRING, token.getValue()));
+            } else {
+                // Autres types de tokens, les passer tels quels
+                semanticTokens.add(token);
             }
-            elementBuilder.append(c);
-            i++;
         }
         
-        String elementName = elementBuilder.toString();
-        if (!elementName.isEmpty()) {
-            tokens.add(new Token(TOKEN_TYPE.ELEMENT, elementName));
-        }
+        return semanticTokens;
     }
     
-    private int skipToNextNonElementChar(String content, int startPos) {
-        int i = startPos;
-        while (i < content.length()) {
-            char c = content.charAt(i);
-            if (Character.isWhitespace(c) || c == '>' || c == '/') {
-                break;
-            }
-            i++;
-        }
-        return i;
-    }
-    
-    private int parseStringContent(String content, int startPos, List<Token> tokens) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int i = startPos;
-        boolean inQuotes = false;
-        char quoteChar = '"';
+    private List<Token> parseWordToTokens(Token wordToken) {
+        List<Token> result = new ArrayList<>();
+        String word = wordToken.getValue();
+        int i = 0;
         
-        while (i < content.length()) {
-            char currentChar = content.charAt(i);
+        StringBuilder currentString = new StringBuilder();
+        
+        while (i < word.length()) {
+            boolean foundSpecialToken = false;
+            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
             
-            // Gérer les guillemets
-            if (currentChar == '"' || currentChar == '\'') {
-                if (!inQuotes) {
-                    // Ajouter le token précédent s'il y en a un
-                    if (stringBuilder.length() > 0) {
-                        tokens.add(new Token(TOKEN_TYPE.STRING, stringBuilder.toString()));
-                        stringBuilder = new StringBuilder();
+            for (TOKEN_TYPE tokenType : tokenTypes) {
+                if (tokenDefinition.matches(word, i, tokenType)) {
+                    // Avant d'ajouter le token spécial, ajouter la string accumulée
+                    if (currentString.length() > 0) {
+                        result.add(new Token(TOKEN_TYPE.STRING, currentString.toString()));
+                        currentString = new StringBuilder();
                     }
-                    inQuotes = true;
-                    quoteChar = currentChar;
-                    stringBuilder.append(currentChar);
-                    i++;
-                    continue;
-                } else if (currentChar == quoteChar) {
-                    stringBuilder.append(currentChar);
-                    inQuotes = false;
-                    // Ajouter le token quoté
-                    tokens.add(new Token(TOKEN_TYPE.STRING, stringBuilder.toString()));
-                    stringBuilder = new StringBuilder();
-                    i++;
-                    continue;
-                }
-            }
-            
-            if (inQuotes) {
-                stringBuilder.append(currentChar);
-                i++;
-                continue;
-            }
-            
-            // Vérifier si on rencontre un token reconnu
-            boolean foundToken = false;
-            
-            for (TOKEN_TYPE tokenType : TOKEN_TYPE.values()) {
-                if (tokenType == TOKEN_TYPE.ELEMENT || tokenType == TOKEN_TYPE.STRING || 
-                    tokenType == TOKEN_TYPE.OPEN_MARK || tokenType == TOKEN_TYPE.CONTENT || 
-                    tokenType == TOKEN_TYPE.CLOSE_MARK) {
-                    continue; // Skip les tokens complexes
-                }
-                
-                if (tokenDefinition.matches(content, i, tokenType)) {
-                    foundToken = true;
+                    
+                    // Ajouter le token spécial
+                    int tokenLength = tokenDefinition.getTokenLength(tokenType);
+                    String tokenString = tokenDefinition.extractTokenString(word, i, tokenLength);
+                    result.add(new Token(tokenType, tokenString));
+                    i += tokenLength;
+                    foundSpecialToken = true;
                     break;
                 }
             }
             
-            if (foundToken) {
+            if (!foundSpecialToken) {
+                // Caractère normal, l'ajouter à la string courante
+                currentString.append(word.charAt(i));
+                i++;
+            }
+        }
+        
+        // Ajouter la dernière string si elle n'est pas vide
+        if (currentString.length() > 0) {
+            result.add(new Token(TOKEN_TYPE.STRING, currentString.toString()));
+        }
+        
+        return result;
+    }
+    
+    private List<Token> mergeAdjacentStringTokens(List<Token> tokens) {
+        List<Token> merged = new ArrayList<>();
+        StringBuilder stringBuffer = new StringBuilder();
+        
+        for (Token token : tokens) {
+            if (token.getType() == TOKEN_TYPE.STRING) {
+                stringBuffer.append(token.getValue());
+            } else {
+                // Token non-STRING : vider le buffer d'abord
+                if (stringBuffer.length() > 0) {
+                    merged.add(new Token(TOKEN_TYPE.STRING, stringBuffer.toString()));
+                    stringBuffer = new StringBuilder();
+                }
+                merged.add(token);
+            }
+        }
+        
+        // Vider le buffer final
+        if (stringBuffer.length() > 0) {
+            merged.add(new Token(TOKEN_TYPE.STRING, stringBuffer.toString()));
+        }
+        
+        return merged;
+    }
+
+    private WordParsingResult parseWord(Token token) {
+        var word = token.getValue();
+        return parseWordRecursive(word, 0);
+    }
+    
+    private WordParsingResult parseWordRecursive(String word, int startIndex) {
+        List<Token> allSpecializedTokens = new ArrayList<>();
+        int i = startIndex;
+        
+        // 1. Collecter les caractères normaux au début (avant le premier token spécial)
+        StringBuilder wordsAtBeginning = new StringBuilder();
+        boolean foundFirstSpecialToken = false;
+        
+        while (i < word.length() && !foundFirstSpecialToken) {
+            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
+            boolean isSpecialToken = false;
+            
+            for (TOKEN_TYPE tokenType : tokenTypes) {
+                if (tokenDefinition.matches(word, i, tokenType)) {
+                    foundFirstSpecialToken = true;
+                    isSpecialToken = true;
+                    break;
+                }
+            }
+            
+            if (!isSpecialToken) {
+                wordsAtBeginning.append(word.charAt(i));
+                i++;
+            }
+        }
+        
+        // 2. Parser les tokens spéciaux consécutifs
+        while (i < word.length()) {
+            boolean foundSpecialToken = false;
+            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
+            
+            for (TOKEN_TYPE tokenType : tokenTypes) {
+                if (tokenDefinition.matches(word, i, tokenType)) {
+                    int tokenLength = tokenDefinition.getTokenLength(tokenType);
+                    String tokenString = tokenDefinition.extractTokenString(word, i, tokenLength);
+                    allSpecializedTokens.add(new Token(tokenType, tokenString));
+                    i += tokenLength;
+                    foundSpecialToken = true;
+                    break;
+                }
+            }
+            
+            if (!foundSpecialToken) {
+                // On a atteint des caractères normaux après des tokens spéciaux
+                // Il faut parser récursivement le reste pour détecter d'autres tokens spéciaux éventuels
+                if (i < word.length()) {
+                    WordParsingResult remainingResult = parseWordRecursive(word, i);
+                    
+                    // Fusionner les résultats
+                    if (remainingResult.getWordsAtBeginning() != null) {
+                        // Il y a des mots normaux au début du parsing récursif
+                        // Ces mots doivent être traités comme un token STRING intermédiaire
+                        String intermediateWord = remainingResult.getWordsAtBeginning().getValue();
+                        allSpecializedTokens.add(new Token(TOKEN_TYPE.STRING, intermediateWord));
+                        
+                        // Ajouter les tokens spéciaux du parsing récursif
+                        allSpecializedTokens.addAll(remainingResult.getSpecializedToken());
+                        
+                        Token beginningToken = wordsAtBeginning.length() > 0 ? new Token(TOKEN_TYPE.WORD, wordsAtBeginning.toString()) : null;
+                        return new WordParsingResult(beginningToken, allSpecializedTokens, remainingResult.getWordsAtTheEnd());
+                    } else {
+                        // Pas de mots au début dans le parsing récursif, donc il n'y avait que des tokens spéciaux
+                        allSpecializedTokens.addAll(remainingResult.getSpecializedToken());
+                        Token beginningToken = wordsAtBeginning.length() > 0 ? new Token(TOKEN_TYPE.WORD, wordsAtBeginning.toString()) : null;
+                        return new WordParsingResult(beginningToken, allSpecializedTokens, remainingResult.getWordsAtTheEnd());
+                    }
+                }
                 break;
             }
-            
-            // Si c'est un espace et qu'on a déjà du contenu, terminer ce token SEULEMENT si on est dans une balise
-            if (insideTag && Character.isWhitespace(currentChar) && stringBuilder.length() > 0) {
-                tokens.add(new Token(TOKEN_TYPE.STRING, stringBuilder.toString()));
-                stringBuilder = new StringBuilder();
-                // Collecter les espaces
-                while (i < content.length() && Character.isWhitespace(content.charAt(i))) {
-                    stringBuilder.append(content.charAt(i));
-                    i++;
-                }
-                if (stringBuilder.length() > 0) {
-                    tokens.add(new Token(TOKEN_TYPE.STRING, stringBuilder.toString()));
-                    stringBuilder = new StringBuilder();
-                }
-                continue;
-            }
-            
-            stringBuilder.append(currentChar);
+        }
+        
+        // 3. Si on arrive ici, il n'y avait pas de caractères normaux après les tokens spéciaux
+        Token beginningToken = wordsAtBeginning.length() > 0 ? new Token(TOKEN_TYPE.WORD, wordsAtBeginning.toString()) : null;
+        return new WordParsingResult(beginningToken, allSpecializedTokens, null);
+    }
+
+    private int parseElementAfterOpen(List<Token> basicTokens, int startIndex, List<Token> semanticTokens) {
+        int i = startIndex;
+
+        // Ignorer les espaces
+        while (i < basicTokens.size() && basicTokens.get(i).getType() == TOKEN_TYPE.BLANK) {
             i++;
         }
-        
-        String stringValue = stringBuilder.toString();
-        if (!stringValue.isEmpty()) {
-            tokens.add(new Token(TOKEN_TYPE.STRING, stringValue));
+
+        // Le prochain WORD devrait être l'élément
+        if (i < basicTokens.size() && basicTokens.get(i).getType() == TOKEN_TYPE.WORD) {
+            semanticTokens.add(new Token(TOKEN_TYPE.ELEMENT, basicTokens.get(i).getValue()));
+            i++;
         }
-        
+
         return i;
+    }
+
+
+    // Cette méthode n'est plus utilisée avec la nouvelle approche simplifiée
+    private int accumulateStringTokens(List<Token> basicTokens, int startIndex, List<Token> semanticTokens) {
+        // Legacy method - not used anymore
+        return startIndex + 1;
     }
 }

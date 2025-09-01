@@ -18,7 +18,7 @@ class FunctionUpdaterTest {
 
     @BeforeEach
     void setUp() {
-        template = new JsUpdaterTemplate("FUNCTION", "//<function id=**id**>\n**name**() {\n**content**\n}\n//<function/>\n\n", "//<FUNCTIONS>");
+        template = new JsUpdaterTemplate("FUNCTION", "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n", "//<FUNCTIONS>");
         functionUpdater = new FunctionUpdater(template);
     }
 

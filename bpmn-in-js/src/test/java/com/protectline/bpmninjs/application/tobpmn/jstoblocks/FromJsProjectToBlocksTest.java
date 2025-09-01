@@ -79,4 +79,28 @@ class FromJsProjectToBlocksTest {
         // Then
         assertBlocksAreEqualToExpected(fileUtil, process);
     }
+
+    @Test
+    void should_create_blocks_from_js_project_with_problematic_functions() throws IOException {
+        // Given
+        var process = "test-parsing-issue";
+
+        // When
+        fromJsProjectToBlocks.updateBlockFromJsProject(process);
+
+        // Then
+        assertBlocksAreEqualToExpected(fileUtil, process);
+    }
+
+    @Test
+    void should_create_blocks_from_js_project_CreateCustomer_Dev() throws IOException {
+        // Given - Real CreateCustomer_Dev BpmnRunner.js with 26 functions
+        var process = "CreateCustomer_Dev";
+
+        // When - Parse the JS project to blocks
+        fromJsProjectToBlocks.updateBlockFromJsProject(process);
+
+        // Then - Should successfully parse all 26 functions
+        assertBlocksAreEqualToExpected(fileUtil, process);
+    }
 }

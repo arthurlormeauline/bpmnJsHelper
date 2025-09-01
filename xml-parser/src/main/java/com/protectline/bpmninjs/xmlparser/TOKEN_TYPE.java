@@ -2,13 +2,16 @@ package com.protectline.bpmninjs.xmlparser;
 
 public enum TOKEN_TYPE {
     // Tokens de base (lexer)
-    SLASH_SLASH,  // //
-    OPEN,         // < (anciennement OPEN)
-    CLOSE,        // > (anciennement CLOSE)
+    OPEN,         // <
+    CLOSE,        // >
     EQUALS,       // =
-    SLASH,        // /
-    ELEMENT,      // element name after <
-    STRING,       // any string content
+    END_SYMBOL,   // /
+    ELEMENT,      // nom d'élement après <
+    STRING,       //
+    
+    // Nouveaux tokens pour la tokenisation en deux étapes
+    WORD,         // séquence de caractères non-blancs
+    BLANK,        // séquence d'espaces, tabs, newlines
     
     // Tokens complexes (token parser - étape intermédiaire)
     OPEN_MARK,    // balise ouvrante avec attributs

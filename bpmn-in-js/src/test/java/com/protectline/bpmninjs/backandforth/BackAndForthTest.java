@@ -73,7 +73,7 @@ class BackAndForthTest {
 
     @Test
     void should_create_jsProject_and_create_bpmn_back_again() throws IOException {
-        var process = "interventionPlanif-tf";
+        var process = "CreateCustomer_Dev";
         var bpmnFile = fileUtil.getBpmnFile(process);
         var workDir = fileUtil.getWorkingDirectory();
 

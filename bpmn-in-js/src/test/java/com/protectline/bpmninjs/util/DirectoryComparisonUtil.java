@@ -3,7 +3,9 @@ package com.protectline.bpmninjs.util;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class DirectoryComparisonUtil {
 
@@ -46,6 +48,8 @@ public class DirectoryComparisonUtil {
                     return false;
                 }
                 if (!areFilesEqual(file1, file2)) {
+                    System.out.println("FILE 1 : "+Files.readString(file1));
+                    System.out.println("FILE 2 : "+Files.readString(file2));
                     System.out.println("file : "+ file1.getFileName()+" is different");
                     return false;
                 }
@@ -61,13 +65,28 @@ public class DirectoryComparisonUtil {
     }
 
     private static boolean areFilesEqual(Path file1, Path file2) throws IOException {
-        if (Files.size(file1) != Files.size(file2)) {
-            return false;
+        // Comparaison ligne par ligne
+        List<String> lines1 = Files.readAllLines(file1);
+        List<String> lines2 = Files.readAllLines(file2);
+
+        if (!lines1.equals(lines2)) {
+            System.out.println("=== LINE-BY-LINE COMPARISON DEBUG ===");
+            System.out.println("File1 lines: " + lines1.size());
+            System.out.println("File2 lines: " + lines2.size());
+            
+            int maxLines = Math.max(lines1.size(), lines2.size());
+            for (int i = 0; i < maxLines; i++) {
+                String line1 = i < lines1.size() ? lines1.get(i) : "<MISSING>";
+                String line2 = i < lines2.size() ? lines2.get(i) : "<MISSING>";
+                
+                if (!line1.equals(line2)) {
+                    System.out.println("Line " + (i+1) + " DIFF:");
+                    System.out.println("  File1: \"" + line1 + "\"");
+                    System.out.println("  File2: \"" + line2 + "\"");
+                }
+            }
         }
 
-        byte[] content1 = Files.readAllBytes(file1);
-        byte[] content2 = Files.readAllBytes(file2);
-
-        return Arrays.equals(content1, content2);
+        return lines1.equals(lines2);
     }
 }

@@ -2,13 +2,13 @@
   {
     "name": "MAIN",
     "element" : "main",
-    "template": "//<main>\n\n//<FUNCTIONS>\n//<main/>",
+    "template": "//<main>\n\n//<FUNCTIONS>\n//</main>",
     "flag": "//<MAIN>"
   },
   {
     "name": "FUNCTION",
     "element" :"function",
-    "template": "//<function id=**id**>\n**name**() {\n**content**\n}\n//<function/>\n\n",
+    "template": "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n",
     "flag": "//<FUNCTIONS>"
   }
 ]

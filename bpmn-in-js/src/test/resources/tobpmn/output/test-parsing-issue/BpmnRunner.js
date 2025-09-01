@@ -64,27 +64,52 @@ class BpmnRunner {
 
 //<main>
 
-//<function id=880ed997-78b2-4ff6-bb02-9eeadfa6bcb7>
-Delay_definition_0() {
-delay definition script
+//<function id=simple-function-1>
+simpleFunction_0() {
+print('This is a simple function');
+//NEW ;
+execution.setVariable('test', 'value1');
 }
 //</function>
 
-//<function id=74b70353-a19e-4ad7-9838-5251ab67d8a6>
-Get_device_by_name_0() {
-get device by name url script
+//<function id=simple-function-2>
+simpleFunction_1() {
+//NEW ;
+var result = execution.getVariable('test');
+print('Result: ' + result);
 }
 //</function>
 
-//<function id=a96073f8-befb-430d-b8a0-466100ca5bc9>
-Get_device_by_name_1() {
-get device by name output script
+//<function id=problematic-function>
+problematicFunction_0() {
+//NEW ;
+print('Starting problematic function');
+if (execution.getVariable('condition')) {
+    // Commentaire with } closing brace in comment
+    var obj = { key: "value", nested: { inner: true } };
+    execution.setVariable('result', obj);
+}
+/* Another comment with } brace */
+execution.setVariable('state', 'completed');
 }
 //</function>
 
-//<function id=da508040-ebc4-4267-82fb-d7d4576e136e>
-Event_1u1d1qi_0() {
-start event / script
+//<function id=complex-json-function>
+complexJsonFunction_0() {
+//NEW ;
+var complexObj = {
+    "data": {
+        "items": [
+            { "id": 1, "name": "item1" },
+            { "id": 2, "name": "item2" }
+        ],
+        "metadata": {
+            "count": 2,
+            "filters": { "active": true }
+        }
+    }
+};
+execution.setVariable('complexData', JSON.stringify(complexObj));
 }
 //</function>
 

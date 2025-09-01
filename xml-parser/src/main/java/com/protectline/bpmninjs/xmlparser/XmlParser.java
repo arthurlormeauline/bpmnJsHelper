@@ -4,11 +4,14 @@ import java.util.List;
 
 public class XmlParser {
 
-    private Lexer lexer;
     private TokenParser tokenParser;
 
-    public List<Element> parseXml(String jsContent){
-        List<Token> tokens = lexer.tokenize(jsContent);
+    public XmlParser() {
+        this.tokenParser = new TokenParser();
+    }
+
+    public List<Element> parseXml(String jsContent, TokenDefinition tokenDefinition){
+        List<Token> tokens = new Lexer(tokenDefinition).tokenize(jsContent);
         return tokenParser.parseTokensToElements(tokens);
     }
 }

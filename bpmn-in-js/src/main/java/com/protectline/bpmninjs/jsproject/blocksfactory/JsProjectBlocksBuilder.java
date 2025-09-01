@@ -21,7 +21,7 @@ public class JsProjectBlocksBuilder {
     public List<Block> parseJsToBlocks(String jsContent) {
 
         List<Block> allBlocks = new ArrayList<>();
-        List<Element> elements = xmlParser.parseXml(jsContent);
+        List<Element> elements = xmlParser.parseXml(jsContent, new JsProjectTokenDefinition());
         
         for (Element element : elements) {
             try {

@@ -1,0 +1,30 @@
+org.opentest4j.AssertionFailedError:
+Expecting actual:
+  [Token{type=OPEN, value=<},
+    Token{type=ELEMENT, value=bpmn:task},
+    Token{type=STRING, value= id},
+    Token{type=EQUALS, value==},
+    Token{type=STRING, value="task1"},
+    Token{type=CLOSE, value=>},
+    Token{type=STRING, value=Some content},
+    Token{type=OPEN, value=<},
+    Token{type=END_SYMBOL, value=/},
+    Token{type=STRING, value=bpmn:task},
+    Token{type=CLOSE, value=>}]
+to contain exactly (and in same order):
+  [Token{type=OPEN, value=<},
+    Token{type=ELEMENT, value=bpmn:task},
+    Token{type=STRING, value= id},
+    Token{type=EQUALS, value==},
+    Token{type=STRING, value="task1"},
+    Token{type=CLOSE, value=>},
+    Token{type=STRING, value=Some content},
+    Token{type=OPEN, value=<},
+    Token{type=END_SYMBOL, value=/},
+    Token{type=ELEMENT, value=bpmn:task},
+    Token{type=CLOSE, value=>}]
+but some elements were not found:
+  [Token{type=ELEMENT, value=bpmn:task}]
+and others were not expected:
+  [Token{type=STRING, value=bpmn:task}]
+

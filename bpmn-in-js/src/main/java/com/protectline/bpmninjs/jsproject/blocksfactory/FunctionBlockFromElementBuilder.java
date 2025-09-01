@@ -25,7 +25,7 @@ class FunctionBlockFromElementBuilder implements BlockFromElementBuilder {
     public BlockFromElementResult parse(String content, Map<String, String> attributes) {
         List<Block> blocks = new ArrayList<>();
         
-        // Template FUNCTION: "//<function id=**id**>\n**name**() {\n**content**\n}\n//<function/>\n\n"
+        // Template FUNCTION: "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n"
         // On extrait les placeholders **name** et **content**
         
         String functionName = extractFunctionName(content);

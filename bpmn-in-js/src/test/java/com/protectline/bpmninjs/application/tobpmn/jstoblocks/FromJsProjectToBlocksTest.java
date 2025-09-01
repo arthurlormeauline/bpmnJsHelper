@@ -79,4 +79,16 @@ class FromJsProjectToBlocksTest {
         // Then
         assertBlocksAreEqualToExpected(fileUtil, process);
     }
+
+    @Test
+    void should_create_blocks_from_js_project_with_problematic_functions() throws IOException {
+        // Given
+        var process = "test-parsing-issue";
+
+        // When
+        fromJsProjectToBlocks.updateBlockFromJsProject(process);
+
+        // Then
+        assertBlocksAreEqualToExpected(fileUtil, process);
+    }
 }

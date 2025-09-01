@@ -62,7 +62,7 @@ class BpmnRunner {
         console.log(message);
     }
 
-//<MAIN>
+//<main>
 
 //<function id=435ec209-a46a-47b3-809a-fe263f4133a0>
     increment_retries_0() {

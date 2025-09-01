@@ -8,23 +8,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Parser principal utilisant l'architecture Lexer -> TokenParser -> JsParser
- */
 public class JsProjectBlocksBuilder {
     
-    private final Lexer lexer;
-    private final TokenParser tokenParser;
-    private final BlockFromElementFactory parserFactory;
+    private final BlockFromElementFactory blockFromElementFactory;
     private XmlParser xmlParser;
 
     public JsProjectBlocksBuilder(FileUtil fileUtil) throws IOException {
-        this.lexer = new Lexer();
-        this.tokenParser = new TokenParser();
-        this.parserFactory = new BlockFromElementFactory(fileUtil);
+        this.blockFromElementFactory = new BlockFromElementFactory(fileUtil);
         this.xmlParser = new XmlParser();
     }
-
 
     public List<Block> parseJsToBlocks(String jsContent) {
 
@@ -33,7 +25,7 @@ public class JsProjectBlocksBuilder {
         
         for (Element element : elements) {
             try {
-                BlockFromElementBuilder parser = parserFactory.getBlockBuilder(element.getElementName());
+                BlockFromElementBuilder parser = blockFromElementFactory.getBlockBuilder(element.getElementName());
                 BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {

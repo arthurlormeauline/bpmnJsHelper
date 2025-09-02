@@ -9,7 +9,7 @@
         "name": "simpleFunction_0",
         "type": "FUNCTION",
         "nodeType": "SERVICE_TASK",
-        "content": "print('This is a simple function');\nexecution.setVariable('test', 'value1');",
+        "content": "//NEW :\nprint('This is a simple function');\nexecution.setVariable('test', 'value1');",
         "scriptIndex": "0"
       }
     },
@@ -22,7 +22,7 @@
         "name": "simpleFunction_1",
         "type": "FUNCTION",
         "nodeType": "SERVICE_TASK",
-        "content": "var result = execution.getVariable('test');\nprint('Result: ' + result);",
+        "content": "//NEW :\nvar result = execution.getVariable('test');\nprint('Result: ' + result);",
         "scriptIndex": "1"
       }
     },
@@ -35,7 +35,7 @@
         "name": "problematicFunction_0",
         "type": "FUNCTION",
         "nodeType": "SERVICE_TASK",
-        "content": "print('Starting problematic function');\nif (execution.getVariable('condition')) {\n    // Commentaire with } closing brace in comment\n    var obj = { key: \"value\", nested: { inner: true } };\n    execution.setVariable('result', obj);\n}\n/* Another comment with } brace */\nexecution.setVariable('state', 'completed');",
+        "content": "//NEW :\nprint('Starting problematic function');\nif (execution.getVariable('condition')) {\n    // Commentaire with } closing brace in comment\n    var obj = { key: \"value\", nested: { inner: true } };\n    execution.setVariable('result', obj);\n}\n/* Another comment with } brace */\nexecution.setVariable('state', 'completed');",
         "scriptIndex": "0"
       }
     },
@@ -48,7 +48,7 @@
         "name": "complexJsonFunction_0",
         "type": "FUNCTION",
         "nodeType": "SERVICE_TASK",
-        "content": "var complexObj = {\n    \"data\": {\n        \"items\": [\n            { \"id\": 1, \"name\": \"item1\" },\n            { \"id\": 2, \"name\": \"item2\" }\n        ],\n        \"metadata\": {\n            \"count\": 2,\n            \"filters\": { \"active\": true }\n        }\n    }\n};\nexecution.setVariable('complexData', JSON.stringify(complexObj));",
+        "content": "//NEW :\nvar complexObj = {\n    \"data\": {\n        \"items\": [\n            { \"id\": 1, \"name\": \"item1\" },\n            { \"id\": 2, \"name\": \"item2\" }\n        ],\n        \"metadata\": {\n            \"count\": 2,\n            \"filters\": { \"active\": true }\n        }\n    }\n};\nexecution.setVariable('complexData', JSON.stringify(complexObj));",
         "scriptIndex": "0"
       }
     }

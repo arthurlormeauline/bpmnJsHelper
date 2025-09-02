@@ -1,6 +1,7 @@
 package com.protectline.bpmninjs.application.tojsproject.blockstojsproject;
 
 import com.protectline.bpmninjs.application.BlockWriter;
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.files.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +25,8 @@ class FromBlockToJsProjectTest {
     void setup() throws URISyntaxException, IOException {
         Path workingDirectory = getResourcePath(FromBlockToJsProjectTest.class, "tojsproject");
         fileUtil = new FileUtil(workingDirectory);
-        fromBlockToJsProject = new FromBlockToJsProject(fileUtil, new BlockWriter());
+        MainProvider mainProvider = new MainProvider(fileUtil);
+        fromBlockToJsProject = new FromBlockToJsProject(fileUtil, new BlockWriter(), mainProvider);
         
         Path sourceDir = workingDirectory.resolve("expectedblocks").resolve("simplify");
         Path targetDir = workingDirectory.resolve("blocks").resolve("simplify");

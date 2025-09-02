@@ -26,7 +26,9 @@ public class BlockUtil {
     }
 
     private static String getName(Node node, String id) {
-        return node.getAttributeValue("name") != null ? node.getAttributeValue("name") : id;
+        String name = node.getAttributeValue("name") != null ? node.getAttributeValue("name") : id;
+        // Replace spaces with underscores for consistent naming
+        return name.replace(" ", "_");
     }
 
 }

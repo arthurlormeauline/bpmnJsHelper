@@ -33,12 +33,7 @@ public class FromBpmnToBlocks {
 
         Path blocksFile = fileUtil.getBlocksFile(process);
         Files.createDirectories(blocksFile.getParent());
-        WriteBlock writer = null;
-
-        for (Block block : blocks){
-            writer = blockWriterFactory.getBlockWriter(block);
-        }
-
+        WriteBlock writer = blockWriterFactory.getBlockWriter();
         writer.writeBlocksToFile(blocks, blocksFile);
     }
 }

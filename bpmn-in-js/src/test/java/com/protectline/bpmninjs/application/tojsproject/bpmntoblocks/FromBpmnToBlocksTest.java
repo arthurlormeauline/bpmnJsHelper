@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.util.AssertUtil.assertBlocksEqualIgnoringId;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class FromBpmnToBlocksTest {
 
@@ -41,6 +41,6 @@ class FromBpmnToBlocksTest {
         // Then
         var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks").resolve(process).resolve(process + ".json"));
         var actualBlocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
-        assertThat(actualBlocks).isEqualTo(expectedBlock);
+        assertBlocksEqualIgnoringId(actualBlocks, expectedBlock);
     }
 }

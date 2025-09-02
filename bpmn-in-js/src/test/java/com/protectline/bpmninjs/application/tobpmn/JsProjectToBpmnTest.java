@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.application.tobpmn;
 
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class JsProjectToBpmnTest {
         }
 
         // When
-        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil, new MainProvider(fileUtil));
         jsProjectToBpmn.updateBpmn(processName);
 
         // Then

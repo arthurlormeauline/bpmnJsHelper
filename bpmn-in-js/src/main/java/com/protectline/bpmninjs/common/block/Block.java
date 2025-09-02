@@ -21,6 +21,11 @@ public class Block {
         setAttribute("name", name);
         setAttribute("type", type != null ? type.toString() : null);
         setAttribute("nodeType", nodeType != null ? nodeType.toString() : null);
+        // Auto-populate scriptIndex from name if not explicitly set
+        Integer autoScriptIndex = extractScriptIndex();
+        if (autoScriptIndex != null) {
+            setScriptIndex(autoScriptIndex);
+        }
     }
 
     public Block(BpmnPath path, String name, BlockType type, NodeType nodeType, String id) {
@@ -30,16 +35,23 @@ public class Block {
         setAttribute("name", name);
         setAttribute("type", type != null ? type.toString() : null);
         setAttribute("nodeType", nodeType != null ? nodeType.toString() : null);
+        // Auto-populate scriptIndex from name if not explicitly set
+        Integer autoScriptIndex = extractScriptIndex();
+        if (autoScriptIndex != null) {
+            setScriptIndex(autoScriptIndex);
+        }
     }
 
     public Block(BpmnPath path, String name, String content, NodeType nodeType) {
         this(path, name, BlockType.FUNCTION, nodeType);
         setAttribute("content", content);
+        // Auto-populate scriptIndex is already done in the parent constructor
     }
 
     public Block(BpmnPath path, String name, String content, NodeType nodeType, String id) {
         this(path, name, BlockType.FUNCTION, nodeType, id);
         setAttribute("content", content);
+        // Auto-populate scriptIndex is already done in the parent constructor
     }
 
     // Direct field getters

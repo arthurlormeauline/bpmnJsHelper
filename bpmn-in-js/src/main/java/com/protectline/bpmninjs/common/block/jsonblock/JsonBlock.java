@@ -1,6 +1,7 @@
 package com.protectline.bpmninjs.common.block.jsonblock;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
@@ -55,24 +56,29 @@ public class JsonBlock {
     }
     
     // Backward compatibility getters for tests
+    @JsonIgnore
     public String getName() {
         return attributes.get("name");
     }
     
+    @JsonIgnore
     public String getContent() {
         return attributes.get("content");
     }
     
+    @JsonIgnore
     public BlockType getType() {
         String typeStr = attributes.get("type");
         return typeStr != null ? BlockType.valueOf(typeStr) : null;
     }
     
+    @JsonIgnore
     public NodeType getNodeType() {
         String nodeTypeStr = attributes.get("nodeType");
         return nodeTypeStr != null ? NodeType.valueOf(nodeTypeStr) : null;
     }
     
+    @JsonIgnore
     public Integer getScriptIndex() {
         String scriptIndexStr = attributes.get("scriptIndex");
         return scriptIndexStr != null ? Integer.valueOf(scriptIndexStr) : null;

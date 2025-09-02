@@ -9,7 +9,7 @@
         "name": "retries_1_0",
         "type": "FUNCTION",
         "nodeType": "SERVICE_TASK",
-        "content": "placeholder",
+        "content": "var retries = execution.getVariable(\"retries\");\n\n// Decrement\nretries = retries - 1;\n\n// Don't allow negative retries\nif (retries < 0) {\n  retries = 0;\n}\n\nexecution.setVariable(\"retries\", retries);\nprint('Retrying failed task and changing retries variable to ' + retries);",
         "scriptIndex": "0"
       }
     },
@@ -22,7 +22,7 @@
         "name": "Create_Billing_Account_0",
         "type": "FUNCTION",
         "nodeType": "SERVICE_TASK",
-        "content": "placeholder",
+        "content": "\n    var url_tb= execution.getVariable('url_crm_customer');\n    url_tb+'/api/customer/v1/billingAccount/'\n",
         "scriptIndex": "0"
       }
     }

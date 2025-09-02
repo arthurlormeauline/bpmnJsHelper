@@ -15,7 +15,7 @@ public class BpmnToJS {
 
     public BpmnToJS(FileUtil fileUtil, MainProvider mainProvider) throws IOException {
         bpmnToBlock = new FromBpmnToBlocks(fileUtil, mainProvider.getBuilderProvider(), mainProvider.getBlockFileUtilProvider().getBlockWriterFactory());
-        blockToJs = new FromBlockToJsProject(fileUtil, new BlockWriter(), mainProvider.getTemplateProvider());
+        blockToJs = new FromBlockToJsProject(fileUtil, new BlockWriter(), mainProvider);
     }
 
     public void createProject(String process) throws IOException {

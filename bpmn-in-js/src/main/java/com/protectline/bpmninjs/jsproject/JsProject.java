@@ -16,7 +16,7 @@ public class JsProject {
     private final TemplateProvider templateProvider;
     private final BlockFromElementFactory blockFromElementFactory;
 
-    public JsProject(FileUtil fileUtil, MainProvider mainProvider) {
+    public JsProject(FileUtil fileUtil, MainProvider mainProvider) throws IOException {
         this.fileUtil = fileUtil;
         jsProjectUpdater = new JsProjectUpdater(fileUtil);
         this.templateProvider= mainProvider.getTemplateProvider();

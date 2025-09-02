@@ -18,7 +18,7 @@ public class MainProvider {
     private final List<JsUpdaterTemplate> jsTemplateUpdaters;
     private final FileUtil fileUtil;
 
-    MainProvider(FileUtil fileUtil) throws IOException {
+    public MainProvider(FileUtil fileUtil) throws IOException {
         this.jsTemplateUpdaters = readJsUpdaterTemplatesFromFile(fileUtil);
         this.fileUtil = fileUtil;
     }

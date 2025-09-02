@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.xmlparser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,51 +62,63 @@ public class SimplifiedTokenDefinition {
     
     /**
      * Parse un OPEN_MARK à partir de la position donnée
+     * Pattern: [OPEN, STRING, (EQUALS, STRING)*, CLOSE]
      */
     public static OpenMarkResult parseOpenMark(List<Token> tokens, int startIndex) {
-        List<TOKEN_TYPE> pattern = getOpenMarkTokens();
-        // La STRING est à l'index 1 dans le pattern [OPEN, STRING]
-        String stringValue = tokens.get(startIndex + 1).getStringValue();
-        // Extraire l'elementName en splittant par des espaces et en prenant le premier élément
-        String[] parts = stringValue.trim().split("\\s+");
-        String elementName = parts[0];
-        int i = startIndex + pattern.size();
+        String firstStringValue = tokens.get(startIndex + 1).getStringValue().trim();
+        int i = startIndex + 2; // Skip OPEN and first STRING
         
-        // Parser les attributs - d'abord extraire les noms d'attributs de la STRING initiale
         Map<String, String> attributes = new HashMap<>();
+        String elementName;
         
-        // Si la STRING contient plus que juste l'elementName, extraire les noms d'attributs
-        String[] allParts = stringValue.trim().split("\\s+");
-        String pendingAttrName = null;
-        if (allParts.length > 1) {
-            // Il y a des noms d'attributs potentiels dans la STRING
-            for (int partIndex = 1; partIndex < allParts.length; partIndex++) {
-                pendingAttrName = allParts[partIndex];
-                // Chercher = et valeur dans les tokens suivants
-                if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.EQUALS &&
-                    i + 1 < tokens.size() && tokens.get(i + 1).getType() == TOKEN_TYPE.STRING) {
-                    
-                    String attrValue = tokens.get(i + 1).getStringValue().trim();
-                    attributes.put(pendingAttrName, attrValue);
-                    i += 2; // Skip = and value
-                    pendingAttrName = null;
-                }
+        // Si c'est juste [OPEN, STRING, CLOSE], la STRING est l'elementName
+        if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.CLOSE) {
+            elementName = firstStringValue;
+        } else {
+            // Il y a des attributs, donc splitter la première STRING pour récupérer l'elementName
+            String[] firstStringParts = firstStringValue.split("\\s+");
+            elementName = firstStringParts[0];
+            
+            // Collecter tous les noms d'attributs de la première STRING
+            List<String> attributeNames = new ArrayList<>();
+            for (int j = 1; j < firstStringParts.length; j++) {
+                attributeNames.add(firstStringParts[j]);
             }
-        }
-        
-        // Continuer à parser les attributs normaux jusqu'au >
-        while (i < tokens.size() && tokens.get(i).getType() != TOKEN_TYPE.CLOSE) {
-            if (tokens.get(i).getType() == TOKEN_TYPE.STRING &&
-                i + 2 < tokens.size() &&
-                tokens.get(i + 1).getType() == TOKEN_TYPE.EQUALS &&
-                tokens.get(i + 2).getType() == TOKEN_TYPE.STRING) {
-                
-                String attrName = tokens.get(i).getStringValue().trim();
-                String attrValue = tokens.get(i + 2).getStringValue().trim();
-                attributes.put(attrName, attrValue);
-                i += 3;
-            } else {
-                i++;
+            
+            int attributeIndex = 0;
+            
+            // Parser les séquences (EQUALS, STRING)
+            while (i < tokens.size() && tokens.get(i).getType() != TOKEN_TYPE.CLOSE) {
+                if (tokens.get(i).getType() == TOKEN_TYPE.EQUALS &&
+                    i + 1 < tokens.size() &&
+                    tokens.get(i + 1).getType() == TOKEN_TYPE.STRING) {
+                    
+                    String valueString = tokens.get(i + 1).getStringValue().trim();
+                    
+                    // Si la valeur contient des espaces après une valeur quotée, splitter
+                    String actualValue = valueString;
+                    if (valueString.startsWith("\"") && valueString.contains("\" ")) {
+                        int endQuoteIndex = valueString.indexOf("\" ") + 1;
+                        actualValue = valueString.substring(0, endQuoteIndex);
+                        String nextAttrName = valueString.substring(endQuoteIndex + 1).trim();
+                        
+                        // Ajouter le prochain nom d'attribut à la liste
+                        if (!nextAttrName.isEmpty()) {
+                            attributeNames.add(nextAttrName);
+                        }
+                    }
+                    
+                    // Assigner l'attribut si on a un nom disponible
+                    if (attributeIndex < attributeNames.size()) {
+                        String attrName = attributeNames.get(attributeIndex);
+                        attributes.put(attrName, actualValue);
+                    }
+                    
+                    attributeIndex++;
+                    i += 2; // Skip EQUALS and STRING
+                } else {
+                    i++;
+                }
             }
         }
         

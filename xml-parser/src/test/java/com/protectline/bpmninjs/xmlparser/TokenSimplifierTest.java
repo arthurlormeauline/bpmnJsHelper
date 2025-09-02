@@ -22,12 +22,12 @@ class TokenSimplifierTest {
         // Given - JS Project format with //<
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-                new Token(TOKEN_TYPE.ELEMENT, "main"),
+                new Token(TOKEN_TYPE.STRING, "main"),
                 new Token(TOKEN_TYPE.CLOSE, ">"),
                 new Token(TOKEN_TYPE.STRING, "content"),
                 new Token(TOKEN_TYPE.OPEN, "//<"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.ELEMENT, "main"),
+                new Token(TOKEN_TYPE.STRING, "main"),
                 new Token(TOKEN_TYPE.CLOSE, ">")
         );
 
@@ -58,15 +58,14 @@ class TokenSimplifierTest {
         // Given - BPMN format with <
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "<"),
-                new Token(TOKEN_TYPE.ELEMENT, "bpmn:task"),
-                new Token(TOKEN_TYPE.STRING, " id"),
+                new Token(TOKEN_TYPE.STRING, "bpmn:task id"),
                 new Token(TOKEN_TYPE.EQUALS, "="),
                 new Token(TOKEN_TYPE.STRING, "\"task1\""),
                 new Token(TOKEN_TYPE.CLOSE, ">"),
                 new Token(TOKEN_TYPE.STRING, "Task content"),
                 new Token(TOKEN_TYPE.OPEN, "<"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.ELEMENT, "bpmn:task"),
+                new Token(TOKEN_TYPE.STRING, "bpmn:task"),
                 new Token(TOKEN_TYPE.CLOSE, ">")
         );
 
@@ -114,12 +113,12 @@ class TokenSimplifierTest {
         // Given
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-                new Token(TOKEN_TYPE.ELEMENT, "main"),
+                new Token(TOKEN_TYPE.STRING, "main"),
                 new Token(TOKEN_TYPE.CLOSE, ">"),
                 new Token(TOKEN_TYPE.STRING, "content"),
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-                new Token(TOKEN_TYPE.ELEMENT, "main"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "main"),
                 new Token(TOKEN_TYPE.CLOSE, ">")
         );
 

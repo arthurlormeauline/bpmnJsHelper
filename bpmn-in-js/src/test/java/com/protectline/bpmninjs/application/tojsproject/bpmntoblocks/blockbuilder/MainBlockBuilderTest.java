@@ -1,12 +1,12 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.blockbuilder;
 
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.FunctionBlockBuilder;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.FunctionBlockBuilder;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.equalsIgnoringId;
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.getExpectedBlock;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class MainBlockBuilderTest {
 
@@ -54,7 +54,7 @@ class MainBlockBuilderTest {
         var expectedGetDeviceByName_1 = getExpectedBlock("Activity_0rwauzg", "Get_device_by_name_1", "get device by name output script", NodeType.SERVICE_TASK);
         var expectedStartEvent = getExpectedBlock("Event_1u1d1qi", "Event_1u1d1qi_0", "start event script", NodeType.START);
 
-        assertThat(actual).isEqualTo(List.of(expectedDelayDefinition, expectedGetDeviceByName_0, expectedGetDeviceByName_1, expectedStartEvent));
+        equalsIgnoringId(actual, List.of(expectedDelayDefinition, expectedGetDeviceByName_0, expectedGetDeviceByName_1, expectedStartEvent));
     }
 
     private static Stream<Arguments> shouldExtractAllBlocksData() {

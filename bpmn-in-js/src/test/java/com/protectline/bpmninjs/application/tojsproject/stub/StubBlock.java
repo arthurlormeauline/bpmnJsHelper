@@ -3,21 +3,21 @@ package com.protectline.bpmninjs.application.tojsproject.stub;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
 
 import java.util.List;
+import java.util.Objects;
 
 public class StubBlock {
-    public static FunctionBlock getExpectedBlock(String id, String name, String script, NodeType nodeType) {
+    public static Block getExpectedBlock(String id, String name, String script, NodeType nodeType) {
         return getExpectedBlock(id, name, script, nodeType, null);
     }
 
-    public static FunctionBlock getExpectedBlock(String id, String name, String script, NodeType nodeType, String uuid) {
+    public static Block getExpectedBlock(String id, String name, String script, NodeType nodeType, String uuid) {
         BpmnPath expectedPath = new BpmnPath(id);
         String expectedName = name;
         String expectedContent = script;
-        return uuid == null ? new FunctionBlock(expectedPath, expectedName, expectedContent, nodeType) :
-                new FunctionBlock(expectedPath, expectedName, expectedContent, nodeType, uuid);
+        return uuid == null ? new Block(expectedPath, expectedName, expectedContent, nodeType) :
+                new Block(expectedPath, expectedName, expectedContent, nodeType, uuid);
     }
 
     public static List<Block> getExpectedNewBlocks() {
@@ -62,5 +62,59 @@ public class StubBlock {
                 "da508040-ebc4-4267-82fb-d7d4576e136e");
 
         return List.of(expectedDelayDefinition, expectedGetDeviceByName_0, expectedGetDeviceByName_1, expectedStartEvent);
+    }
+
+    /**
+     * Compare deux blocs en excluant l'UUID (utile pour les tests)
+     */
+    public static boolean equalsIgnoringId(Block block1, Block block2) {
+        if (block1 == block2) return true;
+        if (block1 == null || block2 == null) return false;
+        
+        return Objects.equals(block1.getPath(), block2.getPath()) &&
+               Objects.equals(block1.getName(), block2.getName()) &&
+               Objects.equals(block1.getContent(), block2.getContent()) &&
+               Objects.equals(block1.getType(), block2.getType()) &&
+               Objects.equals(block1.getNodeType(), block2.getNodeType()) &&
+               Objects.equals(block1.getScriptIndex(), block2.getScriptIndex());
+    }
+
+    /**
+     * Compare deux listes de blocs en excluant les UUIDs
+     */
+    public static boolean equalsIgnoringId(List<Block> list1, List<Block> list2) {
+        if (list1 == list2) return true;
+        if (list1 == null || list2 == null) return false;
+        if (list1.size() != list2.size()) return false;
+        
+        for (int i = 0; i < list1.size(); i++) {
+            if (!equalsIgnoringId(list1.get(i), list2.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Debug - compare et affiche les différences entre deux blocs
+     */
+    public static void debugBlockComparison(Block block1, Block block2) {
+        System.out.println("=== DEBUG BLOCK COMPARISON ===");
+        System.out.println("Block1 ID: " + block1.getId());
+        System.out.println("Block2 ID: " + block2.getId());
+        
+        System.out.println("Path equals: " + Objects.equals(block1.getPath(), block2.getPath()));
+        System.out.println("  Block1 path: '" + block1.getPath() + "'");
+        System.out.println("  Block2 path: '" + block2.getPath() + "'");
+        
+        System.out.println("Name equals: " + Objects.equals(block1.getName(), block2.getName()));
+        System.out.println("  Block1 name: '" + block1.getName() + "' (length: " + (block1.getName() != null ? block1.getName().length() : "null") + ")");
+        System.out.println("  Block2 name: '" + block2.getName() + "' (length: " + (block2.getName() != null ? block2.getName().length() : "null") + ")");
+        
+        System.out.println("Content equals: " + Objects.equals(block1.getContent(), block2.getContent()));
+        System.out.println("Type equals: " + Objects.equals(block1.getType(), block2.getType()));
+        System.out.println("NodeType equals: " + Objects.equals(block1.getNodeType(), block2.getNodeType()));
+        System.out.println("ScriptIndex equals: " + Objects.equals(block1.getScriptIndex(), block2.getScriptIndex()));
+        System.out.println("===============================");
     }
 }

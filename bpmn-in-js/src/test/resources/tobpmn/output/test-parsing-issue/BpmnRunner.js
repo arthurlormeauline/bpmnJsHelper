@@ -66,15 +66,15 @@ class BpmnRunner {
 
 //<function id=simple-function-1>
 simpleFunction_0() {
+//NEW :
 print('This is a simple function');
-//NEW ;
 execution.setVariable('test', 'value1');
 }
 //</function>
 
 //<function id=simple-function-2>
 simpleFunction_1() {
-//NEW ;
+//NEW :
 var result = execution.getVariable('test');
 print('Result: ' + result);
 }
@@ -82,7 +82,7 @@ print('Result: ' + result);
 
 //<function id=problematic-function>
 problematicFunction_0() {
-//NEW ;
+//NEW :
 print('Starting problematic function');
 if (execution.getVariable('condition')) {
     // Commentaire with } closing brace in comment
@@ -96,7 +96,7 @@ execution.setVariable('state', 'completed');
 
 //<function id=complex-json-function>
 complexJsonFunction_0() {
-//NEW ;
+//NEW :
 var complexObj = {
     "data": {
         "items": [

@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.common.block.Block;
 
@@ -23,11 +24,6 @@ public class MainBlockBuilder implements BlockBuilder {
         }
 
         return blocks;
-    }
-
-    public MainBlockBuilder registerSubBlockBuilder(BlockBuilder builder) {
-        builders.add(builder);
-        return this;
     }
 
     public MainBlockBuilder registerSubBlockBuilders(List<BlockBuilder> builders) {

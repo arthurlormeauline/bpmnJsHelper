@@ -1,15 +1,18 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.common.block.persist.BlockUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.common.block.persist.BlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.util.AssertUtil.assertBlocksEqualIgnoringId;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class FromBpmnToBlocksTest {
 
@@ -21,7 +24,9 @@ class FromBpmnToBlocksTest {
         var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(FromBpmnToBlocksTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
-        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        BlockUtil blockUtil = new BlockUtil();
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, mainFactory.getBlockBuilders(), blockUtil);
     }
 
 
@@ -37,6 +42,6 @@ class FromBpmnToBlocksTest {
         // Then
         var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks").resolve(process).resolve(process + ".json"));
         var actualBlocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
-        assertThat(actualBlocks).isEqualTo(expectedBlock);
+        assertBlocksEqualIgnoringId(actualBlocks, expectedBlock);
     }
 }

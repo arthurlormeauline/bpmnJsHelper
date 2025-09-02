@@ -2,8 +2,9 @@ package com.protectline.bpmninjs.jsproject.jsupdater;
 
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.common.block.Block;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.jsupdater.FunctionUpdater;
+import com.protectline.bpmninjs.translateunitfactory.template.Template;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,11 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FunctionUpdaterTest {
 
     private FunctionUpdater functionUpdater;
-    private JsUpdaterTemplate template;
+    private Template template;
 
     @BeforeEach
     void setUp() {
-        template = new JsUpdaterTemplate("FUNCTION", "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n", "//<FUNCTIONS>");
+        template = new Template("FUNCTION", "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n", "//<FUNCTIONS>");
         functionUpdater = new FunctionUpdater(template);
     }
 
@@ -27,7 +28,7 @@ class FunctionUpdaterTest {
         // Given
         BpmnPath path = new BpmnPath("Activity_1sbsavb");
         String originalName = "check if serviceInstance mandatory = false";
-        FunctionBlock block = new FunctionBlock(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_1sbsavb");
+        Block block = new Block(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_1sbsavb");
         
         // When
         String result = functionUpdater.update("//<FUNCTIONS>", List.of(block));
@@ -42,7 +43,7 @@ class FunctionUpdaterTest {
         // Given
         BpmnPath path = new BpmnPath("Activity_test");
         String originalName = "créer élément avec accénts";
-        FunctionBlock block = new FunctionBlock(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_test");
+        Block block = new Block(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_test");
         
         // When
         String result = functionUpdater.update("//<FUNCTIONS>", List.of(block));
@@ -57,7 +58,7 @@ class FunctionUpdaterTest {
         // Given
         BpmnPath path = new BpmnPath("Activity_test");
         String originalName = "123 start with number";
-        FunctionBlock block = new FunctionBlock(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_test");
+        Block block = new Block(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_test");
         
         // When
         String result = functionUpdater.update("//<FUNCTIONS>", List.of(block));
@@ -71,7 +72,7 @@ class FunctionUpdaterTest {
         // Given
         BpmnPath path = new BpmnPath("Activity_test");
         String originalName = "";
-        FunctionBlock block = new FunctionBlock(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_test");
+        Block block = new Block(path, originalName + "_0", "some content", NodeType.SCRIPT, "Activity_test");
         
         // When
         String result = functionUpdater.update("//<FUNCTIONS>", List.of(block));

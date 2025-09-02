@@ -1,48 +1,56 @@
 {
   "blocks": [
     {
-      "name": "simpleFunction_0",
-      "path": {
-        "id": "simpleFunction"
-      },
-      "type": "FUNCTION",
-      "nodeType": "SERVICE_TASK",
       "id": "simple-function-1",
-      "content": "print('This is a simple function');\nexecution.setVariable('test', 'value1');",
-      "scriptIndex": 0
-    },
-    {
-      "name": "simpleFunction_1",
       "path": {
         "id": "simpleFunction"
       },
-      "type": "FUNCTION",
-      "nodeType": "SERVICE_TASK",
-      "id": "simple-function-2",
-      "content": "var result = execution.getVariable('test');\nprint('Result: ' + result);",
-      "scriptIndex": 1
+      "attributes": {
+        "name": "simpleFunction_0",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "//NEW :\nprint('This is a simple function');\nexecution.setVariable('test', 'value1');",
+        "scriptIndex": "0"
+      }
     },
     {
-      "name": "problematicFunction_0",
+      "id": "simple-function-2",
+      "path": {
+        "id": "simpleFunction"
+      },
+      "attributes": {
+        "name": "simpleFunction_1",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "//NEW :\nvar result = execution.getVariable('test');\nprint('Result: ' + result);",
+        "scriptIndex": "1"
+      }
+    },
+    {
+      "id": "problematic-function",
       "path": {
         "id": "problematicFunction"
       },
-      "type": "FUNCTION",
-      "nodeType": "SERVICE_TASK",
-      "id": "problematic-function",
-      "content": "print('Starting problematic function');\nif (execution.getVariable('condition')) {\n    // Commentaire with } closing brace in comment\n    var obj = { key: \"value\", nested: { inner: true } };\n    execution.setVariable('result', obj);\n}\n/* Another comment with } brace */\nexecution.setVariable('state', 'completed');",
-      "scriptIndex": 0
+      "attributes": {
+        "name": "problematicFunction_0",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "//NEW :\nprint('Starting problematic function');\nif (execution.getVariable('condition')) {\n    // Commentaire with } closing brace in comment\n    var obj = { key: \"value\", nested: { inner: true } };\n    execution.setVariable('result', obj);\n}\n/* Another comment with } brace */\nexecution.setVariable('state', 'completed');",
+        "scriptIndex": "0"
+      }
     },
     {
-      "name": "complexJsonFunction_0",
+      "id": "complex-json-function",
       "path": {
         "id": "complexJsonFunction"
       },
-      "type": "FUNCTION",
-      "nodeType": "SERVICE_TASK",
-      "id": "complex-json-function",
-      "content": "var complexObj = {\n    \"data\": {\n        \"items\": [\n            { \"id\": 1, \"name\": \"item1\" },\n            { \"id\": 2, \"name\": \"item2\" }\n        ],\n        \"metadata\": {\n            \"count\": 2,\n            \"filters\": { \"active\": true }\n        }\n    }\n};\nexecution.setVariable('complexData', JSON.stringify(complexObj));",
-      "scriptIndex": 0
+      "attributes": {
+        "name": "complexJsonFunction_0",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "//NEW :\nvar complexObj = {\n    \"data\": {\n        \"items\": [\n            { \"id\": 1, \"name\": \"item1\" },\n            { \"id\": 2, \"name\": \"item2\" }\n        ],\n        \"metadata\": {\n            \"count\": 2,\n            \"filters\": { \"active\": true }\n        }\n    }\n};\nexecution.setVariable('complexData', JSON.stringify(complexObj));",
+        "scriptIndex": "0"
+      }
     }
   ]
 }

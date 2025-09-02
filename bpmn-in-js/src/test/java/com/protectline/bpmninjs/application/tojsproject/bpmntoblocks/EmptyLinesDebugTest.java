@@ -1,7 +1,9 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
-import com.protectline.bpmninjs.common.block.FunctionBlock;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.common.block.persist.BlockUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 
-import static com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.common.block.persist.BlockUtil.readBlocksFromFile;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 
 class EmptyLinesDebugTest {
@@ -22,7 +24,9 @@ class EmptyLinesDebugTest {
         var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(EmptyLinesDebugTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
-        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        BlockUtil blockUtil = new BlockUtil();
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, mainFactory.getBlockBuilders(), blockUtil);
     }
 
     @Test
@@ -48,8 +52,6 @@ class EmptyLinesDebugTest {
         
         System.out.println("\n=== BLOCS PARSÉS ===");
         actualBlocks.stream()
-            .filter(block -> block instanceof FunctionBlock)
-            .map(block -> (FunctionBlock) block)
             .forEach(block -> {
                 System.out.println("Block name: " + block.getName());
                 System.out.println("Block content: '" + block.getContent() + "'");

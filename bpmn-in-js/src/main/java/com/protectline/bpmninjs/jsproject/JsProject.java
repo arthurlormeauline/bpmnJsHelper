@@ -1,36 +1,22 @@
 package com.protectline.bpmninjs.jsproject;
 
-import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectBlocksBuilder;
-
 import java.io.IOException;
 import java.util.List;
 
-import static com.protectline.bpmninjs.jsproject.jsupdater.JsUpdaterFactory.getJsUpdaters;
-import static com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
-
-public class JsProject {
-
-    private final FileUtil fileUtil;
-    private final JsProjectUpdater jsProjectUpdater;
-
-    public JsProject(FileUtil fileUtil) {
-        this.fileUtil = fileUtil;
-        jsProjectUpdater = new JsProjectUpdater(fileUtil);
-    }
-
-    public void updateProject(String process, List<Block> blocks) throws IOException {
-        fileUtil.deleteJsDirectoryIfExists(process);
-        fileUtil.copyTemplateToJsDirectory(process);
-        var jsUpdaterTemplates = readJsUpdaterTemplatesFromFile(fileUtil);
-        var updaters = getJsUpdaters(blocks, jsUpdaterTemplates);
-        jsProjectUpdater.updateProject(process, blocks, updaters);
-    }
-
-    public List<Block> getBlocks(String process) throws IOException {
-        var parser = new JsProjectBlocksBuilder(fileUtil);
-        var jsContent = fileUtil.getJsRunnerFileContent(process);
-        return parser.parseJsToBlocks(jsContent);
-    }
+public interface JsProject {
+    
+    /**
+     * Returns the elements parsed from the JS project
+     */
+    List<JsNode> getElements() throws IOException;
+    
+    /**
+     * Returns the JS content string from the project
+     */
+    String getJsContent() throws IOException;
+    
+    /**
+     * Writes the updated JS content back to the project
+     */
+    void writeJsContent(String updatedContent) throws IOException;
 }

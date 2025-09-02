@@ -40,10 +40,8 @@ public class GenericLexer {
             int count = 0;
 
             if (splittedString.size() == 1) {
-                if (beginWithSplitter) {
-                    interResult.add(new Token(typeUseToSplit, splittedString.get(0)));
-                }
-                interResult.add(token);
+                // Pas de split sur ce type, continuer avec le type suivant
+                parseString(indexType + 1, types, def, interResult, token.getStringValue());
             } else {
                 if (!beginWithSplitter) {
                     count = 1;
@@ -52,13 +50,11 @@ public class GenericLexer {
                 for (int splittedStringIndex = 0; splittedStringIndex < splittedString.size(); splittedStringIndex++) {
                     var stringTokenToParse = splittedString.get(splittedStringIndex);
 
-                    if (count % 2 == 0) { // true for all splitter token
+                    if (stringTokenToParse.equals(splitTokenValue)) { // Check if it's actually the delimiter
                         interResult.add(new Token(typeUseToSplit, stringTokenToParse));
                     } else { // should be string to parse recursively
-                        indexType++;
-                        parseString(indexType, types, def, interResult, stringTokenToParse);
+                        parseString(indexType + 1, types, def, interResult, stringTokenToParse);
                     }
-                    count++;
                 }
             }
 

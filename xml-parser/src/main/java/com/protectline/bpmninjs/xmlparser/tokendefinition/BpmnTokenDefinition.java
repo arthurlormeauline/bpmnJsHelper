@@ -51,7 +51,7 @@ public class BpmnTokenDefinition implements TokenDefinition {
 
     @Override
     public TOKEN_TYPE getType(String str) {
-        if (str.equals("//<")){
+        if (str.equals("<")){
             return OPEN;
         }else if(str.equals(">")){
             return CLOSE;

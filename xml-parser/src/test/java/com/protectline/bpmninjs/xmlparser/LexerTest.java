@@ -73,15 +73,11 @@ class LexerTest {
 
         // Then
         assertThat(tokens).containsExactly(
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.OPEN, "<"),
+                new Token(TOKEN_TYPE.OPEN, "//<"),
             new Token(TOKEN_TYPE.STRING, "main"),
             new Token(TOKEN_TYPE.CLOSE, ">"),
             new Token(TOKEN_TYPE.STRING, "\n\nsome content\n"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.OPEN, "<"),
+                new Token(TOKEN_TYPE.OPEN, "//<"),
             new Token(TOKEN_TYPE.END_SYMBOL, "/"),
             new Token(TOKEN_TYPE.STRING, "main"),
             new Token(TOKEN_TYPE.CLOSE, ">")

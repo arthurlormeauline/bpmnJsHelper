@@ -3,7 +3,6 @@ package com.protectline.bpmninjs.common.block.jsonblock;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
 import lombok.Getter;
 
 import java.util.List;
@@ -12,22 +11,27 @@ import java.util.stream.Collectors;
 @Getter
 public class FunctionBlocksList {
     @JsonProperty("blocks")
-    private final List<FunctionJsonBlock> blocks;
+    private final List<JsonBlock> blocks;
 
-    public FunctionBlocksList(List<FunctionBlock> functionBlocks, int a) {
-        this.blocks = functionBlocks.stream()
-                .map(FunctionJsonBlock::new)
+    public FunctionBlocksList(List<Block> blocks, int a) {
+        this.blocks = blocks.stream()
+                .map(JsonBlock::new)
                 .collect(Collectors.toList());
     }
 
     @JsonCreator
-    public FunctionBlocksList(@JsonProperty("blocks") List<FunctionJsonBlock> blocks) {
+    public FunctionBlocksList(@JsonProperty("blocks") List<JsonBlock> blocks) {
         this.blocks = blocks;
     }
 
-    public List<Block> toFunctionBlocks() {
+    public List<Block> toBlocks() {
         return blocks.stream()
-                .map(FunctionJsonBlock::toFunctionBlock)
+                .map(JsonBlock::toBlock)
                 .collect(Collectors.toList());
+    }
+
+    // Backward compatibility method
+    public List<Block> toFunctionBlocks() {
+        return toBlocks();
     }
 }

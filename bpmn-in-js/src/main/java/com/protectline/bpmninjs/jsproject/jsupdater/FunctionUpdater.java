@@ -2,7 +2,6 @@ package com.protectline.bpmninjs.jsproject.jsupdater;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
 import com.protectline.bpmninjs.jsproject.JsUpdater;
 import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
@@ -29,7 +28,7 @@ public class FunctionUpdater implements JsUpdater {
         blocks.forEach(block ->
         {
             if (block.getType().equals(BlockType.FUNCTION)) {
-                var function = buildFunction((FunctionBlock) block);
+                var function = buildFunction((Block) block);
                 allFunction.append(function);
             }
         });
@@ -37,7 +36,7 @@ public class FunctionUpdater implements JsUpdater {
         return allFunction.toString();
     }
 
-    private String buildFunction(FunctionBlock block) {
+    private String buildFunction(Block block) {
         var function = template.getTemplate();
         function = function.replace("**id**", block.getId().toString());
         function = function.replace("**name**", normalizeJavaScriptFunctionName(block.getName().toString()));

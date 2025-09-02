@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.jsproject.blocksfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder.BlockFromElementFactory;
 import com.protectline.bpmninjs.xmlparser.*;
 
 import java.io.IOException;
@@ -13,8 +13,8 @@ public class JsProjectBlocksBuilder {
     private final BlockFromElementFactory blockFromElementFactory;
     private XmlParser xmlParser;
 
-    public JsProjectBlocksBuilder(FileUtil fileUtil) throws IOException {
-        this.blockFromElementFactory = new BlockFromElementFactory(fileUtil);
+    public JsProjectBlocksBuilder(BlockFromElementFactory blockFromElementFactory) throws IOException {
+        this.blockFromElementFactory = blockFromElementFactory;
         this.xmlParser = new XmlParser();
     }
 
@@ -25,7 +25,7 @@ public class JsProjectBlocksBuilder {
         
         for (Element element : elements) {
             try {
-                BlockFromElementBuilder parser = blockFromElementFactory.getBlockBuilder(element.getElementName());
+                BlockFromElement parser = blockFromElementFactory.getBlockBuilder(element.getElementName());
                 BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {

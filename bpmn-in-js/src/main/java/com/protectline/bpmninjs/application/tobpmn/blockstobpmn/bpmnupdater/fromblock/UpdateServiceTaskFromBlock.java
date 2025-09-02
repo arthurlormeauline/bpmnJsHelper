@@ -2,12 +2,12 @@ package com.protectline.bpmninjs.application.tobpmn.blockstobpmn.bpmnupdater.fro
 
 import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
+import com.protectline.bpmninjs.common.block.Block;
 
-public class UpdateServiceTaskFromFunctionBlock implements BpmUpdater {
-    private final FunctionBlock block;
+public class UpdateServiceTaskFromBlock implements BpmUpdater {
+    private final Block block;
 
-    public UpdateServiceTaskFromFunctionBlock(FunctionBlock block) {
+    public UpdateServiceTaskFromBlock(Block block) {
         this.block = block;
     }
 

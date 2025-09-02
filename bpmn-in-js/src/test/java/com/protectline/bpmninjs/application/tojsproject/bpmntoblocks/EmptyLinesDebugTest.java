@@ -1,6 +1,8 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
-import com.protectline.bpmninjs.common.block.FunctionBlock;
+import com.protectline.bpmninjs.application.BlockWriterFactory;
+import com.protectline.bpmninjs.application.BuildersProvider;
+import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,9 @@ class EmptyLinesDebugTest {
         var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(EmptyLinesDebugTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
-        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);
+        BuildersProvider provider= new BuildersProvider();
+        BlockWriterFactory writerFactory = new BlockWriterFactory();
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, provider, writerFactory);
     }
 
     @Test
@@ -48,8 +52,6 @@ class EmptyLinesDebugTest {
         
         System.out.println("\n=== BLOCS PARSÉS ===");
         actualBlocks.stream()
-            .filter(block -> block instanceof FunctionBlock)
-            .map(block -> (FunctionBlock) block)
             .forEach(block -> {
                 System.out.println("Block name: " + block.getName());
                 System.out.println("Block content: '" + block.getContent() + "'");

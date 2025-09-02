@@ -2,6 +2,7 @@ package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder.BlockFromElementFactory;
 import com.protectline.bpmninjs.util.AssertUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class JsProjectTest {
     void setup() throws URISyntaxException {
         var testDirectory = "tojsproject";
         fileUtil = new FileUtil(getResourcePath(JsProjectTest.class, testDirectory));
-        jsProject = new JsProject(fileUtil);
+        jsProject = new JsProject(fileUtil, new BlockFromElementFactory(fileUtil));
     }
 
     @Test

@@ -3,21 +3,20 @@ package com.protectline.bpmninjs.application.tojsproject.stub;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
 
 import java.util.List;
 
 public class StubBlock {
-    public static FunctionBlock getExpectedBlock(String id, String name, String script, NodeType nodeType) {
+    public static Block getExpectedBlock(String id, String name, String script, NodeType nodeType) {
         return getExpectedBlock(id, name, script, nodeType, null);
     }
 
-    public static FunctionBlock getExpectedBlock(String id, String name, String script, NodeType nodeType, String uuid) {
+    public static Block getExpectedBlock(String id, String name, String script, NodeType nodeType, String uuid) {
         BpmnPath expectedPath = new BpmnPath(id);
         String expectedName = name;
         String expectedContent = script;
-        return uuid == null ? new FunctionBlock(expectedPath, expectedName, expectedContent, nodeType) :
-                new FunctionBlock(expectedPath, expectedName, expectedContent, nodeType, uuid);
+        return uuid == null ? new Block(expectedPath, expectedName, expectedContent, nodeType) :
+                new Block(expectedPath, expectedName, expectedContent, nodeType, uuid);
     }
 
     public static List<Block> getExpectedNewBlocks() {

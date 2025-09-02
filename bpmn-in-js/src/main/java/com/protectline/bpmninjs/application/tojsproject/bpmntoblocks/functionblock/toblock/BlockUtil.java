@@ -3,13 +3,12 @@ package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionbl
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.Node;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionBlockUtil {
-    public static List<Block> getFunctionBlockFromScripts(Node node, BpmnPath path) {
+public class BlockUtil {
+    public static List<Block> getBlockFromScripts(Node node, BpmnPath path) {
         String id = path.getId();
 
         if (id != null) {
@@ -18,7 +17,7 @@ public class FunctionBlockUtil {
             List<Block> blocks = new ArrayList<>();
             for (int i = 0; i < scripts.size(); i++) {
                 var script = scripts.get(i);
-                blocks.add(new FunctionBlock(path, name + "_" + i, script, node.getType()));
+                blocks.add(new Block(path, name + "_" + i, script, node.getType()));
             }
             return blocks;
         } else {

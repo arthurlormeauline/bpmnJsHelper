@@ -3,6 +3,7 @@ package com.protectline.bpmninjs.application;
 import com.google.common.io.Resources;
 import com.protectline.bpmninjs.application.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.application.tojsproject.BpmnToJS;
+import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
 import com.protectline.bpmninjs.files.FileUtil;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 public class Application {
+
     public static void run(String[] args) throws URISyntaxException, IOException {
         if (args.length > 2 || args.length < 1) {
             System.out.println("usage : javac [app] processName [options : -toJs | -toBpmn]");
@@ -30,15 +32,19 @@ public class Application {
 
     private static void toBpmn(String process) throws URISyntaxException, IOException {
         System.out.println("Update bpmn file from js project");
-        FileUtil fileUtil = new FileUtil(Path.of(Resources.getResource("/").toURI()));
-        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil);
+        Path workingDirectory = Path.of(Resources.getResource("/").toURI());
+        FileUtil fileUtil = new FileUtil(workingDirectory);
+        MainProvider mainProvider = new MainProvider(fileUtil);
+        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil, mainProvider);
         toBpmn.updateBpmn(process);
     }
 
     private static void toJsProject(String process) throws URISyntaxException, IOException {
         System.out.println("Create js project from bpmn file");
         Path workingDirectory = Path.of(Resources.getResource("/").toURI());
-        BpmnToJS toJs = new BpmnToJS(new FileUtil(workingDirectory));
+        FileUtil fileUtil = new FileUtil(workingDirectory);
+        var mainProvider = new MainProvider(fileUtil);
+        BpmnToJS toJs = new BpmnToJS(fileUtil, mainProvider);
         toJs.createProject(process);
     }
 }

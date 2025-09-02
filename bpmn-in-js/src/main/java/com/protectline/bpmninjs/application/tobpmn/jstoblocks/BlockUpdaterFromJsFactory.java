@@ -4,10 +4,10 @@ import com.protectline.bpmninjs.common.block.BlockType;
 
 public class BlockUpdaterFromJsFactory {
     
-    public static BlockUpdaterFromJs getUpdater(BlockType blockType) {
+    public static UpdateBlockFromJs getUpdater(BlockType blockType) {
         switch (blockType) {
             case FUNCTION:
-                return new FunctionBlockUpdaterFromJs();
+                return new BlockUpdaterFromJs();
             default:
                 throw new IllegalArgumentException("Unsupported block type: " + blockType);
         }

@@ -23,15 +23,14 @@ class TokenParserTest {
         // Given - JS Project format
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.ELEMENT, "function"),
-            new Token(TOKEN_TYPE.STRING, " id"),
+            new Token(TOKEN_TYPE.STRING, "function id"),
             new Token(TOKEN_TYPE.EQUALS, "="),
             new Token(TOKEN_TYPE.STRING, "230"),
             new Token(TOKEN_TYPE.CLOSE, ">"),
             new Token(TOKEN_TYPE.STRING, "function d(){}"),
                 new Token(TOKEN_TYPE.OPEN, "//<"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-            new Token(TOKEN_TYPE.ELEMENT, "function"),
+            new Token(TOKEN_TYPE.STRING, "function"),
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
 
@@ -51,15 +50,14 @@ class TokenParserTest {
         // Given - BPMN format
         List<Token> tokens = Arrays.asList(
             new Token(TOKEN_TYPE.OPEN, "<"),
-                new Token(TOKEN_TYPE.ELEMENT, "bpmn:task"),
-                new Token(TOKEN_TYPE.STRING, " id"),
+                new Token(TOKEN_TYPE.STRING, "bpmn:task id"),
                 new Token(TOKEN_TYPE.EQUALS, "="),
                 new Token(TOKEN_TYPE.STRING, "\"task1\""),
             new Token(TOKEN_TYPE.CLOSE, ">"),
                 new Token(TOKEN_TYPE.STRING, "Task content"),
             new Token(TOKEN_TYPE.OPEN, "<"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.ELEMENT, "bpmn:task"),
+                new Token(TOKEN_TYPE.STRING, "bpmn:task"),
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
 
@@ -79,13 +77,13 @@ class TokenParserTest {
         // Given
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.ELEMENT, "main"),
+            new Token(TOKEN_TYPE.STRING, "main"),
             new Token(TOKEN_TYPE.CLOSE, ">"),
                 new Token(TOKEN_TYPE.STRING, "some content"),
                 new Token(TOKEN_TYPE.OPEN, "//<"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
 
-            new Token(TOKEN_TYPE.ELEMENT, "main"),
+            new Token(TOKEN_TYPE.STRING, "main"),
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
 
@@ -105,12 +103,12 @@ class TokenParserTest {
         // Given - Balises non correspondantes
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.ELEMENT, "function"),
+            new Token(TOKEN_TYPE.STRING, "function"),
             new Token(TOKEN_TYPE.CLOSE, ">"),
             new Token(TOKEN_TYPE.STRING, "content"),
                 new Token(TOKEN_TYPE.OPEN, "//<"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-            new Token(TOKEN_TYPE.ELEMENT, "main"),
+            new Token(TOKEN_TYPE.STRING, "main"),
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
 
@@ -125,7 +123,7 @@ class TokenParserTest {
         // Given - Balise fermante manquante
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.ELEMENT, "function"),
+            new Token(TOKEN_TYPE.STRING, "function"),
             new Token(TOKEN_TYPE.CLOSE, ">"),
             new Token(TOKEN_TYPE.STRING, "content")
             // Pas de balise fermante !

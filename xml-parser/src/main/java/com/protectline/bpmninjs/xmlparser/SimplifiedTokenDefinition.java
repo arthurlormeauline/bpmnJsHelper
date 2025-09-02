@@ -11,18 +11,18 @@ public class SimplifiedTokenDefinition {
     
     /**
      * Retourne la séquence de tokens qui compose un OPEN_MARK
-     * Pattern: [OPEN, ELEMENT]
+     * Pattern: [OPEN, STRING]
      */
     public static List<TOKEN_TYPE> getOpenMarkTokens() {
-        return List.of(TOKEN_TYPE.OPEN, TOKEN_TYPE.ELEMENT);
+        return List.of(TOKEN_TYPE.OPEN, TOKEN_TYPE.STRING);
     }
     
     /**
      * Retourne la séquence de tokens qui compose un CLOSE_MARK
-     * Pattern: [OPEN, END_SYMBOL, ELEMENT, CLOSE]
+     * Pattern: [OPEN, END_SYMBOL, STRING, CLOSE]
      */
     public static List<TOKEN_TYPE> getCloseMarkTokens() {
-        return List.of(TOKEN_TYPE.OPEN, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.ELEMENT, TOKEN_TYPE.CLOSE);
+        return List.of(TOKEN_TYPE.OPEN, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.STRING, TOKEN_TYPE.CLOSE);
     }
     
     /**
@@ -64,12 +64,36 @@ public class SimplifiedTokenDefinition {
      */
     public static OpenMarkResult parseOpenMark(List<Token> tokens, int startIndex) {
         List<TOKEN_TYPE> pattern = getOpenMarkTokens();
-        // L'ELEMENT est à l'index 1 dans le pattern [OPEN, ELEMENT]
-        String elementName = tokens.get(startIndex + 1).getStringValue();
+        // La STRING est à l'index 1 dans le pattern [OPEN, STRING]
+        String stringValue = tokens.get(startIndex + 1).getStringValue();
+        // Extraire l'elementName en splittant par des espaces et en prenant le premier élément
+        String[] parts = stringValue.trim().split("\\s+");
+        String elementName = parts[0];
         int i = startIndex + pattern.size();
         
-        // Parser les attributs jusqu'au >
+        // Parser les attributs - d'abord extraire les noms d'attributs de la STRING initiale
         Map<String, String> attributes = new HashMap<>();
+        
+        // Si la STRING contient plus que juste l'elementName, extraire les noms d'attributs
+        String[] allParts = stringValue.trim().split("\\s+");
+        String pendingAttrName = null;
+        if (allParts.length > 1) {
+            // Il y a des noms d'attributs potentiels dans la STRING
+            for (int partIndex = 1; partIndex < allParts.length; partIndex++) {
+                pendingAttrName = allParts[partIndex];
+                // Chercher = et valeur dans les tokens suivants
+                if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.EQUALS &&
+                    i + 1 < tokens.size() && tokens.get(i + 1).getType() == TOKEN_TYPE.STRING) {
+                    
+                    String attrValue = tokens.get(i + 1).getStringValue().trim();
+                    attributes.put(pendingAttrName, attrValue);
+                    i += 2; // Skip = and value
+                    pendingAttrName = null;
+                }
+            }
+        }
+        
+        // Continuer à parser les attributs normaux jusqu'au >
         while (i < tokens.size() && tokens.get(i).getType() != TOKEN_TYPE.CLOSE) {
             if (tokens.get(i).getType() == TOKEN_TYPE.STRING &&
                 i + 2 < tokens.size() &&
@@ -98,8 +122,11 @@ public class SimplifiedTokenDefinition {
      */
     public static CloseMarkResult parseCloseMark(List<Token> tokens, int startIndex) {
         List<TOKEN_TYPE> pattern = getCloseMarkTokens();
-        // L'ELEMENT est à l'index 2 dans le pattern [OPEN, END_SYMBOL, ELEMENT, CLOSE]
-        String elementName = tokens.get(startIndex + 2).getStringValue();
+        // La STRING est à l'index 2 dans le pattern [OPEN, END_SYMBOL, STRING, CLOSE]
+        String stringValue = tokens.get(startIndex + 2).getStringValue();
+        // Extraire l'elementName en splittant par des espaces et en prenant le premier élément
+        String[] parts = stringValue.trim().split("\\s+");
+        String elementName = parts[0];
         int nextIndex = startIndex + pattern.size();
         
         CloseMark closeMark = new CloseMark(elementName);

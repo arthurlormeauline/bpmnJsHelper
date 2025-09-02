@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class GenericLexerTest {
+class LexerTest {
 
     @Test
     void should_tokenize_js_project_simple_function_tag() {

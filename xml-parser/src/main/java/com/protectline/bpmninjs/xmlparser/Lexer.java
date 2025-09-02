@@ -6,11 +6,13 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
+
 /**
  * Lexer générique qui utilise une TokenDefinition pour parser différents formats
  */
 public class Lexer {
-    
+
     private final TokenDefinition tokenDefinition;
     private boolean insideTag = false;
     
@@ -19,9 +21,8 @@ public class Lexer {
     }
     
     public List<Token> tokenize(String content) {
-        List<Token> basicTokens = tokenizeToWordsAndBlanks(content);
-        List<Token> semanticTokens = analyzeSemanticTokens(basicTokens);
-        return mergeAdjacentStringTokens(semanticTokens);
+        var genLexer = new GenericLexer();
+        return genLexer.tokenize(content, List.of(OPEN,CLOSE,END_SYMBOL,EQUALS), tokenDefinition);
     }
 
     private List<Token> tokenizeToWordsAndBlanks(String content) {
@@ -90,7 +91,7 @@ public class Lexer {
         
         while (i < word.length()) {
             boolean foundSpecialToken = false;
-            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
+            TOKEN_TYPE[] tokenTypes = {OPEN, CLOSE, END_SYMBOL, TOKEN_TYPE.EQUALS};
             
             for (TOKEN_TYPE tokenType : tokenTypes) {
                 if (tokenDefinition.matches(word, i, tokenType)) {
@@ -164,7 +165,7 @@ public class Lexer {
         boolean foundFirstSpecialToken = false;
         
         while (i < word.length() && !foundFirstSpecialToken) {
-            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
+            TOKEN_TYPE[] tokenTypes = {OPEN, CLOSE, END_SYMBOL, TOKEN_TYPE.EQUALS};
             boolean isSpecialToken = false;
             
             for (TOKEN_TYPE tokenType : tokenTypes) {
@@ -184,7 +185,7 @@ public class Lexer {
         // 2. Parser les tokens spéciaux consécutifs
         while (i < word.length()) {
             boolean foundSpecialToken = false;
-            TOKEN_TYPE[] tokenTypes = {TOKEN_TYPE.OPEN, TOKEN_TYPE.CLOSE, TOKEN_TYPE.END_SYMBOL, TOKEN_TYPE.EQUALS};
+            TOKEN_TYPE[] tokenTypes = {OPEN, CLOSE, END_SYMBOL, TOKEN_TYPE.EQUALS};
             
             for (TOKEN_TYPE tokenType : tokenTypes) {
                 if (tokenDefinition.matches(word, i, tokenType)) {

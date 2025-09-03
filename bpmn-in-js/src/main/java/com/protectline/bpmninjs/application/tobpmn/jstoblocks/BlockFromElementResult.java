@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.blocksfromelement;
+package com.protectline.bpmninjs.application.tobpmn.jstoblocks;
 
 import com.protectline.bpmninjs.common.block.Block;
 

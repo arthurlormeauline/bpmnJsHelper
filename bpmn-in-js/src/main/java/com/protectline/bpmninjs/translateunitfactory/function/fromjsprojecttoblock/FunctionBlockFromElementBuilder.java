@@ -3,8 +3,8 @@ package com.protectline.bpmninjs.translateunitfactory.function.fromjsprojecttobl
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElementResult;
+import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElementResult;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
 import java.util.ArrayList;

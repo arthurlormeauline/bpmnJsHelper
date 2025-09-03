@@ -6,7 +6,7 @@ import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
 import com.protectline.bpmninjs.translateunitfactory.function.fromblocktobpmn.documentUpdater.FromFuntionBlockFactory;
 import com.protectline.bpmninjs.translateunitfactory.function.fromblocktojsproject.FunctionUpdater;
 import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.FunctionBlockBuilder;
@@ -65,20 +65,9 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     }
 
     @Override
-    public List<Template> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+    public List<Template> getTemplate(com.protectline.bpmninjs.files.FileUtil fileUtil) {
         try {
-            return TemplateUtil
-                    .getTemplate(fileUtil, "functiontranslateunit");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load function templates", e);
-        }
-    }
-
-    @Override
-    public List<Template> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil) {
-        try {
-            return TemplateUtil
-                    .getTemplate(fileUtil, "functiontranslateunit");
+            return TemplateUtil.getTemplate(fileUtil, "functiontranslateunit");
         } catch (Exception e) {
             throw new RuntimeException("Failed to load function templates", e);
         }

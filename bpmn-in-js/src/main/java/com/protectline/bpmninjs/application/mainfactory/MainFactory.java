@@ -6,7 +6,7 @@ import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilde
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
 import com.protectline.bpmninjs.translateunitfactory.entrypoint.EntryPointJsUpdater;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
@@ -20,8 +20,7 @@ import java.util.Optional;
 
 public class MainFactory {
 
-    private final List<Template> jsTemplateUpdaters;
-    private final List<Template> templatesForParser;
+    private final List<Template> templates;
     private final FileUtil fileUtil;
     private final List<TranslateUnitAbstractFactory> translateFactories;
     private final Map<String, TranslateUnitAbstractFactory> factoryByElement;
@@ -31,15 +30,13 @@ public class MainFactory {
         this.fileUtil = fileUtil;
         this.translateFactories = new ArrayList<>();
         this.factoryByElement = new HashMap<>();
-        this.jsTemplateUpdaters = new ArrayList<>();
-        this.templatesForParser = new ArrayList<>();
-        
-        // Load all factories from provider
+        this.templates = new ArrayList<>();
+
         for (TranslateUnitAbstractFactory factory : factoryProvider.getTranslateUnitFactories()) {
             addTranslateFactory(factory);
         }
     }
-    
+
     public void addTranslateFactory(TranslateUnitAbstractFactory factory) {
         translateFactories.add(factory);
         
@@ -47,20 +44,15 @@ public class MainFactory {
         if (elementNames.isEmpty()) {
             throw new IllegalArgumentException("Factory must handle specific elements: " + factory.getClass().getSimpleName());
         }
-        
         for (String elementName : elementNames) {
             factoryByElement.put(elementName, factory);
         }
-        
-        // Collecter les templates de cette factory
         try {
-            jsTemplateUpdaters.addAll(factory.getJsUpdaterTemplates(fileUtil));
-            templatesForParser.addAll(factory.getTemplatesForParser(fileUtil));
+            templates.addAll(factory.getTemplate(fileUtil));
         } catch (Exception e) {
             throw new RuntimeException("Failed to load templates from factory: " + factory.getClass().getSimpleName(), e);
         }
     }
-
 
     public UpdateBlockFromJs blockUpdaterFromJsFactory(BlockType type) {
         return translateFactories.stream()
@@ -78,10 +70,6 @@ public class MainFactory {
                 .toList();
     }
 
-    /**
-     * Remplace la logique de BlockFromElementFactory#getBlockBuilder
-     * Sélectionne la bonne factory basée sur l'élément et crée le BlockFromElement approprié
-     */
     public BlockFromElement getBlockBuilder(String element) {
         Template template = getTemplateByElement(element);
         
@@ -98,10 +86,7 @@ public class MainFactory {
         throw new UnsupportedOperationException("Factory found but could not create BlockFromElement for element: " + element);
     }
 
-    /**
-     * Remplace la logique de BpmnDocumentUpdaterFactory#getupdater
-     * Sélectionne la bonne factory basée sur le block et crée le BpmUpdater approprié
-     */
+
     public DocumentUpdater getBpmnUpdater(Block block) {
         return translateFactories.stream()
                 .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(block.getType()))
@@ -110,18 +95,13 @@ public class MainFactory {
                 .orElseThrow(() -> new IllegalArgumentException("No Bpmn document updater for this type of block: " + block.getType()));
     }
 
-    /**
-     * Remplace la logique de JsUpdaterFactory#getJsUpdaters
-     * Crée les JsUpdater en utilisant les factories et templates
-     */
+
     public List<com.protectline.bpmninjs.jsproject.JsUpdater> getJsUpdaters(List<Block> blocks) {
         List<com.protectline.bpmninjs.jsproject.JsUpdater> updaters = new ArrayList<>();
         
-        // Ajouter le main updater (EntryPoint)
         Template mainTemplate = getJsUpdaterTemplate("MAIN");
         updaters.add(new EntryPointJsUpdater(mainTemplate));
         
-        // Ajouter les updaters basés sur les blocks
         var blockTypes = blocks.stream().map(Block::getType).distinct().toList();
         for (BlockType blockType : blockTypes) {
             translateFactories.stream()
@@ -137,7 +117,7 @@ public class MainFactory {
     }
 
     private Template getJsUpdaterTemplate(String templateName) {
-        return jsTemplateUpdaters.stream()
+        return templates.stream()
                 .filter(template -> template.getName().equals(templateName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No template found for: " + templateName));
@@ -148,10 +128,9 @@ public class MainFactory {
     }
     
     private Template getTemplateByElement(String elementName) {
-        return templatesForParser.stream()
+        return templates.stream()
             .filter(template -> template.getElement().equals(elementName))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No template found for element: " + elementName));
     }
-    
 }

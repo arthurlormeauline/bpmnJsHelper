@@ -1,9 +1,6 @@
-package com.protectline.bpmninjs.jsproject.blocksfromelement;
+package com.protectline.bpmninjs.application.tobpmn.jstoblocks;
 
 
-import com.protectline.bpmninjs.common.block.Block;
-
-import java.util.List;
 import java.util.Map;
 
 public interface BlockFromElement {

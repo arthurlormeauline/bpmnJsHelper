@@ -6,8 +6,6 @@ import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.JsProject;
 import com.protectline.bpmninjs.jsproject.JsProjectImpl;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElementResult;
 import com.protectline.bpmninjs.xmlparser.Element;
 
 import java.io.IOException;

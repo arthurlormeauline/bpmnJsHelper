@@ -1,11 +1,8 @@
-package com.protectline.bpmninjs.jsproject.blocksfromelement;
+package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.xmlparser.TOKEN_TYPE;
 import com.protectline.bpmninjs.xmlparser.TokenDefinition;
 
-/**
- * Définition des tokens pour les projets JavaScript (//<element>)
- */
 public class JsProjectTokenDefinition implements TokenDefinition {
     
     @Override

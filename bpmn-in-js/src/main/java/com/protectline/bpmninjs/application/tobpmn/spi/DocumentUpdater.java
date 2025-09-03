@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.application.tobpmn.blockstobpmn;
+package com.protectline.bpmninjs.application.tobpmn.spi;
 
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 

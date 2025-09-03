@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.application.tobpmn.blockstobpmn;
 
+import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;

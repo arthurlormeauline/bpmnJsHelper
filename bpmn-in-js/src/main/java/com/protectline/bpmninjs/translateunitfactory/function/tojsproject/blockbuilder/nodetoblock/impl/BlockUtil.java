@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.nodetoblock.impl;
+package com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock.impl;
 
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.Node;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockUtil {
-    public static List<Block> getBlockFromScripts(Node node, BpmnPath path) {
+    public static List<Block> getBlockFromNode(Node node, BpmnPath path) {
         String id = path.getId();
 
         if (id != null) {

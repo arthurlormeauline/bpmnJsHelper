@@ -1,7 +1,7 @@
-package com.protectline.bpmninjs.translateunitfactory.entrypoint;
+package com.protectline.bpmninjs.translateunitfactory.entrypoint.tobpmn;
 
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElementResult;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
 

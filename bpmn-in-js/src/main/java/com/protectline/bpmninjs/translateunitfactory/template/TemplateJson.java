@@ -30,8 +30,4 @@ public class TemplateJson {
     public Template toTemplate() {
         return new Template(name, template, flag, element);
     }
-    
-    public Template toTemplateForParser() {
-        return new Template(name, element, template, true);
-    }
 }

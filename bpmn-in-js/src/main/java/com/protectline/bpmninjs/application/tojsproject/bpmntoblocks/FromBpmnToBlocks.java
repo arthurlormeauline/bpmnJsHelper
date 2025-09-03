@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
 import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;

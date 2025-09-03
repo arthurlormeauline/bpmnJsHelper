@@ -1,6 +1,8 @@
 package com.protectline.bpmninjs.application.tobpmn.jstoblocks;
 
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.files.FileUtil;
@@ -28,13 +30,12 @@ public class FromJsProjectToBlocks {
         JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
         List<Element> elementsFromJsProject = jsProject.getElements();
         
-        // Conversion des Element en Block (logique migrée depuis JsProjectBlocksBuilder)
         List<Block> blocksFromJsProject = convertElementsToBlocks(elementsFromJsProject);
 
         checkBlocksAreSimilar(blocksFromFile, blocksFromJsProject);
 
         for (Block block : blocksFromJsProject) {
-            UpdateBlockFromJs updater = mainFactory.blockUpdaterFromJsFactory(block.getType());
+            UpdateBlock updater = mainFactory.blockUpdaterFromJsFactory(block.getType());
             updater.updateBlockContent(blocksFromFile, block);
         }
 

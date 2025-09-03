@@ -1,83 +1,85 @@
 package com.protectline.bpmninjs.translateunitfactory.function;
 
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.DocumentUpdater;
 import com.protectline.bpmninjs.application.mainfactory.TranslateUnitAbstractFactory;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
+import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
-import com.protectline.bpmninjs.translateunitfactory.function.fromblocktobpmn.documentUpdater.FromFuntionBlockFactory;
-import com.protectline.bpmninjs.translateunitfactory.function.fromblocktojsproject.FunctionUpdater;
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.FunctionBlockBuilder;
-import com.protectline.bpmninjs.translateunitfactory.function.fromjsprojecttoblock.FunctionBlockFromElementBuilder;
-import com.protectline.bpmninjs.translateunitfactory.function.fromjsprojecttoblock.FunctionBlockUpdaterFromJs;
-import com.protectline.bpmninjs.translateunitfactory.template.TemplateUtil;
+import com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromblocktobpmn.documentUpdater.FromFuntionBlockFactory;
+import com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromjsprojecttoblock.blockfromelement.FunctionBlockFromElement;
+import com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromjsprojecttoblock.updateblock.UpdateFunctionBlocks;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.FunctionBlockBuilder;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.jsupdater.FunctionUpdater;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
+import com.protectline.bpmninjs.translateunitfactory.template.TemplateUtil;
 
 import java.util.List;
 import java.util.Optional;
 
 public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactory {
 
-    @Override
-    public List<String> getElementNames() {
-        return List.of("function");
-    }
+    private final Template template;
+    private List<String> names;
+    private BlockBuilder blockBuilder;
+    private BlockFromElement blockFromElement;
+    private UpdateBlock updateBlock;
+    private BlockType blockType;
+    private FunctionUpdater functionUpdater;
 
-    @Override
-    public Optional<BlockBuilder> createBlockBuilder() {
-        return Optional.of(new FunctionBlockBuilder());
-    }
-
-    @Override
-    public Optional<BlockFromElement> createBlockFromElement(Template template, String elementName) {
-        if (canHandleElement(elementName)) {
-            return Optional.of(new FunctionBlockFromElementBuilder(template));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<UpdateBlockFromJs> createUpdateBlockFromJs(BlockType type) {
-        if (getBlockType().isPresent() && getBlockType().get().equals(type)) {
-            return Optional.of(new FunctionBlockUpdaterFromJs());
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<BlockType> getBlockType() {
-        return Optional.of(BlockType.FUNCTION);
-    }
-
-    @Override
-    public Optional<DocumentUpdater> createBpmUpdater(Block block) {
-        if (getBlockType().isPresent() && getBlockType().get().equals(block.getType())) {
-            return Optional.of(FromFuntionBlockFactory.getFromBlock(block));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean canHandleElement(String elementName) {
-        return "function".equals(elementName);
-    }
-
-    @Override
-    public List<Template> getTemplate(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+    public FunctionTranslateUnitFactory(com.protectline.bpmninjs.files.FileUtil fileUtil) {
         try {
-            return TemplateUtil.getTemplate(fileUtil, "functiontranslateunit");
+            this.template = TemplateUtil.getTemplate(fileUtil, "functiontranslateunit").get(0);
+            this.blockBuilder = new FunctionBlockBuilder();
+            this.names = List.of("function");
+            this.blockType = BlockType.FUNCTION;
+            this.blockFromElement = new FunctionBlockFromElement(template);
+            this.updateBlock = new UpdateFunctionBlocks();
+            this.functionUpdater = new FunctionUpdater(template);
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to load function templates", e);
         }
     }
 
     @Override
-    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, Template template) {
-        if (getBlockType().isPresent() && getBlockType().get().equals(type)) {
-            return Optional.of(new FunctionUpdater(template));
-        }
-        return Optional.empty();
+    public List<String> getElementNames() {
+        return names;
+    }
+
+    @Override
+    public Optional<BlockBuilder> createBlockBuilder() {
+        return Optional.of(blockBuilder);
+    }
+
+    @Override
+    public Optional<BlockFromElement> createBlockFromElement(com.protectline.bpmninjs.files.FileUtil fileUtil, String elementName) {
+        return Optional.of(blockFromElement);
+    }
+
+    @Override
+    public Optional<UpdateBlock> createUpdateBlockFromJs(BlockType type) {
+        return Optional.of(updateBlock);
+    }
+
+    @Override
+    public Optional<BlockType> getBlockType() {
+        return Optional.of(blockType);
+    }
+
+    @Override
+    public Optional<DocumentUpdater> createBpmUpdater(Block block) {
+        return Optional.of(FromFuntionBlockFactory.getFromBlock(block));
+    }
+
+    @Override
+    public Template getTemplate(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        return template;
+    }
+
+    @Override
+    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        return Optional.of(functionUpdater);
     }
 }

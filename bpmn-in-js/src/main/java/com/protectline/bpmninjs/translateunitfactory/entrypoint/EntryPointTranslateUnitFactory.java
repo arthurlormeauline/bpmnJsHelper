@@ -2,12 +2,14 @@ package com.protectline.bpmninjs.translateunitfactory.entrypoint;
 
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
 import com.protectline.bpmninjs.application.mainfactory.TranslateUnitAbstractFactory;
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.DocumentUpdater;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
+import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
+import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
+import com.protectline.bpmninjs.translateunitfactory.entrypoint.tobpmn.EntryPointBlockFromElement;
+import com.protectline.bpmninjs.translateunitfactory.entrypoint.tojsproject.EntryPointJsUpdater;
 import com.protectline.bpmninjs.translateunitfactory.template.TemplateUtil;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
@@ -16,9 +18,25 @@ import java.util.Optional;
 
 public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFactory {
 
+    private final Template template;
+    private EntryPointJsUpdater jsUpdater;
+    private EntryPointBlockFromElement blockFromElement;
+    private List<String> elementNames;
+
+    public EntryPointTranslateUnitFactory(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        try {
+            this.template = TemplateUtil.getTemplate(fileUtil, "main").get(0);
+            this.blockFromElement = new EntryPointBlockFromElement(template);
+            this.jsUpdater = new EntryPointJsUpdater(template);
+            this.elementNames = List.of("main");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load main templates", e);
+        }
+    }
+
     @Override
     public List<String> getElementNames() {
-        return List.of("main");
+        return elementNames;
     }
 
     @Override
@@ -27,15 +45,12 @@ public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFact
     }
 
     @Override
-    public Optional<BlockFromElement> createBlockFromElement(Template template, String elementName) {
-        if (canHandleElement(elementName)) {
-            return Optional.of(new EntryPointBlockFromElement(template));
-        }
-        return Optional.empty();
+    public Optional<BlockFromElement> createBlockFromElement(com.protectline.bpmninjs.files.FileUtil fileUtil, String elementName) {
+        return Optional.of(blockFromElement);
     }
 
     @Override
-    public Optional<UpdateBlockFromJs> createUpdateBlockFromJs(BlockType type) {
+    public Optional<UpdateBlock> createUpdateBlockFromJs(BlockType type) {
         return Optional.empty();
     }
 
@@ -50,21 +65,12 @@ public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFact
     }
 
     @Override
-    public boolean canHandleElement(String elementName) {
-        return "main".equals(elementName);
+    public Template getTemplate(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        return template;
     }
 
     @Override
-    public List<Template> getTemplate(com.protectline.bpmninjs.files.FileUtil fileUtil) {
-        try {
-            return TemplateUtil.getTemplate(fileUtil, "main");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load main templates", e);
-        }
-    }
-
-    @Override
-    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, Template template) {
-        return Optional.of(new EntryPointJsUpdater(template));
+    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        return Optional.of(jsUpdater);
     }
 }

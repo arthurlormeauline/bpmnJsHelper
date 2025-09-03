@@ -1,9 +1,8 @@
-package com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.nodetoblock;
+package com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock;
 
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.NodeToBlock;
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.nodetoblock.impl.ScriptNodeToFunctionBlock;
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.nodetoblock.impl.ServiceTaskNodeToFunctionBlock;
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.nodetoblock.impl.StartNodeToFunctionBlock;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock.impl.ScriptNodeToFunctionBlock;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock.impl.ServiceTaskNodeToFunctionBlock;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock.impl.StartNodeToFunctionBlock;
 import com.protectline.bpmninjs.bpmndocument.model.Node;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 

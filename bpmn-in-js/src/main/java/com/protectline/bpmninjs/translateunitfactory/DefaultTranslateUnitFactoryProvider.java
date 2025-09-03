@@ -10,10 +10,10 @@ import java.util.List;
 public class DefaultTranslateUnitFactoryProvider implements TranslateUnitFactoryProvider {
 
     @Override
-    public List<TranslateUnitAbstractFactory> getTranslateUnitFactories() {
+    public List<TranslateUnitAbstractFactory> getTranslateUnitFactories(com.protectline.bpmninjs.files.FileUtil fileUtil) {
         return List.of(
-            new EntryPointTranslateUnitFactory(),
-            new FunctionTranslateUnitFactory()
+            new EntryPointTranslateUnitFactory(fileUtil),
+            new FunctionTranslateUnitFactory(fileUtil)
         );
     }
 }

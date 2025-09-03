@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface TranslateUnitFactoryProvider {
     
-    List<TranslateUnitAbstractFactory> getTranslateUnitFactories();
+    List<TranslateUnitAbstractFactory> getTranslateUnitFactories(com.protectline.bpmninjs.files.FileUtil fileUtil);
 }

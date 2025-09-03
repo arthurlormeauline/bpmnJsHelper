@@ -1,11 +1,11 @@
-package com.protectline.bpmninjs.translateunitfactory.function.fromjsprojecttoblock;
+package com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromjsprojecttoblock.updateblock;
 
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
+import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
 import com.protectline.bpmninjs.common.block.Block;
 
 import java.util.List;
 
-public class FunctionBlockUpdaterFromJs implements UpdateBlockFromJs {
+public class UpdateFunctionBlocks implements UpdateBlock {
 
     @Override
     public void updateBlockContent(List<Block> blocksFromFile, Block blockFromJs) {

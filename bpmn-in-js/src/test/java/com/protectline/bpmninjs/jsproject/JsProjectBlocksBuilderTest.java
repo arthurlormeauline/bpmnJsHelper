@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.jsproject;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElementResult;
 import com.protectline.bpmninjs.xmlparser.Element;
 import com.protectline.bpmninjs.common.block.Block;

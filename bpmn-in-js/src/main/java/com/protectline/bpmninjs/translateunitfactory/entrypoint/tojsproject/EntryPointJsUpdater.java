@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.translateunitfactory.entrypoint;
+package com.protectline.bpmninjs.translateunitfactory.entrypoint.tojsproject;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.JsUpdater;

@@ -1,6 +1,6 @@
-package com.protectline.bpmninjs.translateunitfactory.function.fromblocktobpmn.documentUpdater;
+package com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromblocktobpmn.documentUpdater;
 
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.DocumentUpdater;
+import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
 

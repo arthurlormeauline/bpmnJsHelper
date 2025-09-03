@@ -1,9 +1,9 @@
-package com.protectline.bpmninjs.translateunitfactory.function.fromjsprojecttoblock;
+package com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromjsprojecttoblock.blockfromelement;
 
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElementResult;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FunctionBlockFromElementBuilder implements BlockFromElement {
+public class FunctionBlockFromElement implements BlockFromElement {
     
     private final Template template;
     private static final Pattern TEMPLATE_PLACEHOLDER_PATTERN = Pattern.compile("\\*\\*([^*]+)\\*\\*");
     
-    public FunctionBlockFromElementBuilder(Template template) {
+    public FunctionBlockFromElement(Template template) {
         this.template = template;
     }
     
@@ -34,7 +34,6 @@ public class FunctionBlockFromElementBuilder implements BlockFromElement {
         String functionId = attributes.get("id");
         
         if (functionName != null && functionContent != null && functionId != null) {
-            // Créer le Block
             BpmnPath path = new BpmnPath(extractIdFromFunctionName(functionName));
             NodeType nodeType = determineNodeType(functionName);
             
@@ -42,7 +41,6 @@ public class FunctionBlockFromElementBuilder implements BlockFromElement {
             blocks.add(Block);
         }
         
-        // Retourner une chaîne vide car tout le contenu a été parsé en bloc
         return new BlockFromElementResult(blocks, "");
     }
     

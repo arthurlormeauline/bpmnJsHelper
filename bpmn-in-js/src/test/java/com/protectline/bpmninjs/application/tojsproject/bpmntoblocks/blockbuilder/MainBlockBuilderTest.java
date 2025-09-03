@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.blockbuilder;
 
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.FunctionBlockBuilder;
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.FunctionBlockBuilder;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;

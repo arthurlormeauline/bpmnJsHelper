@@ -1,7 +1,8 @@
-package com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock;
+package com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder;
 
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
-import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.nodetoblock.ToFunctionBlockFactory;
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock.NodeToBlock;
+import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.nodetoblock.ToFunctionBlockFactory;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.Node;
@@ -22,7 +23,7 @@ public class FunctionBlockBuilder implements BlockBuilder {
             NodeToBlock toFunctionBlock = ToFunctionBlockFactory.getNodeToFunctionBlock(node);
             String id = getId(node);
             var path = new BpmnPath(id);
-            blocks.addAll(toFunctionBlock.getBlocks(bpmnCamundaDocument, path));
+            blocks.addAll(toFunctionBlock.getBlocks(path));
         }
 
         return blocks;

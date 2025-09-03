@@ -1,14 +1,12 @@
 package com.protectline.bpmninjs.application.mainfactory;
 
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.DocumentUpdater;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
+import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
+import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
+import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElement;
-import com.protectline.bpmninjs.translateunitfactory.entrypoint.EntryPointJsUpdater;
-import com.protectline.bpmninjs.translateunitfactory.template.Template;
+import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,19 +18,16 @@ import java.util.Optional;
 
 public class MainFactory {
 
-    private final List<Template> templates;
     private final FileUtil fileUtil;
     private final List<TranslateUnitAbstractFactory> translateFactories;
     private final Map<String, TranslateUnitAbstractFactory> factoryByElement;
-    private TranslateUnitAbstractFactory fallbackFactory;
 
     public MainFactory(FileUtil fileUtil, TranslateUnitFactoryProvider factoryProvider) throws IOException {
         this.fileUtil = fileUtil;
         this.translateFactories = new ArrayList<>();
         this.factoryByElement = new HashMap<>();
-        this.templates = new ArrayList<>();
 
-        for (TranslateUnitAbstractFactory factory : factoryProvider.getTranslateUnitFactories()) {
+        for (TranslateUnitAbstractFactory factory : factoryProvider.getTranslateUnitFactories(fileUtil)) {
             addTranslateFactory(factory);
         }
     }
@@ -47,14 +42,9 @@ public class MainFactory {
         for (String elementName : elementNames) {
             factoryByElement.put(elementName, factory);
         }
-        try {
-            templates.addAll(factory.getTemplate(fileUtil));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load templates from factory: " + factory.getClass().getSimpleName(), e);
-        }
     }
 
-    public UpdateBlockFromJs blockUpdaterFromJsFactory(BlockType type) {
+    public UpdateBlock blockUpdaterFromJsFactory(BlockType type) {
         return translateFactories.stream()
                 .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(type))
                 .findFirst()
@@ -71,14 +61,12 @@ public class MainFactory {
     }
 
     public BlockFromElement getBlockBuilder(String element) {
-        Template template = getTemplateByElement(element);
-        
         TranslateUnitAbstractFactory factory = factoryByElement.get(element);
         if (factory == null) {
             throw new UnsupportedOperationException("No factory found to handle element: " + element);
         }
         
-        Optional<BlockFromElement> builder = factory.createBlockFromElement(template, element);
+        Optional<BlockFromElement> builder = factory.createBlockFromElement(fileUtil, element);
         if (builder.isPresent()) {
             return builder.get();
         }
@@ -99,8 +87,13 @@ public class MainFactory {
     public List<com.protectline.bpmninjs.jsproject.JsUpdater> getJsUpdaters(List<Block> blocks) {
         List<com.protectline.bpmninjs.jsproject.JsUpdater> updaters = new ArrayList<>();
         
-        Template mainTemplate = getJsUpdaterTemplate("MAIN");
-        updaters.add(new EntryPointJsUpdater(mainTemplate));
+        // Ajouter l'EntryPoint updater
+        translateFactories.stream()
+                .filter(factory -> factory.getElementNames().contains("main"))
+                .findFirst()
+                .ifPresent(factory -> {
+                    factory.createJsUpdater(null, fileUtil).ifPresent(updaters::add);
+                });
         
         var blockTypes = blocks.stream().map(Block::getType).distinct().toList();
         for (BlockType blockType : blockTypes) {
@@ -108,29 +101,12 @@ public class MainFactory {
                     .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(blockType))
                     .findFirst()
                     .ifPresent(factory -> {
-                        Template template = getJsUpdaterTemplate(getTemplateName(blockType));
-                        factory.createJsUpdater(blockType, template).ifPresent(updaters::add);
+                        factory.createJsUpdater(blockType, fileUtil).ifPresent(updaters::add);
                     });
         }
         
         return updaters;
     }
 
-    private Template getJsUpdaterTemplate(String templateName) {
-        return templates.stream()
-                .filter(template -> template.getName().equals(templateName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No template found for: " + templateName));
-    }
-
-    private String getTemplateName(BlockType blockType) {
-        return blockType.name(); // FUNCTION -> "FUNCTION"
-    }
     
-    private Template getTemplateByElement(String elementName) {
-        return templates.stream()
-            .filter(template -> template.getElement().equals(elementName))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("No template found for element: " + elementName));
-    }
 }

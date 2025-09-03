@@ -9,7 +9,6 @@ public class Template {
     private final String flag;
     private final String element;
     
-    // Constructeur principal avec tous les champs
     public Template(String name, String template, String flag, String element) {
         this.name = name;
         this.template = template;
@@ -17,7 +16,6 @@ public class Template {
         this.element = element;
     }
     
-    // Constructeur pour compatibilité avec JsUpdaterTemplate
     public Template(String name, String template, String flag) {
         this.name = name;
         this.template = template;

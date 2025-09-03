@@ -9,6 +9,7 @@ import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
 import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,5 +55,31 @@ public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFact
     @Override
     public boolean canHandleElement(String elementName) {
         return "main".equals(elementName);
+    }
+
+    @Override
+    public List<JsUpdaterTemplate> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        try {
+            return com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil
+                    .readJsUpdaterTemplatesFromFile(fileUtil, "main");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load main templates", e);
+        }
+    }
+
+    @Override
+    public List<TemplateForParser> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        try {
+            return com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil
+                    .readTemplatesForParserFromFile(fileUtil, "main");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load main templates", e);
+        }
+    }
+
+    @Override
+    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, JsUpdaterTemplate template) {
+        // Entry point factory creates main updater regardless of BlockType
+        return Optional.of(new EntryPointJsUpdater(template));
     }
 }

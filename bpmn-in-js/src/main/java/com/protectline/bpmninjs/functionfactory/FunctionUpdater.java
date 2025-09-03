@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.jsupdater;
+package com.protectline.bpmninjs.functionfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;

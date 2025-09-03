@@ -7,6 +7,7 @@ import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
 import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,4 +49,19 @@ public interface TranslateUnitAbstractFactory {
      * Returns true if this factory can handle the given element name
      */
     boolean canHandleElement(String elementName);
+
+    /**
+     * Returns the JS updater templates provided by this factory for JS code generation
+     */
+    List<JsUpdaterTemplate> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil);
+
+    /**
+     * Returns the templates for parser provided by this factory for block parsing
+     */
+    List<TemplateForParser> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil);
+
+    /**
+     * Creates a JsUpdater for JS code generation if this factory handles the given type
+     */
+    Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, JsUpdaterTemplate template);
 }

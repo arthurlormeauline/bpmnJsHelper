@@ -1,20 +1,20 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.jsproject.jsupdater.JsUpdaterFactory;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
 
 public class UpdaterProvider {
 
-    private final List<JsUpdaterTemplate> updaterTemplates;
+    private final MainFactory mainFactory;
 
-    public UpdaterProvider(List<JsUpdaterTemplate> updaterTemplates) {
-        this.updaterTemplates = updaterTemplates;
+    public UpdaterProvider(MainFactory mainFactory) {
+        this.mainFactory = mainFactory;
     }
 
     List<JsUpdater> getJsUpdaters(List<Block> blocks) {
-        return JsUpdaterFactory.getJsUpdaters(blocks, updaterTemplates);
+        return mainFactory.getJsUpdaters(blocks);
     }
 }

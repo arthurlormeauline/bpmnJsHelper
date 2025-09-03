@@ -2,6 +2,7 @@ package com.protectline.bpmninjs.jsproject.jsupdater;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
+import com.protectline.bpmninjs.functionfactory.FunctionUpdater;
 import com.protectline.bpmninjs.jsproject.JsUpdater;
 import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 import com.protectline.bpmninjs.application.entrypointfactory.EntryPointJsUpdater;

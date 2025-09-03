@@ -8,6 +8,7 @@ import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
 import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,5 +57,33 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     @Override
     public boolean canHandleElement(String elementName) {
         return "function".equals(elementName);
+    }
+
+    @Override
+    public List<JsUpdaterTemplate> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        try {
+            return com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil
+                    .readJsUpdaterTemplatesFromFile(fileUtil, "functiontranslateunit");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load function templates", e);
+        }
+    }
+
+    @Override
+    public List<TemplateForParser> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+        try {
+            return com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil
+                    .readTemplatesForParserFromFile(fileUtil, "functiontranslateunit");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load function templates", e);
+        }
+    }
+
+    @Override
+    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, JsUpdaterTemplate template) {
+        if (getBlockType().isPresent() && getBlockType().get().equals(type)) {
+            return Optional.of(new FunctionUpdater(template));
+        }
+        return Optional.empty();
     }
 }

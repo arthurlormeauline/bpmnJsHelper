@@ -33,4 +33,28 @@ public class JsUpdaterTemplateUtil {
             .map(TemplateJson::toTemplateForParser)
             .collect(Collectors.toList());
     }
+
+    public static List<JsUpdaterTemplate> readJsUpdaterTemplatesFromFile(FileUtil fileUtil, String subFolder) throws IOException {
+        Path templatesFile = fileUtil.getJsUpdaterTemplatesJsonFile().getParent()
+                .resolve(subFolder).resolve("jsupdatertemplate.json");
+        List<TemplateJson> jsonTemplates = objectMapper.readValue(
+            templatesFile.toFile(), 
+            new TypeReference<List<TemplateJson>>() {}
+        );
+        return jsonTemplates.stream()
+            .map(TemplateJson::toJsUpdaterTemplate)
+            .collect(Collectors.toList());
+    }
+    
+    public static List<TemplateForParser> readTemplatesForParserFromFile(FileUtil fileUtil, String subFolder) throws IOException {
+        Path templatesFile = fileUtil.getJsUpdaterTemplatesJsonFile().getParent()
+                .resolve(subFolder).resolve("jsupdatertemplate.json");
+        List<TemplateJson> jsonTemplates = objectMapper.readValue(
+            templatesFile.toFile(), 
+            new TypeReference<List<TemplateJson>>() {}
+        );
+        return jsonTemplates.stream()
+            .map(TemplateJson::toTemplateForParser)
+            .collect(Collectors.toList());
+    }
 }

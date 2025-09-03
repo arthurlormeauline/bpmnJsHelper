@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.jsupdater.FunctionUpdater;
+import com.protectline.bpmninjs.functionfactory.FunctionUpdater;
 import com.protectline.bpmninjs.application.entrypointfactory.EntryPointJsUpdater;
 import com.protectline.bpmninjs.util.AssertUtil;
 import org.junit.jupiter.api.AfterEach;

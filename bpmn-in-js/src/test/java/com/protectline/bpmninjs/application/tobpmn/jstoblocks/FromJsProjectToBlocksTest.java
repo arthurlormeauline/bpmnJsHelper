@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.application.tobpmn.jstoblocks;
 
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class FromJsProjectToBlocksTest {
 
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
-        fromJsProjectToBlocks = new FromJsProjectToBlocks(fileUtil);
+        fromJsProjectToBlocks = new FromJsProjectToBlocks(fileUtil, new MainProvider(fileUtil));
 
     }
 
@@ -94,7 +95,7 @@ class FromJsProjectToBlocksTest {
 
     @Test
     void should_create_blocks_from_js_project_CreateCustomer_Dev() throws IOException {
-        // Given - Real CreateCustomer_Dev BpmnRunner.js with 26 functions
+        // Given - Real CreateCustomer_Dev BpmnRunner.js
         var process = "CreateCustomer_Dev";
 
         // When - Parse the JS project to blocks

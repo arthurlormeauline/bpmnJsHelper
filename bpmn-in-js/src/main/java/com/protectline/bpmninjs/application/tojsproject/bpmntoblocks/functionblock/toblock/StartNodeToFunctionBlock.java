@@ -9,7 +9,7 @@ import com.protectline.bpmninjs.common.block.Block;
 
 import java.util.Collection;
 
-import static com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock.FunctionBlockUtil.getFunctionBlockFromScripts;
+import static com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock.BlockUtil.getBlockFromScripts;
 
 
 public class StartNodeToFunctionBlock implements NodeToBlock {
@@ -21,6 +21,6 @@ public class StartNodeToFunctionBlock implements NodeToBlock {
 
     @Override
     public Collection<? extends Block> getBlocks(BpmnDocument bpmnCamundaDocument, BpmnPath path) {
-        return getFunctionBlockFromScripts(node, path);
+        return getBlockFromScripts(node, path);
     }
 }

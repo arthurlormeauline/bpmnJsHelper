@@ -1,5 +1,7 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
+import com.protectline.bpmninjs.application.BlockWriterFactory;
+import com.protectline.bpmninjs.application.BuildersProvider;
 import com.protectline.bpmninjs.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,8 +10,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.util.AssertUtil.assertBlocksEqualIgnoringId;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class FromBpmnToBlocksTest {
 
@@ -21,7 +23,9 @@ class FromBpmnToBlocksTest {
         var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(FromBpmnToBlocksTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
-        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil);
+        BuildersProvider provider= new BuildersProvider();
+        BlockWriterFactory writerFactory = new BlockWriterFactory();
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, provider, writerFactory);
     }
 
 
@@ -37,6 +41,6 @@ class FromBpmnToBlocksTest {
         // Then
         var expectedBlock = readBlocksFromFile(workingdir.resolve("expectedBlocks").resolve(process).resolve(process + ".json"));
         var actualBlocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
-        assertThat(actualBlocks).isEqualTo(expectedBlock);
+        assertBlocksEqualIgnoringId(actualBlocks, expectedBlock);
     }
 }

@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.jsproject.blocksfactory;
 
 import java.util.Map;
 
-public interface BlockFromElementBuilder {
+public interface BlockFromElement {
     
     /**
      * Parse le contenu avec les attributs fournis

@@ -1,5 +1,7 @@
 package com.protectline.bpmninjs.application.tojsproject;
 
+import com.protectline.bpmninjs.application.BlockWriter;
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.application.tojsproject.blockstojsproject.FromBlockToJsProject;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.FromBpmnToBlocks;
 import com.protectline.bpmninjs.files.FileUtil;
@@ -11,9 +13,9 @@ public class BpmnToJS {
     private final FromBpmnToBlocks bpmnToBlock;
     private final FromBlockToJsProject blockToJs;
 
-    public BpmnToJS(FileUtil fileUtil) throws IOException {
-        bpmnToBlock = new FromBpmnToBlocks(fileUtil);
-        blockToJs = new FromBlockToJsProject(fileUtil);
+    public BpmnToJS(FileUtil fileUtil, MainProvider mainProvider) throws IOException {
+        bpmnToBlock = new FromBpmnToBlocks(fileUtil, mainProvider.getBuilderProvider(), mainProvider.getBlockFileUtilProvider().getBlockWriterFactory());
+        blockToJs = new FromBlockToJsProject(fileUtil, new BlockWriter(), mainProvider);
     }
 
     public void createProject(String process) throws IOException {

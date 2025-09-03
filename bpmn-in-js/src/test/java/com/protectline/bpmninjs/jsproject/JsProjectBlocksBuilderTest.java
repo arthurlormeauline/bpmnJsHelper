@@ -2,6 +2,7 @@ package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectBlocksBuilder;
+import com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder.BlockFromElementFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ class JsProjectBlocksBuilderTest {
     @BeforeEach
     void setup() throws IOException, URISyntaxException {
         FileUtil files = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
-        jsProjectBlocksBuilder = new JsProjectBlocksBuilder(files);
+        jsProjectBlocksBuilder = new JsProjectBlocksBuilder(new BlockFromElementFactory(files));
     }
 
 

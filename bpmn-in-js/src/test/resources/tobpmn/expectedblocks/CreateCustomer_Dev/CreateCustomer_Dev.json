@@ -1,6 +1,30 @@
 {
   "blocks": [
-    {"name": "retries_1_0", "path": {"id": "retries_1"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "32cb633b-0bb2-4c27-89fd-8812410863c6", "content": "placeholder", "scriptIndex": 0},
-    {"name": "Create_Billing_Account_0", "path": {"id": "Create_Billing_Account"}, "type": "FUNCTION", "nodeType": "SERVICE_TASK", "id": "f15c404f-979e-440d-bbf0-04c98580d03b", "content": "placeholder", "scriptIndex": 0}
+    {
+      "id": "32cb633b-0bb2-4c27-89fd-8812410863c6",
+      "path": {
+        "id": "retries_1"
+      },
+      "attributes": {
+        "name": "retries_1_0",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "var retries = execution.getVariable(\"retries\");\n\n// Decrement\nretries = retries - 1;\n\n// Don't allow negative retries\nif (retries < 0) {\n  retries = 0;\n}\n\nexecution.setVariable(\"retries\", retries);\nprint('Retrying failed task and changing retries variable to ' + retries);",
+        "scriptIndex": "0"
+      }
+    },
+    {
+      "id": "f15c404f-979e-440d-bbf0-04c98580d03b",
+      "path": {
+        "id": "Create_Billing_Account"
+      },
+      "attributes": {
+        "name": "Create_Billing_Account_0",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "\n    var url_tb= execution.getVariable('url_crm_customer');\n    url_tb+'/api/customer/v1/billingAccount/'\n",
+        "scriptIndex": "0"
+      }
+    }
   ]
 }

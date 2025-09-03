@@ -1,38 +1,38 @@
 package com.protectline.bpmninjs.application.tobpmn.jstoblocks;
 
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.JsProject;
 
 import java.io.IOException;
 import java.util.List;
 
-import static com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockUpdaterFromJsFactory.getUpdater;
-
 public class FromJsProjectToBlocks {
     private final FileUtil fileUtil;
+    private final MainProvider mainProvider;
 
-    public FromJsProjectToBlocks(FileUtil fileUtil) {
+    public FromJsProjectToBlocks(FileUtil fileUtil, MainProvider mainProvider) {
         this.fileUtil = fileUtil;
+        this.mainProvider = mainProvider;
     }
 
     public void updateBlockFromJsProject(String process) throws IOException {
-        List<Block> blocksFromFile = FunctionJsonBlockUtil.readBlocksFromFile(fileUtil.getBlocksFile(process));
+        List<Block> blocksFromFile = mainProvider.getBlockFileUtilProvider().getBlockWriterFactory().getBlockWriter()
+                .readBlocksFromFile(fileUtil.getBlocksFile(process));
 
-        JsProject jsProject = new JsProject(fileUtil);
+        JsProject jsProject = new JsProject(fileUtil, mainProvider);
         List<Block> blocksFromJsProject = jsProject.getBlocks(process);
 
         checkBlocksAreSimilar(blocksFromFile, blocksFromJsProject);
 
         for (Block blockFromJs : blocksFromJsProject) {
-            BlockUpdaterFromJs updater = getUpdater(blockFromJs.getType());
+            UpdateBlockFromJs updater = mainProvider.jsUpdaterFomBlockFactory(blockFromJs.getType());
             updater.updateBlockContent(blocksFromFile, blockFromJs);
         }
 
-        FunctionJsonBlockUtil.writeBlocksToFile(blocksFromFile.stream()
-                .map(block -> (com.protectline.bpmninjs.common.block.FunctionBlock) block)
-                .toList(), fileUtil.getBlocksFile(process));
+        mainProvider.getBlockFileUtilProvider().getBlockWriterFactory().getBlockWriter()
+                .writeBlocksToFile(blocksFromFile, fileUtil.getBlocksFile(process));
     }
 
     private static void checkBlocksAreSimilar(List<Block> blocksFromFile, List<Block> blocksFromJsProject) {

@@ -2,19 +2,19 @@ package com.protectline.bpmninjs.application.tobpmn.blockstobpmn.bpmnupdater.fro
 
 import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
-import com.protectline.bpmninjs.common.block.FunctionBlock;
+import com.protectline.bpmninjs.common.block.Block;
 
 public class FromFuntionBlockFactory {
 
-    public static BpmUpdater getFromBlock(FunctionBlock block) {
+    public static BpmUpdater getFromBlock(Block block) {
         NodeType type = block.getNodeType();
         switch (type) {
             case START:
-                return new UpdateStartFromFunctionBlock(block);
+                return new UpdateStartFromBlock(block);
             case SCRIPT:
-                return new UpdateScriptFromFunctionBlock(block);
+                return new UpdateScriptFromBlock(block);
             case SERVICE_TASK:
-                return new UpdateServiceTaskFromFunctionBlock(block);
+                return new UpdateServiceTaskFromBlock(block);
             default:
                 throw new IllegalArgumentException("No bpmn updater found for type : " + type);
         }

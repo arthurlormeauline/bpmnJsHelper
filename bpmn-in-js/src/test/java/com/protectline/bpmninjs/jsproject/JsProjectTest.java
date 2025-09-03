@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.jsproject;
 
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.util.AssertUtil;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.equalsIgnoringId;
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -20,10 +22,10 @@ class JsProjectTest {
     private FileUtil fileUtil;
 
     @BeforeEach
-    void setup() throws URISyntaxException {
+    void setup() throws URISyntaxException, IOException {
         var testDirectory = "tojsproject";
         fileUtil = new FileUtil(getResourcePath(JsProjectTest.class, testDirectory));
-        jsProject = new JsProject(fileUtil);
+        jsProject = new JsProject(fileUtil, new MainProvider(fileUtil));
     }
 
     @Test
@@ -50,6 +52,6 @@ class JsProjectTest {
 
         // Then
         List<Block> expectedBlocksWithUUID = getExpectedBlocksWithUUID();
-        assertThat(actualBlocks.containsAll(expectedBlocksWithUUID)).isTrue();
+        equalsIgnoringId(actualBlocks, expectedBlocksWithUUID);
     }
 }

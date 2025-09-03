@@ -4,7 +4,7 @@ import com.protectline.bpmninjs.common.block.Block;
 
 import java.util.List;
 
-class BlockFromElementResult {
+public class BlockFromElementResult {
     private final List<Block> blocks;
     private final String cleanedContent;
 

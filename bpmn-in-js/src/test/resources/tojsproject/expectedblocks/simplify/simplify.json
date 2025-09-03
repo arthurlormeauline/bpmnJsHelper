@@ -1,48 +1,56 @@
 {
   "blocks": [
     {
-      "name": "Delay_definition_0",
+      "id": "880ed997-78b2-4ff6-bb02-9eeadfa6bcb7",
       "path": {
         "id": "Activity_0q6wfo8"
       },
-      "type": "FUNCTION",
-      "nodeType": "SCRIPT",
-      "id": "880ed997-78b2-4ff6-bb02-9eeadfa6bcb7",
-      "content": "delay definition script",
-      "scriptIndex": 0
+      "attributes": {
+        "name": "Delay_definition_0",
+        "type": "FUNCTION",
+        "nodeType": "SCRIPT",
+        "content": "delay definition script",
+        "scriptIndex": "0"
+      }
     },
     {
-      "name": "Get_device_by_name_0",
-      "path": {
-        "id": "Activity_0rwauzg"
-      },
-      "type": "FUNCTION",
-      "nodeType": "SERVICE_TASK",
       "id": "74b70353-a19e-4ad7-9838-5251ab67d8a6",
-      "content": "get device by name url script",
-      "scriptIndex": 0
-    },
-    {
-      "name": "Get_device_by_name_1",
       "path": {
         "id": "Activity_0rwauzg"
       },
-      "type": "FUNCTION",
-      "nodeType": "SERVICE_TASK",
-      "id": "a96073f8-befb-430d-b8a0-466100ca5bc9",
-      "content": "get device by name output script",
-      "scriptIndex": 1
+      "attributes": {
+        "name": "Get_device_by_name_0",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "get device by name url script",
+        "scriptIndex": "0"
+      }
     },
     {
-      "name": "Event_1u1d1qi_0",
+      "id": "a96073f8-befb-430d-b8a0-466100ca5bc9",
+      "path": {
+        "id": "Activity_0rwauzg"
+      },
+      "attributes": {
+        "name": "Get_device_by_name_1",
+        "type": "FUNCTION",
+        "nodeType": "SERVICE_TASK",
+        "content": "get device by name output script",
+        "scriptIndex": "1"
+      }
+    },
+    {
+      "id": "da508040-ebc4-4267-82fb-d7d4576e136e",
       "path": {
         "id": "Event_1u1d1qi"
       },
-      "type": "FUNCTION",
-      "nodeType": "START",
-      "id": "da508040-ebc4-4267-82fb-d7d4576e136e",
-      "content": "start event script",
-      "scriptIndex": 0
+      "attributes": {
+        "name": "Event_1u1d1qi_0",
+        "type": "FUNCTION",
+        "nodeType": "START",
+        "content": "start event script",
+        "scriptIndex": "0"
+      }
     }
   ]
 }

@@ -1,5 +1,8 @@
 package com.protectline.bpmninjs.backandforth;
 
+import com.protectline.bpmninjs.Main;
+import com.protectline.bpmninjs.application.BuildersProvider;
+import com.protectline.bpmninjs.application.MainProvider;
 import com.protectline.bpmninjs.application.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.application.tojsproject.BpmnToJS;
 import com.protectline.bpmninjs.files.FileUtil;
@@ -51,7 +54,7 @@ class BackAndForthTest {
         for (File bpmnFile : bpmnFiles) {
             String processName = bpmnFile.getName().replace(".bpmn", "");
 
-            BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
+            BpmnToJS bpmnToJs = new BpmnToJS(fileUtil, new MainProvider(fileUtil));
             bpmnToJs.createProject(processName);
 
             // Vérifier que le projet JS a été créé
@@ -59,7 +62,7 @@ class BackAndForthTest {
             assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
             assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
+            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil, new MainProvider(fileUtil));
             jsProjectToBpmn.updateBpmn(processName);
 
             assertTrue(Files.exists(bpmnFile.toPath()),
@@ -77,7 +80,7 @@ class BackAndForthTest {
         var bpmnFile = fileUtil.getBpmnFile(process);
         var workDir = fileUtil.getWorkingDirectory();
 
-        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil);
+        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil, new MainProvider(fileUtil));
         bpmnToJs.createProject(process);
 
         // Vérifier que le projet JS a été créé
@@ -85,7 +88,7 @@ class BackAndForthTest {
         assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
         assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil);
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil, new MainProvider(fileUtil));
         jsProjectToBpmn.updateBpmn(process);
 
         assertTrue(Files.exists(bpmnFile),

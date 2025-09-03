@@ -1,13 +1,12 @@
 package com.protectline.bpmninjs.application.mainfactory;
 
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
+import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.DocumentUpdater;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
-import com.protectline.bpmninjs.translateunit.TemplateForParser;
-import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
+import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +27,7 @@ public interface TranslateUnitAbstractFactory {
     /**
      * Creates a BlockFromElement for the given template and element
      */
-    Optional<BlockFromElement> createBlockFromElement(TemplateForParser template, String elementName);
+    Optional<BlockFromElement> createBlockFromElement(Template template, String elementName);
 
     /**
      * Creates an UpdateBlockFromJs if this factory handles the given type
@@ -38,7 +37,7 @@ public interface TranslateUnitAbstractFactory {
     /**
      * Creates a BpmUpdater for BPMN document updates
      */
-    Optional<BpmUpdater> createBpmUpdater(Block block);
+    Optional<DocumentUpdater> createBpmUpdater(Block block);
 
     /**
      * Returns the BlockType that this factory handles, or empty if it doesn't handle any specific type
@@ -53,15 +52,15 @@ public interface TranslateUnitAbstractFactory {
     /**
      * Returns the JS updater templates provided by this factory for JS code generation
      */
-    List<JsUpdaterTemplate> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil);
+    List<Template> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil);
 
     /**
      * Returns the templates for parser provided by this factory for block parsing
      */
-    List<TemplateForParser> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil);
+    List<Template> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil);
 
     /**
      * Creates a JsUpdater for JS code generation if this factory handles the given type
      */
-    Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, JsUpdaterTemplate template);
+    Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, Template template);
 }

@@ -4,7 +4,7 @@ import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.translateunitfactory.FunctionBlockBuilder;
+import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.FunctionBlockBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,6 @@ import java.util.List;
 
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.getExpectedBlock;
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.equalsIgnoringId;
-import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.debugBlockComparison;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

@@ -1,8 +1,8 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.translateunitfactory.FunctionUpdater;
-import com.protectline.bpmninjs.translateunitfactory.EntryPointJsUpdater;
+import com.protectline.bpmninjs.translateunitfactory.function.fromblocktojsproject.FunctionUpdater;
+import com.protectline.bpmninjs.translateunitfactory.entrypoint.EntryPointJsUpdater;
 import com.protectline.bpmninjs.util.AssertUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
-import static com.protectline.bpmninjs.translateunit.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
+import static com.protectline.bpmninjs.translateunitfactory.template.TemplateUtil.getTemplate;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 
 class JsProjectUpdaterTest {
@@ -94,7 +94,7 @@ class JsProjectUpdaterTest {
     }
 
     private List<JsUpdater> getUpdaters() throws IOException {
-        var templates=readJsUpdaterTemplatesFromFile(fileUtil);
+        var templates= getTemplate(fileUtil);
         var mainUpdaterTemplate = templates.stream()
                 .filter(template -> template.getName().equals("MAIN"))
                 .findFirst()

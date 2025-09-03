@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.jsproject;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectBlocksBuilder;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.JsProjectBlocksBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

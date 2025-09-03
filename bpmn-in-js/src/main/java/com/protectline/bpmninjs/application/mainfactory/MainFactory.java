@@ -1,16 +1,15 @@
 package com.protectline.bpmninjs.application.mainfactory;
 
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
+import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.DocumentUpdater;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.UpdaterProvider;
-import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
-import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
-import com.protectline.bpmninjs.translateunit.TemplateForParser;
-import com.protectline.bpmninjs.translateunitfactory.TranslateUnitFactoryProvider;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
+import com.protectline.bpmninjs.translateunitfactory.entrypoint.EntryPointJsUpdater;
+import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,8 +21,8 @@ import java.util.Optional;
 
 public class MainFactory {
 
-    private final List<JsUpdaterTemplate> jsTemplateUpdaters;
-    private final List<TemplateForParser> templatesForParser;
+    private final List<Template> jsTemplateUpdaters;
+    private final List<Template> templatesForParser;
     private final FileUtil fileUtil;
     private final List<TranslateUnitAbstractFactory> translateFactories;
     private final Map<String, TranslateUnitAbstractFactory> factoryByElement;
@@ -89,7 +88,7 @@ public class MainFactory {
      * Sélectionne la bonne factory basée sur l'élément et crée le BlockFromElement approprié
      */
     public BlockFromElement getBlockBuilder(String element) {
-        TemplateForParser template = getTemplateByElement(element);
+        Template template = getTemplateByElement(element);
         
         TranslateUnitAbstractFactory factory = factoryByElement.get(element);
         if (factory == null) {
@@ -108,7 +107,7 @@ public class MainFactory {
      * Remplace la logique de BpmnDocumentUpdaterFactory#getupdater
      * Sélectionne la bonne factory basée sur le block et crée le BpmUpdater approprié
      */
-    public BpmUpdater getBpmnUpdater(Block block) {
+    public DocumentUpdater getBpmnUpdater(Block block) {
         return translateFactories.stream()
                 .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(block.getType()))
                 .findFirst()
@@ -124,8 +123,8 @@ public class MainFactory {
         List<com.protectline.bpmninjs.jsproject.JsUpdater> updaters = new ArrayList<>();
         
         // Ajouter le main updater (EntryPoint)
-        JsUpdaterTemplate mainTemplate = getJsUpdaterTemplate("MAIN");
-        updaters.add(new com.protectline.bpmninjs.translateunitfactory.EntryPointJsUpdater(mainTemplate));
+        Template mainTemplate = getJsUpdaterTemplate("MAIN");
+        updaters.add(new EntryPointJsUpdater(mainTemplate));
         
         // Ajouter les updaters basés sur les blocks
         var blockTypes = blocks.stream().map(Block::getType).distinct().toList();
@@ -134,7 +133,7 @@ public class MainFactory {
                     .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(blockType))
                     .findFirst()
                     .ifPresent(factory -> {
-                        JsUpdaterTemplate template = getJsUpdaterTemplate(getTemplateName(blockType));
+                        Template template = getJsUpdaterTemplate(getTemplateName(blockType));
                         factory.createJsUpdater(blockType, template).ifPresent(updaters::add);
                     });
         }
@@ -142,7 +141,7 @@ public class MainFactory {
         return updaters;
     }
 
-    private JsUpdaterTemplate getJsUpdaterTemplate(String templateName) {
+    private Template getJsUpdaterTemplate(String templateName) {
         return jsTemplateUpdaters.stream()
                 .filter(template -> template.getName().equals(templateName))
                 .findFirst()
@@ -153,7 +152,7 @@ public class MainFactory {
         return blockType.name(); // FUNCTION -> "FUNCTION"
     }
     
-    private TemplateForParser getTemplateByElement(String elementName) {
+    private Template getTemplateByElement(String elementName) {
         return templatesForParser.stream()
             .filter(template -> template.getElement().equals(elementName))
             .findFirst()

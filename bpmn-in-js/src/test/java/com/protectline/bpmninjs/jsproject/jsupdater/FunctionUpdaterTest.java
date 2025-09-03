@@ -3,8 +3,8 @@ package com.protectline.bpmninjs.jsproject.jsupdater;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.translateunitfactory.FunctionUpdater;
-import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunitfactory.function.fromblocktojsproject.FunctionUpdater;
+import com.protectline.bpmninjs.translateunitfactory.template.Template;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,11 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FunctionUpdaterTest {
 
     private FunctionUpdater functionUpdater;
-    private JsUpdaterTemplate template;
+    private Template template;
 
     @BeforeEach
     void setUp() {
-        template = new JsUpdaterTemplate("FUNCTION", "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n", "//<FUNCTIONS>");
+        template = new Template("FUNCTION", "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n", "//<FUNCTIONS>");
         functionUpdater = new FunctionUpdater(template);
     }
 

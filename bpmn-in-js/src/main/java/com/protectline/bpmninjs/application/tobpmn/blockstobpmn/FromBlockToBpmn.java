@@ -30,7 +30,7 @@ public class FromBlockToBpmn {
 
         // Itérer sur les blocks et déléguer à MainFactory
         for (Block block : blocks) {
-            BpmUpdater updater = mainFactory.getBpmnUpdater(block);
+            DocumentUpdater updater = mainFactory.getBpmnUpdater(block);
             updater.updateDocument(document);
         }
 

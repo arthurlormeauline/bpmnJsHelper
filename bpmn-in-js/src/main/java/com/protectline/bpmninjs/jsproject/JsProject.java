@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.jsproject;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectBlocksBuilder;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.JsProjectBlocksBuilder;
 
 import java.io.IOException;
 import java.util.List;

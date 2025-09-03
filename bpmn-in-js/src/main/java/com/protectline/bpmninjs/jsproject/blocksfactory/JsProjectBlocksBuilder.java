@@ -29,7 +29,7 @@ public class JsProjectBlocksBuilder {
                 BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {
-                System.err.println("No parser found for element: " + element.getElementName());
+                throw new IllegalArgumentException("No parser found for element: " + element.getElementName());
             }
         }
         

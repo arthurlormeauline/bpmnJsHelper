@@ -1,36 +1,24 @@
 package com.protectline.bpmninjs.jsproject;
 
-import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.JsProjectBlocksBuilder;
 
 import java.io.IOException;
 import java.util.List;
 
-public class JsProject {
-
-    private final FileUtil fileUtil;
-    private final JsProjectUpdater jsProjectUpdater;
-    private final MainFactory mainFactory;
-
-    public JsProject(FileUtil fileUtil, MainFactory mainFactory) throws IOException {
-        this.fileUtil = fileUtil;
-        jsProjectUpdater = new JsProjectUpdater(fileUtil);
-        this.mainFactory = mainFactory;
-
-    }
-
-    public void updateProject(String process, List<Block> blocks) throws IOException {
-        fileUtil.deleteJsDirectoryIfExists(process);
-        fileUtil.copyTemplateToJsDirectory(process);
-        var updaters = mainFactory.getJsUpdaters(blocks);
-        jsProjectUpdater.updateProject(process, blocks, updaters);
-    }
-
-    public List<Block> getBlocks(String process) throws IOException {
-        var parser = new JsProjectBlocksBuilder(mainFactory);
-        var jsContent = fileUtil.getJsRunnerFileContent(process);
-        return parser.parseJsToBlocks(jsContent);
-    }
+public interface JsProject {
+    
+    /**
+     * Returns the blocks parsed from the JS project
+     */
+    List<Block> getBlocks() throws IOException;
+    
+    /**
+     * Returns the JS content string from the project
+     */
+    String getJsContent() throws IOException;
+    
+    /**
+     * Writes the updated JS content back to the project
+     */
+    void writeJsContent(String updatedContent) throws IOException;
 }

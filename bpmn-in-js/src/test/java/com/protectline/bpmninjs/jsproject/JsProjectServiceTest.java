@@ -1,9 +1,8 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.translateunitfactory.function.fromblocktojsproject.FunctionUpdater;
-import com.protectline.bpmninjs.translateunitfactory.entrypoint.EntryPointJsUpdater;
 import com.protectline.bpmninjs.util.AssertUtil;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,24 +12,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.getExpectedBlocksWithUUID;
-import static com.protectline.bpmninjs.translateunitfactory.template.TemplateUtil.getTemplate;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 
-class JsProjectUpdaterTest {
+class JsProjectServiceTest {
 
     public static final String TEST_DIRECTORY = "tojsproject";
     @TempDir
     Path tempDir;
-    private JsProjectUpdater jsProjectUpdater;
+    private JsProjectService jsProjectService;
     private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws Exception {
         // Copier toute la structure de test vers le répertoire temporaire
-        Path resourcesPath = getResourcePath(JsProjectUpdaterTest.class, TEST_DIRECTORY);
+        Path resourcesPath = getResourcePath(JsProjectServiceTest.class, TEST_DIRECTORY);
 
         var testWorkingDirectory = tempDir.resolve("testData");
         fileUtil = new FileUtil(testWorkingDirectory);
@@ -39,7 +36,7 @@ class JsProjectUpdaterTest {
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
         
-        jsProjectUpdater = new JsProjectUpdater(fileUtil);
+        jsProjectService = new JsProjectService(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
     }
 
     @AfterEach
@@ -82,27 +79,16 @@ class JsProjectUpdaterTest {
         // Given
         var process = "simplify";
         var blocks = getExpectedBlocksWithUUID();
-        var updaters= getUpdaters();
         fileUtil.deleteJsDirectoryIfExists(process);
         fileUtil.copyTemplateToJsDirectory(process);
+        
+        // Création de l'instance JsProject pour ce process
+        JsProject jsProject = new JsProjectImpl(process, fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
 
         // When
-        jsProjectUpdater.updateProject(process, blocks, updaters);
+        jsProjectService.updateProject(jsProject, blocks);
 
         // Then
         AssertUtil.assertJsProjectIsEqualToExpected(fileUtil, process);
-    }
-
-    private List<JsUpdater> getUpdaters() throws IOException {
-        var templates= getTemplate(fileUtil);
-        var mainUpdaterTemplate = templates.stream()
-                .filter(template -> template.getName().equals("MAIN"))
-                .findFirst()
-                .get();
-        var functionUpdaterTemplate = templates.stream()
-                .filter(template -> template.getName().equals("FUNCTION"))
-                .findFirst()
-                .get();
-        return List.of(new EntryPointJsUpdater(mainUpdaterTemplate), new FunctionUpdater(functionUpdaterTemplate));
     }
 }

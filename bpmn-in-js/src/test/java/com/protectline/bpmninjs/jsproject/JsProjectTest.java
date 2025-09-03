@@ -18,14 +18,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class JsProjectTest {
 
-    private JsProject jsProject;
+    private JsProjectService jsProjectService;
     private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
         var testDirectory = "tojsproject";
         fileUtil = new FileUtil(getResourcePath(JsProjectTest.class, testDirectory));
-        jsProject = new JsProject(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
+        jsProjectService = new JsProjectService(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
     }
 
     @Test
@@ -33,9 +33,16 @@ class JsProjectTest {
         // Given
         var process = "simplify";
         var blocks = getExpectedBlocksWithUUID();
+        
+        // Préparation du projet JS avec les templates
+        fileUtil.deleteJsDirectoryIfExists(process);
+        fileUtil.copyTemplateToJsDirectory(process);
+        
+        // Création de l'instance JsProject pour ce process
+        JsProject jsProject = new JsProjectImpl(process, fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
 
         // When
-        jsProject.updateProject(process, blocks);
+        jsProjectService.updateProject(jsProject, blocks);
 
         // Then
         AssertUtil.assertJsProjectIsEqualToExpected(fileUtil, process);
@@ -46,9 +53,10 @@ class JsProjectTest {
     void should_get_blocks_from_project() throws IOException {
         // Given
         var process = "simplify";
+        JsProject jsProject = new JsProjectImpl(process, fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
 
         // When
-        var actualBlocks = jsProject.getBlocks(process);
+        var actualBlocks = jsProject.getBlocks();
 
         // Then
         List<Block> expectedBlocksWithUUID = getExpectedBlocksWithUUID();

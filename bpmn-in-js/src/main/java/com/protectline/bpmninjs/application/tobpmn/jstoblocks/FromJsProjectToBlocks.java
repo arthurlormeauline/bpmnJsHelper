@@ -5,6 +5,7 @@ import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.JsProject;
+import com.protectline.bpmninjs.jsproject.JsProjectImpl;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,8 +24,8 @@ public class FromJsProjectToBlocks {
     public void updateBlockFromJsProject(String process) throws IOException {
         List<Block> blocksFromFile = blockWriter.readBlocksFromFile(fileUtil.getBlocksFile(process));
 
-        JsProject jsProject = new JsProject(fileUtil, mainFactory);
-        List<Block> blocksFromJsProject = jsProject.getBlocks(process);
+        JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
+        List<Block> blocksFromJsProject = jsProject.getBlocks();
 
         checkBlocksAreSimilar(blocksFromFile, blocksFromJsProject);
 

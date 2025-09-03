@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder;
+package com.protectline.bpmninjs.application.entrypointfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class MainBlockFromElement implements BlockFromElement {
+public class EntryPointBlockFromElement implements BlockFromElement {
     
     private final TemplateForParser template;
-    
-    MainBlockFromElement(TemplateForParser template) {
+
+    public EntryPointBlockFromElement(TemplateForParser template) {
         this.template = template;
     }
     

@@ -1,7 +1,8 @@
-package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock;
+package com.protectline.bpmninjs.functionfactory;
 
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.NodeToBlock;
+import com.protectline.bpmninjs.functionfactory.functionblock.NodeToBlock;
+import com.protectline.bpmninjs.functionfactory.functionblock.ToFunctionBlockFactory;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.Node;

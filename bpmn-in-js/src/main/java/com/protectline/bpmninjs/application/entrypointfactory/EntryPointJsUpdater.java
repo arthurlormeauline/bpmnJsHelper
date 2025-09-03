@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.jsupdater;
+package com.protectline.bpmninjs.application.entrypointfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.JsUpdater;
@@ -6,12 +6,12 @@ import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
 
-public class MainUpdater implements JsUpdater {
+public class EntryPointJsUpdater implements JsUpdater {
 
 
     private final JsUpdaterTemplate template;
 
-    public MainUpdater(JsUpdaterTemplate jsUpdaterTemplate) {
+    public EntryPointJsUpdater(JsUpdaterTemplate jsUpdaterTemplate) {
         this.template = jsUpdaterTemplate;
     }
 

@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
+package com.protectline.bpmninjs.functionfactory.functionblock;
 
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;

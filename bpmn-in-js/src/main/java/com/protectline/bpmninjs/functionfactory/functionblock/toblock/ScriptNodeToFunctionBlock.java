@@ -1,6 +1,6 @@
-package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock;
+package com.protectline.bpmninjs.functionfactory.functionblock.toblock;
 
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.NodeToBlock;
+import com.protectline.bpmninjs.functionfactory.functionblock.NodeToBlock;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.Node;
@@ -9,7 +9,7 @@ import com.protectline.bpmninjs.common.block.Block;
 
 import java.util.Collection;
 
-import static com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock.BlockUtil.getBlockFromScripts;
+import static com.protectline.bpmninjs.functionfactory.functionblock.toblock.BlockUtil.getBlockFromScripts;
 
 public class ScriptNodeToFunctionBlock implements NodeToBlock {
 

@@ -1,9 +1,11 @@
 package com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder;
 
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.functionfactory.FunctionBlockFromElementBuilder;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
 import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil;
 import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.bpmninjs.application.entrypointfactory.EntryPointBlockFromElement;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +23,7 @@ public class BlockFromElementFactory {
         
         switch (element) {
             case "main":
-                return new MainBlockFromElement(template);
+                return new EntryPointBlockFromElement(template);
             case "function":
                 return new FunctionBlockFromElementBuilder(template);
             default:

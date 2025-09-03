@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs.application.tobpmn.jstoblocks;
 
-import com.protectline.bpmninjs.application.MainProvider;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class FromJsProjectToBlocksTest {
 
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
-        fromJsProjectToBlocks = new FromJsProjectToBlocks(fileUtil, new MainProvider(fileUtil));
+        fromJsProjectToBlocks = new FromJsProjectToBlocks(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
 
     }
 

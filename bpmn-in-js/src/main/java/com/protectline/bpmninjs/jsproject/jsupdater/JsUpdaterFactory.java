@@ -4,6 +4,7 @@ import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.JsUpdater;
 import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.application.entrypointfactory.EntryPointJsUpdater;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class JsUpdaterFactory {
     public static List<JsUpdater> getJsUpdaters(List<Block> blocks, List<JsUpdaterTemplate> jsUpdaterTemplates) {
         List updaters = new ArrayList<JsUpdater>();
         JsUpdaterTemplate mainUpdaterTemplate = getUpdater(jsUpdaterTemplates, "MAIN");
-        updaters.add(new MainUpdater(mainUpdaterTemplate));
+        updaters.add(new EntryPointJsUpdater(mainUpdaterTemplate));
         getUpdatersBasedOnBlocks(blocks, updaters, jsUpdaterTemplates);
         return updaters;
     }

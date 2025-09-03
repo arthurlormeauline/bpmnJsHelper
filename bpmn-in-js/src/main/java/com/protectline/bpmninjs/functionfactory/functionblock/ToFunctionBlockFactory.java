@@ -1,9 +1,8 @@
-package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock;
+package com.protectline.bpmninjs.functionfactory.functionblock;
 
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.NodeToBlock;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock.ScriptNodeToFunctionBlock;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock.ServiceTaskNodeToFunctionBlock;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.toblock.StartNodeToFunctionBlock;
+import com.protectline.bpmninjs.functionfactory.functionblock.toblock.ScriptNodeToFunctionBlock;
+import com.protectline.bpmninjs.functionfactory.functionblock.toblock.ServiceTaskNodeToFunctionBlock;
+import com.protectline.bpmninjs.functionfactory.functionblock.toblock.StartNodeToFunctionBlock;
 import com.protectline.bpmninjs.bpmndocument.model.Node;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 

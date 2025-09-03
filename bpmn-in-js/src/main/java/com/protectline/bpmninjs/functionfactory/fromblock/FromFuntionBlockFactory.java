@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.application.tobpmn.blockstobpmn.bpmnupdater.fromblock;
+package com.protectline.bpmninjs.functionfactory.fromblock;
 
 import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;

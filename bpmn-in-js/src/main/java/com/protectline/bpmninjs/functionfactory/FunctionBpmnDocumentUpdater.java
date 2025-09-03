@@ -1,7 +1,7 @@
-package com.protectline.bpmninjs.application.tobpmn.blockstobpmn.bpmnupdater;
+package com.protectline.bpmninjs.functionfactory;
 
 import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.bpmnupdater.fromblock.FromFuntionBlockFactory;
+import com.protectline.bpmninjs.functionfactory.fromblock.FromFuntionBlockFactory;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.common.block.Block;
 

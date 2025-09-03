@@ -1,10 +1,10 @@
 package com.protectline.bpmninjs.application.tobpmn.blockstobpmn;
 
-import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.bpmnupdater.BpmnDocumentUpdater;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +15,11 @@ import static com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockU
 public class FromBlockToBpmn {
 
     private final FileUtil fileUtil;
+    private final MainFactory mainFactory;
 
-    public FromBlockToBpmn(FileUtil fileUtil) {
+    public FromBlockToBpmn(FileUtil fileUtil, MainFactory mainFactory) {
         this.fileUtil = fileUtil;
+        this.mainFactory = mainFactory;
     }
 
     public void updateBpmnFromBlocks(String process) throws IOException {
@@ -26,8 +28,11 @@ public class FromBlockToBpmn {
 
         List<Block> blocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
 
-        var bpmnDocumentUpdater = new BpmnDocumentUpdater(blocks);
-        bpmnDocumentUpdater.updateDocument(document);
+        // Itérer sur les blocks et déléguer à MainFactory
+        for (Block block : blocks) {
+            BpmUpdater updater = mainFactory.getBpmnUpdater(block);
+            updater.updateDocument(document);
+        }
 
         document.writeToFile(bpmnFile);
     }

@@ -1,9 +1,9 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
-import com.protectline.bpmninjs.application.BlockWriterFactory;
-import com.protectline.bpmninjs.application.BuildersProvider;
-import com.protectline.bpmninjs.common.block.Block;
+import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,9 @@ class EmptyLinesDebugTest {
         var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(EmptyLinesDebugTest.class, testDirectory);
         fileUtil = new FileUtil(resourcePath);
-        BuildersProvider provider= new BuildersProvider();
-        BlockWriterFactory writerFactory = new BlockWriterFactory();
-        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, provider, writerFactory);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        BlockWriter blockWriter = new BlockWriter();
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, mainFactory.getBlockBuilders(), blockWriter);
     }
 
     @Test

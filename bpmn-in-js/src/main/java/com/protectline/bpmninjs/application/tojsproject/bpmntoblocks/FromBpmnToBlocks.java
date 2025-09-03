@@ -1,8 +1,6 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks;
 
-import com.protectline.bpmninjs.application.WriteBlock;
-import com.protectline.bpmninjs.application.BlockWriterFactory;
-import com.protectline.bpmninjs.application.BuildersProvider;
+import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
@@ -15,25 +13,24 @@ import java.util.List;
 
 public class FromBpmnToBlocks {
     private final FileUtil fileUtil;
-    private final BuildersProvider builderProvider;
-    private BlockWriterFactory blockWriterFactory;
+    private final List<BlockBuilder> blockBuilders;
+    private final BlockWriter blockWriter;
 
-    public FromBpmnToBlocks(FileUtil fileUtil, BuildersProvider buildersProvider, BlockWriterFactory blockWriterFactory) throws IOException {
+    public FromBpmnToBlocks(FileUtil fileUtil, List<BlockBuilder> blockBuilders, BlockWriter blockWriter) throws IOException {
         this.fileUtil = fileUtil;
-        this.builderProvider= buildersProvider;
-        this.blockWriterFactory = blockWriterFactory;
+        this.blockBuilders = blockBuilders;
+        this.blockWriter = blockWriter;
     }
 
     public void createBlocksFromBpmn(String process) throws IOException {
         BpmnDocument document = new BpmnCamundaDocument(fileUtil.getBpmnFile(process).toFile());
 
         List<Block> blocks = new MainBlockBuilder().
-                registerSubBlockBuilders(builderProvider.getBuilders())
+                registerSubBlockBuilders(blockBuilders)
                 .getBlocks(document);
 
         Path blocksFile = fileUtil.getBlocksFile(process);
         Files.createDirectories(blocksFile.getParent());
-        WriteBlock writer = blockWriterFactory.getBlockWriter();
-        writer.writeBlocksToFile(blocks, blocksFile);
+        blockWriter.writeBlocksToFile(blocks, blocksFile);
     }
 }

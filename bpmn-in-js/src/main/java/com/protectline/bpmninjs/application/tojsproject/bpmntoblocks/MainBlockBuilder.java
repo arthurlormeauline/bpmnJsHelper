@@ -25,11 +25,6 @@ public class MainBlockBuilder implements BlockBuilder {
         return blocks;
     }
 
-    public MainBlockBuilder registerSubBlockBuilder(BlockBuilder builder) {
-        builders.add(builder);
-        return this;
-    }
-
     public MainBlockBuilder registerSubBlockBuilders(List<BlockBuilder> builders) {
         this.builders.addAll(builders);
         return this;

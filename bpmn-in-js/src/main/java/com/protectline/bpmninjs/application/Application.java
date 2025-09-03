@@ -1,10 +1,11 @@
 package com.protectline.bpmninjs.application;
 
 import com.google.common.io.Resources;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.application.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.application.tojsproject.BpmnToJS;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.functionfactory.FunctionTranslateUnitFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -34,8 +35,8 @@ public class Application {
         System.out.println("Update bpmn file from js project");
         Path workingDirectory = Path.of(Resources.getResource("/").toURI());
         FileUtil fileUtil = new FileUtil(workingDirectory);
-        MainProvider mainProvider = new MainProvider(fileUtil);
-        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil, mainProvider);
+        MainFactory mainFactory = createMainFactoryWithDefaults(fileUtil);
+        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil, mainFactory);
         toBpmn.updateBpmn(process);
     }
 
@@ -43,8 +44,14 @@ public class Application {
         System.out.println("Create js project from bpmn file");
         Path workingDirectory = Path.of(Resources.getResource("/").toURI());
         FileUtil fileUtil = new FileUtil(workingDirectory);
-        var mainProvider = new MainProvider(fileUtil);
-        BpmnToJS toJs = new BpmnToJS(fileUtil, mainProvider);
+        var mainFactory = createMainFactoryWithDefaults(fileUtil);
+        BpmnToJS toJs = new BpmnToJS(fileUtil, mainFactory);
         toJs.createProject(process);
+    }
+    
+    private static MainFactory createMainFactoryWithDefaults(FileUtil fileUtil) throws IOException {
+        MainFactory mainFactory = new MainFactory(fileUtil);
+        mainFactory.addTranslateFactory(new FunctionTranslateUnitFactory());
+        return mainFactory;
     }
 }

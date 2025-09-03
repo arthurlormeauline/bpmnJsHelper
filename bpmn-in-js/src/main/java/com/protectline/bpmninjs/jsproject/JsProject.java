@@ -1,10 +1,9 @@
 package com.protectline.bpmninjs.jsproject;
 
-import com.protectline.bpmninjs.application.MainProvider;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.blocksfactory.JsProjectBlocksBuilder;
-import com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder.BlockFromElementFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,13 +13,13 @@ public class JsProject {
     private final FileUtil fileUtil;
     private final JsProjectUpdater jsProjectUpdater;
     private final UpdaterProvider updaterProvider;
-    private final BlockFromElementFactory blockFromElementFactory;
+    private final MainFactory mainFactory;
 
-    public JsProject(FileUtil fileUtil, MainProvider mainProvider) throws IOException {
+    public JsProject(FileUtil fileUtil, MainFactory mainFactory) throws IOException {
         this.fileUtil = fileUtil;
         jsProjectUpdater = new JsProjectUpdater(fileUtil);
-        this.updaterProvider = mainProvider.getTemplateProvider();
-        this.blockFromElementFactory = mainProvider.getBlockFromElementFactory();
+        this.updaterProvider = mainFactory.getTemplateProvider();
+        this.mainFactory = mainFactory;
 
     }
 
@@ -32,7 +31,7 @@ public class JsProject {
     }
 
     public List<Block> getBlocks(String process) throws IOException {
-        var parser = new JsProjectBlocksBuilder(blockFromElementFactory);
+        var parser = new JsProjectBlocksBuilder(mainFactory);
         var jsContent = fileUtil.getJsRunnerFileContent(process);
         return parser.parseJsToBlocks(jsContent);
     }

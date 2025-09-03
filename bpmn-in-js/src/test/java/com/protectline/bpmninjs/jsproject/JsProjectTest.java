@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs.jsproject;
 
-import com.protectline.bpmninjs.application.MainProvider;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.util.AssertUtil;
@@ -25,7 +25,7 @@ class JsProjectTest {
     void setup() throws URISyntaxException, IOException {
         var testDirectory = "tojsproject";
         fileUtil = new FileUtil(getResourcePath(JsProjectTest.class, testDirectory));
-        jsProject = new JsProject(fileUtil, new MainProvider(fileUtil));
+        jsProject = new JsProject(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
     }
 
     @Test

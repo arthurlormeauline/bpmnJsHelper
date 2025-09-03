@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder;
+package com.protectline.bpmninjs.functionfactory;
 
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class FunctionBlockFromElementBuilder implements BlockFromElement {
+public class FunctionBlockFromElementBuilder implements BlockFromElement {
     
     private final TemplateForParser template;
     private static final Pattern TEMPLATE_PLACEHOLDER_PATTERN = Pattern.compile("\\*\\*([^*]+)\\*\\*");
     
-    FunctionBlockFromElementBuilder(TemplateForParser template) {
+    public FunctionBlockFromElementBuilder(TemplateForParser template) {
         this.template = template;
     }
     

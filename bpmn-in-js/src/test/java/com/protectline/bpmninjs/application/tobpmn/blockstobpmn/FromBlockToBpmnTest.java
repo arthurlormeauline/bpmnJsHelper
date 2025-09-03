@@ -1,6 +1,8 @@
 package com.protectline.bpmninjs.application.tobpmn.blockstobpmn;
 
 import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -31,7 +33,8 @@ class FromBlockToBpmnTest {
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
 
-        fromBlockToBpmn = new FromBlockToBpmn(fileUtil);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        fromBlockToBpmn = new FromBlockToBpmn(fileUtil, mainFactory);
     }
 
     @Test

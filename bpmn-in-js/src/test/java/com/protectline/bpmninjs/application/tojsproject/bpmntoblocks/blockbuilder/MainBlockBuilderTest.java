@@ -1,8 +1,8 @@
 package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.blockbuilder;
 
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilder;
+import com.protectline.bpmninjs.functionfactory.FunctionBlockBuilder;
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
-import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.functionblock.FunctionBlockBuilder;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.equalsIgnoringId;
 import static com.protectline.bpmninjs.application.tojsproject.stub.StubBlock.getExpectedBlock;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class MainBlockBuilderTest {
 

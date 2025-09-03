@@ -1,9 +1,9 @@
 package com.protectline.bpmninjs.application.tojsproject.blockstojsproject;
 
-import com.protectline.bpmninjs.common.block.BlockWriter;
+import com.protectline.bpmninjs.common.block.persist.BlockUtil;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,14 +20,14 @@ import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 class FromBlockToJsProjectTest {
 
     private FromBlockToJsProject fromBlockToJsProject;
-    private com.protectline.bpmninjs.files.FileUtil fileUtil;
+    private FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
         Path workingDirectory = getResourcePath(FromBlockToJsProjectTest.class, "tojsproject");
         fileUtil = new FileUtil(workingDirectory);
         MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
-        fromBlockToJsProject = new FromBlockToJsProject(fileUtil, new BlockWriter(), mainFactory);
+        fromBlockToJsProject = new FromBlockToJsProject(fileUtil, new BlockUtil(), mainFactory);
         
         Path sourceDir = workingDirectory.resolve("expectedblocks").resolve("simplify");
         Path targetDir = workingDirectory.resolve("blocks").resolve("simplify");

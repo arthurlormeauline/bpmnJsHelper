@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject;
+package com.protectline.bpmninjs.jsprojectimpl;
 
 import com.protectline.bpmninjs.xmlparser.TOKEN_TYPE;
 import com.protectline.bpmninjs.xmlparser.TokenDefinition;

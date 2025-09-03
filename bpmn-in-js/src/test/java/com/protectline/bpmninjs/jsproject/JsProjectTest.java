@@ -1,11 +1,11 @@
 package com.protectline.bpmninjs.jsproject;
 
+import com.protectline.bpmninjs.jsprojectimpl.JsProjectImpl;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElementResult;
-import com.protectline.bpmninjs.xmlparser.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,10 +46,10 @@ class JsProjectTest {
         equalsIgnoringId(actualBlocks, expectedBlocksWithUUID);
     }
     
-    private List<Block> convertElementsToBlocks(List<Element> elements, com.protectline.bpmninjs.application.mainfactory.MainFactory mainFactory) throws IOException {
+    private List<Block> convertElementsToBlocks(List<JsNode> elements, com.protectline.bpmninjs.application.mainfactory.MainFactory mainFactory) throws IOException {
         List<Block> allBlocks = new java.util.ArrayList<>();
         
-        for (Element element : elements) {
+        for (JsNode element : elements) {
             try {
                 BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
                 BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());

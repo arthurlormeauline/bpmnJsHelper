@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.files;
+package com.protectline.bpmninjs.application.files;
 
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;

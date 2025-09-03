@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject;
+package com.protectline.bpmninjs.application.tojsproject.spi;
 
 import com.protectline.bpmninjs.common.block.Block;
 

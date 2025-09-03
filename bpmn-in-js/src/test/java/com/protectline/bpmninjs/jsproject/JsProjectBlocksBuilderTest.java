@@ -1,11 +1,11 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.jsprojectimpl.JsProjectImpl;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockFromElementResult;
-import com.protectline.bpmninjs.xmlparser.Element;
 import com.protectline.bpmninjs.common.block.Block;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,10 +61,10 @@ class JsProjectBlocksBuilderTest {
         assertThat(blocksFromProject.size()).isEqualTo(2);
     }
     
-    private java.util.List<Block> convertElementsToBlocks(java.util.List<Element> elements, MainFactory mainFactory) {
+    private java.util.List<Block> convertElementsToBlocks(java.util.List<JsNode> elements, MainFactory mainFactory) {
         java.util.List<Block> allBlocks = new java.util.ArrayList<>();
         
-        for (Element element : elements) {
+        for (JsNode element : elements) {
             try {
                 BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
                 BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());

@@ -6,7 +6,7 @@ import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBu
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

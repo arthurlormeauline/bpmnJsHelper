@@ -4,14 +4,15 @@ import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
 import com.protectline.bpmninjs.bpmndocument.BpmnDocument;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.common.block.persist.BlockUtil.readBlocksFromFile;
+
 
 public class FromBlockToBpmn {
 

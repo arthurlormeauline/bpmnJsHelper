@@ -2,7 +2,7 @@ package com.protectline.bpmninjs.translateunitfactory.function.tojsproject.jsupd
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.jsproject.JsUpdater;
+import com.protectline.bpmninjs.application.tojsproject.spi.JsUpdater;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
 
 import java.text.Normalizer;

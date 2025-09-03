@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.backandforth;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.application.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.application.tojsproject.BpmnToJS;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

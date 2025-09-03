@@ -1,10 +1,12 @@
 package com.protectline.bpmninjs.translateunitfactory.function;
 
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.application.mainfactory.TranslateUnitAbstractFactory;
 import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
 import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
 import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
+import com.protectline.bpmninjs.application.tojsproject.spi.JsUpdater;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromblocktobpmn.documentUpdater.FromFuntionBlockFactory;
@@ -13,7 +15,7 @@ import com.protectline.bpmninjs.translateunitfactory.function.tobpmn.fromjsproje
 import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.FunctionBlockBuilder;
 import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.jsupdater.FunctionUpdater;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
-import com.protectline.bpmninjs.translateunitfactory.template.TemplateUtil;
+import com.protectline.bpmninjs.translateunitfactory.template.persist.TemplateUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     private BlockType blockType;
     private FunctionUpdater functionUpdater;
 
-    public FunctionTranslateUnitFactory(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+    public FunctionTranslateUnitFactory(FileUtil fileUtil) {
         try {
             this.template = TemplateUtil.getTemplate(fileUtil, "functiontranslateunit").get(0);
             this.blockBuilder = new FunctionBlockBuilder();
@@ -54,7 +56,7 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     }
 
     @Override
-    public Optional<BlockFromElement> createBlockFromElement(com.protectline.bpmninjs.files.FileUtil fileUtil, String elementName) {
+    public Optional<BlockFromElement> createBlockFromElement(FileUtil fileUtil, String elementName) {
         return Optional.of(blockFromElement);
     }
 
@@ -74,12 +76,12 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     }
 
     @Override
-    public Template getTemplate(com.protectline.bpmninjs.files.FileUtil fileUtil) {
+    public Template getTemplate(FileUtil fileUtil) {
         return template;
     }
 
     @Override
-    public Optional<com.protectline.bpmninjs.jsproject.JsUpdater> createJsUpdater(BlockType type, com.protectline.bpmninjs.files.FileUtil fileUtil) {
+    public Optional<JsUpdater> createJsUpdater(BlockType type, FileUtil fileUtil) {
         return Optional.of(functionUpdater);
     }
 }

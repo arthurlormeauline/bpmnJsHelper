@@ -1,12 +1,15 @@
-package com.protectline.bpmninjs.jsproject;
+package com.protectline.bpmninjs.jsprojectimpl;
 
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
+import com.protectline.bpmninjs.jsproject.JsNode;
+import com.protectline.bpmninjs.jsproject.JsProject;
 import com.protectline.bpmninjs.xmlparser.XmlParser;
 import com.protectline.bpmninjs.xmlparser.JsProjectTokenDefinition;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JsProjectImpl implements JsProject {
 
@@ -23,9 +26,12 @@ public class JsProjectImpl implements JsProject {
     }
 
     @Override
-    public List<com.protectline.bpmninjs.xmlparser.Element> getElements() throws IOException {
+    public List<JsNode> getElements() throws IOException {
         var jsContent = fileUtil.getJsRunnerFileContent(process);
-        return xmlParser.parseXml(jsContent, new JsProjectTokenDefinition());
+        var elements = xmlParser.parseXml(jsContent, new JsProjectTokenDefinition());
+        return elements.stream()
+                .map(JsNodeImpl::new)
+                .collect(Collectors.toList());
     }
 
     @Override

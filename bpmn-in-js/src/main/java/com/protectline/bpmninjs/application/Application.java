@@ -4,7 +4,7 @@ import com.google.common.io.Resources;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.application.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.application.tojsproject.BpmnToJS;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.translateunitfactory.DefaultTranslateUnitFactoryProvider;
 
 import java.io.IOException;

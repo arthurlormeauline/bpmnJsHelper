@@ -1,7 +1,6 @@
 package com.protectline.bpmninjs.util;
 
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.jsonblock.FunctionJsonBlockUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,6 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import static com.protectline.bpmninjs.common.block.persist.BlockUtil.readBlocksFromFile;
 import static com.protectline.bpmninjs.util.DirectoryComparisonUtil.areDirectoriesEqual;
 import static com.protectline.bpmninjs.util.FileUtil.logBpmnRunnerDiff;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssertUtil {
 
-    public static void assertJsProjectIsEqualToExpected(com.protectline.bpmninjs.files.FileUtil fileUtil, String process) throws IOException {
+    public static void assertJsProjectIsEqualToExpected(com.protectline.bpmninjs.application.files.FileUtil fileUtil, String process) throws IOException {
         Path outputDir = fileUtil.getJsProjectDirectory(process);
         assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
         assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
@@ -31,18 +31,18 @@ public class AssertUtil {
         assertThat(areDirectoriesEqual(outputDir, expectedProject)).isTrue();
     }
 
-    public static void assertBlocksAreEqualToExpected(com.protectline.bpmninjs.files.FileUtil fileUtil, String process) throws IOException {
+    public static void assertBlocksAreEqualToExpected(com.protectline.bpmninjs.application.files.FileUtil fileUtil, String process) throws IOException {
         // Read actual blocks from the generated blocks file
         Path actualBlocksFile = fileUtil.getBlocksFile(process);
         assertTrue(Files.exists(actualBlocksFile), "Blocks file should exist: " + actualBlocksFile);
         
-        List<Block> actualBlocks = FunctionJsonBlockUtil.readBlocksFromFile(actualBlocksFile);
+        List<Block> actualBlocks = readBlocksFromFile(actualBlocksFile);
         
         // Read expected blocks from the expected blocks file
         Path expectedBlocksFile = fileUtil.getWorkingDirectory().resolve("expectedblocks").resolve(process).resolve(process + ".json");
         assertTrue(Files.exists(expectedBlocksFile), "Expected blocks file should exist: " + expectedBlocksFile);
         
-        List<Block> expectedBlocks = FunctionJsonBlockUtil.readBlocksFromFile(expectedBlocksFile);
+        List<Block> expectedBlocks = readBlocksFromFile(expectedBlocksFile);
         
         // Compare blocks
         assertBlocksEqualIgnoringId(actualBlocks, expectedBlocks);

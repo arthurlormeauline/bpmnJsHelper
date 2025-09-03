@@ -1,7 +1,8 @@
-package com.protectline.bpmninjs.translateunitfactory.template;
+package com.protectline.bpmninjs.translateunitfactory.template.persist;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.protectline.bpmninjs.translateunitfactory.template.Template;
 import lombok.Getter;
 
 @Getter

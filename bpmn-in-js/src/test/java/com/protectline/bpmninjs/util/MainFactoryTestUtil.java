@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs.util;
 
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.translateunitfactory.DefaultTranslateUnitFactoryProvider;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 

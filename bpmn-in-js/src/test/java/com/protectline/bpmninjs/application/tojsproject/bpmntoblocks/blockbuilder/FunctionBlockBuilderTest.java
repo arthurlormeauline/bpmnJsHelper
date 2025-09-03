@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.blockbuild
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.camundbpmnaparser.BpmnCamundaDocument;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.translateunitfactory.function.tojsproject.blockbuilder.FunctionBlockBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

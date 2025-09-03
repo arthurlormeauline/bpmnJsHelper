@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs.application.tobpmn.blockstobpmn;
 
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;

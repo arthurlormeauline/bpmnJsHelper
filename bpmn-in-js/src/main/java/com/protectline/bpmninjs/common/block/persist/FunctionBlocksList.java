@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.common.block.jsonblock;
+package com.protectline.bpmninjs.common.block.persist;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

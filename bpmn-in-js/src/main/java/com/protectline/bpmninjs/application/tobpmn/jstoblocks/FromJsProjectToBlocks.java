@@ -4,31 +4,31 @@ import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.common.block.BlockWriter;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
+import com.protectline.bpmninjs.jsproject.JsNode;
 import com.protectline.bpmninjs.jsproject.JsProject;
-import com.protectline.bpmninjs.jsproject.JsProjectImpl;
-import com.protectline.bpmninjs.xmlparser.Element;
+import com.protectline.bpmninjs.jsprojectimpl.JsProjectImpl;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.protectline.bpmninjs.common.block.persist.BlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.common.block.persist.BlockUtil.writeBlocksToFile;
+
 public class FromJsProjectToBlocks {
     private final FileUtil fileUtil;
     private final MainFactory mainFactory;
-    private final BlockWriter blockWriter;
 
     public FromJsProjectToBlocks(FileUtil fileUtil, MainFactory mainFactory) {
         this.fileUtil = fileUtil;
         this.mainFactory = mainFactory;
-        this.blockWriter = new BlockWriter();
     }
 
     public void updateBlockFromJsProject(String process) throws IOException {
-        List<Block> blocksFromFile = blockWriter.readBlocksFromFile(fileUtil.getBlocksFile(process));
+        List<Block> blocksFromFile = readBlocksFromFile(fileUtil.getBlocksFile(process));
 
         JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
-        List<Element> elementsFromJsProject = jsProject.getElements();
+        List<JsNode> elementsFromJsProject = jsProject.getElements();
         
         List<Block> blocksFromJsProject = convertElementsToBlocks(elementsFromJsProject);
 
@@ -39,7 +39,7 @@ public class FromJsProjectToBlocks {
             updater.updateBlockContent(blocksFromFile, block);
         }
 
-        blockWriter.writeBlocksToFile(blocksFromFile, fileUtil.getBlocksFile(process));
+        writeBlocksToFile(blocksFromFile, fileUtil.getBlocksFile(process));
     }
 
     private static void checkBlocksAreSimilar(List<Block> blocksFromFile, List<Block> blocksFromJsProject) {
@@ -60,11 +60,11 @@ public class FromJsProjectToBlocks {
             return false;
         return true;
     }
-    
-    private List<Block> convertElementsToBlocks(List<Element> elements) {
+
+    private List<Block> convertElementsToBlocks(List<JsNode> elements) {
         List<Block> allBlocks = new java.util.ArrayList<>();
-        
-        for (Element element : elements) {
+
+        for (JsNode element : elements) {
             try {
                 BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
                 BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());

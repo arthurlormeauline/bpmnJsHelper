@@ -3,9 +3,10 @@ package com.protectline.bpmninjs.application.mainfactory;
 import com.protectline.bpmninjs.application.tobpmn.spi.DocumentUpdater;
 import com.protectline.bpmninjs.application.tobpmn.spi.UpdateBlock;
 import com.protectline.bpmninjs.application.tojsproject.spi.BlockBuilder;
+import com.protectline.bpmninjs.application.tojsproject.spi.JsUpdater;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
-import com.protectline.bpmninjs.files.FileUtil;
+import com.protectline.bpmninjs.application.files.FileUtil;
 import com.protectline.bpmninjs.application.tobpmn.spi.BlockFromElement;
 
 import java.io.IOException;
@@ -84,8 +85,8 @@ public class MainFactory {
     }
 
 
-    public List<com.protectline.bpmninjs.jsproject.JsUpdater> getJsUpdaters(List<Block> blocks) {
-        List<com.protectline.bpmninjs.jsproject.JsUpdater> updaters = new ArrayList<>();
+    public List<JsUpdater> getJsUpdaters(List<Block> blocks) {
+        List<JsUpdater> updaters = new ArrayList<>();
         
         // Ajouter l'EntryPoint updater
         translateFactories.stream()

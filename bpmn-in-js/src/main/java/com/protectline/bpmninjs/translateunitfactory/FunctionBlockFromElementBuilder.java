@@ -1,11 +1,11 @@
-package com.protectline.bpmninjs.functionfactory;
+package com.protectline.bpmninjs.translateunitfactory;
 
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElementResult;
-import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.bpmninjs.translateunit.TemplateForParser;
 
 import java.util.ArrayList;
 import java.util.List;

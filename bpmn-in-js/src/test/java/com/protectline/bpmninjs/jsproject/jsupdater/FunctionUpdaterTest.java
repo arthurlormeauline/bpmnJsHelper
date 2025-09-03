@@ -3,8 +3,8 @@ package com.protectline.bpmninjs.jsproject.jsupdater;
 import com.protectline.bpmninjs.bpmndocument.model.BpmnPath;
 import com.protectline.bpmninjs.bpmndocument.model.NodeType;
 import com.protectline.bpmninjs.common.block.Block;
-import com.protectline.bpmninjs.functionfactory.FunctionUpdater;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunitfactory.FunctionUpdater;
+import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,9 @@
-package com.protectline.bpmninjs.functionfactory;
+package com.protectline.bpmninjs.translateunitfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.JsUpdater;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
 
 import java.text.Normalizer;
 import java.util.List;

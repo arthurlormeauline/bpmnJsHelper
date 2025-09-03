@@ -5,7 +5,7 @@ import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.application.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.application.tojsproject.BpmnToJS;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.functionfactory.FunctionTranslateUnitFactory;
+import com.protectline.bpmninjs.translateunitfactory.DefaultTranslateUnitFactoryProvider;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -50,8 +50,6 @@ public class Application {
     }
     
     private static MainFactory createMainFactoryWithDefaults(FileUtil fileUtil) throws IOException {
-        MainFactory mainFactory = new MainFactory(fileUtil);
-        mainFactory.addTranslateFactory(new FunctionTranslateUnitFactory());
-        return mainFactory;
+        return new MainFactory(fileUtil, new DefaultTranslateUnitFactoryProvider());
     }
 }

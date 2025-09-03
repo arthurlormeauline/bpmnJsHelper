@@ -6,8 +6,8 @@ import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilde
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
-import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunit.TemplateForParser;
+import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
 
 import java.util.List;
 import java.util.Optional;

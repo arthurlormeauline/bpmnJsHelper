@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.updatertemplate;
+package com.protectline.bpmninjs.translateunit;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

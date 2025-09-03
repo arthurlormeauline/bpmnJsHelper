@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.functionfactory;
+package com.protectline.bpmninjs.translateunitfactory;
 
 import com.protectline.bpmninjs.application.tobpmn.blockstobpmn.BpmUpdater;
 import com.protectline.bpmninjs.functionfactory.fromblock.FromFuntionBlockFactory;

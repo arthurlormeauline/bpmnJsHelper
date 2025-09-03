@@ -8,10 +8,9 @@ import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.UpdaterProvider;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil;
-import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
-import com.protectline.bpmninjs.application.entrypointfactory.EntryPointTranslateUnitFactory;
+import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunit.TemplateForParser;
+import com.protectline.bpmninjs.translateunitfactory.TranslateUnitFactoryProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil.readJsUpdaterTemplatesFromFile;
 
 public class MainFactory {
 
@@ -31,14 +29,17 @@ public class MainFactory {
     private final Map<String, TranslateUnitAbstractFactory> factoryByElement;
     private TranslateUnitAbstractFactory fallbackFactory;
 
-    public MainFactory(FileUtil fileUtil) throws IOException {
+    public MainFactory(FileUtil fileUtil, TranslateUnitFactoryProvider factoryProvider) throws IOException {
         this.fileUtil = fileUtil;
         this.translateFactories = new ArrayList<>();
         this.factoryByElement = new HashMap<>();
         this.jsTemplateUpdaters = new ArrayList<>();
         this.templatesForParser = new ArrayList<>();
         
-        addTranslateFactory(new EntryPointTranslateUnitFactory());
+        // Load all factories from provider
+        for (TranslateUnitAbstractFactory factory : factoryProvider.getTranslateUnitFactories()) {
+            addTranslateFactory(factory);
+        }
     }
     
     public void addTranslateFactory(TranslateUnitAbstractFactory factory) {
@@ -124,7 +125,7 @@ public class MainFactory {
         
         // Ajouter le main updater (EntryPoint)
         JsUpdaterTemplate mainTemplate = getJsUpdaterTemplate("MAIN");
-        updaters.add(new com.protectline.bpmninjs.application.entrypointfactory.EntryPointJsUpdater(mainTemplate));
+        updaters.add(new com.protectline.bpmninjs.translateunitfactory.EntryPointJsUpdater(mainTemplate));
         
         // Ajouter les updaters basés sur les blocks
         var blockTypes = blocks.stream().map(Block::getType).distinct().toList();

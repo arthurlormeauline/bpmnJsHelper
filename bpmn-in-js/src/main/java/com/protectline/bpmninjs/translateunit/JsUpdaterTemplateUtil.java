@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.updatertemplate;
+package com.protectline.bpmninjs.translateunit;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

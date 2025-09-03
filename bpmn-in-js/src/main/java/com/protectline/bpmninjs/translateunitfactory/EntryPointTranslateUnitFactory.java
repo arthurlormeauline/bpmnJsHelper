@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.application.entrypointfactory;
+package com.protectline.bpmninjs.translateunitfactory;
 
 import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.MainBlockBuilder;
 import com.protectline.bpmninjs.application.mainfactory.TranslateUnitAbstractFactory;
@@ -8,8 +8,8 @@ import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilde
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
-import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunit.TemplateForParser;
+import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +60,7 @@ public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFact
     @Override
     public List<JsUpdaterTemplate> getJsUpdaterTemplates(com.protectline.bpmninjs.files.FileUtil fileUtil) {
         try {
-            return com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil
+            return com.protectline.bpmninjs.translateunit.JsUpdaterTemplateUtil
                     .readJsUpdaterTemplatesFromFile(fileUtil, "main");
         } catch (Exception e) {
             throw new RuntimeException("Failed to load main templates", e);
@@ -70,7 +70,7 @@ public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFact
     @Override
     public List<TemplateForParser> getTemplatesForParser(com.protectline.bpmninjs.files.FileUtil fileUtil) {
         try {
-            return com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplateUtil
+            return com.protectline.bpmninjs.translateunit.JsUpdaterTemplateUtil
                     .readTemplatesForParserFromFile(fileUtil, "main");
         } catch (Exception e) {
             throw new RuntimeException("Failed to load main templates", e);

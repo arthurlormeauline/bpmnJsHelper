@@ -1,9 +1,9 @@
-package com.protectline.bpmninjs.application.entrypointfactory;
+package com.protectline.bpmninjs.translateunitfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElement;
 import com.protectline.bpmninjs.jsproject.blocksfactory.BlockFromElementResult;
-import com.protectline.bpmninjs.jsproject.updatertemplate.TemplateForParser;
+import com.protectline.bpmninjs.translateunit.TemplateForParser;
 
 import java.util.ArrayList;
 import java.util.List;

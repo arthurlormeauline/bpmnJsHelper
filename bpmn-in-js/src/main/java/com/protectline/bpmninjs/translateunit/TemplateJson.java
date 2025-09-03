@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.jsproject.updatertemplate;
+package com.protectline.bpmninjs.translateunit;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

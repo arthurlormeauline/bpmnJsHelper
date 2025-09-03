@@ -1,8 +1,8 @@
-package com.protectline.bpmninjs.application.entrypointfactory;
+package com.protectline.bpmninjs.translateunitfactory;
 
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.jsproject.JsUpdater;
-import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
+import com.protectline.bpmninjs.translateunit.JsUpdaterTemplate;
 
 import java.util.List;
 

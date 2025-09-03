@@ -4,7 +4,7 @@ import com.protectline.bpmninjs.application.tobpmn.jstoblocks.BlockUpdaterFromJs
 import com.protectline.bpmninjs.application.tobpmn.jstoblocks.UpdateBlockFromJs;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.TemplateProvider;
+import com.protectline.bpmninjs.jsproject.UpdaterProvider;
 import com.protectline.bpmninjs.jsproject.blocksfactory.blockbuilder.BlockFromElementFactory;
 import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
@@ -31,8 +31,8 @@ public class MainProvider {
         return new FunctionBlockFileUtilProvider();
     }
 
-    public TemplateProvider getTemplateProvider() {
-        return new TemplateProvider(jsTemplateUpdaters);
+    public UpdaterProvider getTemplateProvider() {
+        return new UpdaterProvider(jsTemplateUpdaters);
     }
 
     public BlockFromElementFactory getBlockFromElementFactory() throws IOException {

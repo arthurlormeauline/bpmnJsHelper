@@ -13,13 +13,13 @@ public class JsProject {
 
     private final FileUtil fileUtil;
     private final JsProjectUpdater jsProjectUpdater;
-    private final TemplateProvider templateProvider;
+    private final UpdaterProvider updaterProvider;
     private final BlockFromElementFactory blockFromElementFactory;
 
     public JsProject(FileUtil fileUtil, MainProvider mainProvider) throws IOException {
         this.fileUtil = fileUtil;
         jsProjectUpdater = new JsProjectUpdater(fileUtil);
-        this.templateProvider= mainProvider.getTemplateProvider();
+        this.updaterProvider = mainProvider.getTemplateProvider();
         this.blockFromElementFactory = mainProvider.getBlockFromElementFactory();
 
     }
@@ -27,7 +27,7 @@ public class JsProject {
     public void updateProject(String process, List<Block> blocks) throws IOException {
         fileUtil.deleteJsDirectoryIfExists(process);
         fileUtil.copyTemplateToJsDirectory(process);
-        var updaters = templateProvider.getJsUpdaters(blocks);
+        var updaters = updaterProvider.getJsUpdaters(blocks);
         jsProjectUpdater.updateProject(process, blocks, updaters);
     }
 

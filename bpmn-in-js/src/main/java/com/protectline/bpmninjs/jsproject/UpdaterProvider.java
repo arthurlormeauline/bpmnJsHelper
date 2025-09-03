@@ -6,11 +6,11 @@ import com.protectline.bpmninjs.jsproject.updatertemplate.JsUpdaterTemplate;
 
 import java.util.List;
 
-public class TemplateProvider {
+public class UpdaterProvider {
 
     private final List<JsUpdaterTemplate> updaterTemplates;
 
-    public TemplateProvider(List<JsUpdaterTemplate> updaterTemplates) {
+    public UpdaterProvider(List<JsUpdaterTemplate> updaterTemplates) {
         this.updaterTemplates = updaterTemplates;
     }
 

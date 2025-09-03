@@ -7,7 +7,7 @@ import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilde
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
-import com.protectline.bpmninjs.translateunitfactory.function.fromblocktobpmn.FunctionBpmnDocumentUpdater;
+import com.protectline.bpmninjs.translateunitfactory.function.fromblocktobpmn.documentUpdater.FromFuntionBlockFactory;
 import com.protectline.bpmninjs.translateunitfactory.function.fromblocktojsproject.FunctionUpdater;
 import com.protectline.bpmninjs.translateunitfactory.function.frombpmntoblock.FunctionBlockBuilder;
 import com.protectline.bpmninjs.translateunitfactory.function.fromjsprojecttoblock.FunctionBlockFromElementBuilder;
@@ -54,7 +54,7 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     @Override
     public Optional<DocumentUpdater> createBpmUpdater(Block block) {
         if (getBlockType().isPresent() && getBlockType().get().equals(block.getType())) {
-            return Optional.of(new FunctionBpmnDocumentUpdater(block));
+            return Optional.of(FromFuntionBlockFactory.getFromBlock(block));
         }
         return Optional.empty();
     }

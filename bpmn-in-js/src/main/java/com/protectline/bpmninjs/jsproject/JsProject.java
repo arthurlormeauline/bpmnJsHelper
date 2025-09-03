@@ -12,13 +12,11 @@ public class JsProject {
 
     private final FileUtil fileUtil;
     private final JsProjectUpdater jsProjectUpdater;
-    private final UpdaterProvider updaterProvider;
     private final MainFactory mainFactory;
 
     public JsProject(FileUtil fileUtil, MainFactory mainFactory) throws IOException {
         this.fileUtil = fileUtil;
         jsProjectUpdater = new JsProjectUpdater(fileUtil);
-        this.updaterProvider = mainFactory.getTemplateProvider();
         this.mainFactory = mainFactory;
 
     }
@@ -26,7 +24,7 @@ public class JsProject {
     public void updateProject(String process, List<Block> blocks) throws IOException {
         fileUtil.deleteJsDirectoryIfExists(process);
         fileUtil.copyTemplateToJsDirectory(process);
-        var updaters = updaterProvider.getJsUpdaters(blocks);
+        var updaters = mainFactory.getJsUpdaters(blocks);
         jsProjectUpdater.updateProject(process, blocks, updaters);
     }
 

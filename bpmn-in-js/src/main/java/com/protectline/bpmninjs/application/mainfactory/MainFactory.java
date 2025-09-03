@@ -6,7 +6,6 @@ import com.protectline.bpmninjs.application.tojsproject.bpmntoblocks.BlockBuilde
 import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.common.block.BlockType;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.UpdaterProvider;
 import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
 import com.protectline.bpmninjs.translateunitfactory.entrypoint.EntryPointJsUpdater;
 import com.protectline.bpmninjs.translateunitfactory.template.Template;
@@ -60,10 +59,6 @@ public class MainFactory {
         } catch (Exception e) {
             throw new RuntimeException("Failed to load templates from factory: " + factory.getClass().getSimpleName(), e);
         }
-    }
-
-    public UpdaterProvider getTemplateProvider() {
-        return new UpdaterProvider(this);
     }
 
 

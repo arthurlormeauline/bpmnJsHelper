@@ -6,6 +6,9 @@ import com.protectline.bpmninjs.common.block.BlockWriter;
 import com.protectline.bpmninjs.files.FileUtil;
 import com.protectline.bpmninjs.jsproject.JsProject;
 import com.protectline.bpmninjs.jsproject.JsProjectImpl;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElementResult;
+import com.protectline.bpmninjs.xmlparser.Element;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +28,10 @@ public class FromJsProjectToBlocks {
         List<Block> blocksFromFile = blockWriter.readBlocksFromFile(fileUtil.getBlocksFile(process));
 
         JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
-        List<Block> blocksFromJsProject = jsProject.getBlocks();
+        List<Element> elementsFromJsProject = jsProject.getElements();
+        
+        // Conversion des Element en Block (logique migrée depuis JsProjectBlocksBuilder)
+        List<Block> blocksFromJsProject = convertElementsToBlocks(elementsFromJsProject);
 
         checkBlocksAreSimilar(blocksFromFile, blocksFromJsProject);
 
@@ -54,5 +60,21 @@ public class FromJsProjectToBlocks {
                 .containsAll(blocksFromFile.stream().map(block -> block.getId()).toList()))
             return false;
         return true;
+    }
+    
+    private List<Block> convertElementsToBlocks(List<Element> elements) {
+        List<Block> allBlocks = new java.util.ArrayList<>();
+        
+        for (Element element : elements) {
+            try {
+                BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
+                BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
+                allBlocks.addAll(result.getBlocks());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("No parser found for element: " + element.getElementName());
+            }
+        }
+        
+        return allBlocks;
     }
 }

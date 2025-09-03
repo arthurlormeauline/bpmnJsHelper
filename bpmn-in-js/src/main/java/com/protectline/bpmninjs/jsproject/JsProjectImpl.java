@@ -1,9 +1,9 @@
 package com.protectline.bpmninjs.jsproject;
 
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
-import com.protectline.bpmninjs.common.block.Block;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.JsProjectBlocksBuilder;
+import com.protectline.bpmninjs.xmlparser.XmlParser;
+import com.protectline.bpmninjs.xmlparser.JsProjectTokenDefinition;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,18 +13,19 @@ public class JsProjectImpl implements JsProject {
     private final FileUtil fileUtil;
     private final MainFactory mainFactory;
     private final String process;
+    private final XmlParser xmlParser;
 
-    public JsProjectImpl(String process, FileUtil fileUtil, MainFactory mainFactory) {
+    public JsProjectImpl(String process, FileUtil fileUtil, MainFactory mainFactory) throws IOException {
         this.process = process;
         this.fileUtil = fileUtil;
         this.mainFactory = mainFactory;
+        this.xmlParser = new XmlParser();
     }
 
     @Override
-    public List<Block> getBlocks() throws IOException {
-        var parser = new JsProjectBlocksBuilder(mainFactory);
+    public List<com.protectline.bpmninjs.xmlparser.Element> getElements() throws IOException {
         var jsContent = fileUtil.getJsRunnerFileContent(process);
-        return parser.parseJsToBlocks(jsContent);
+        return xmlParser.parseXml(jsContent, new JsProjectTokenDefinition());
     }
 
     @Override

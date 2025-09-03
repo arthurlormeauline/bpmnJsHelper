@@ -3,7 +3,10 @@ package com.protectline.bpmninjs.jsproject;
 import com.protectline.bpmninjs.application.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.files.FileUtil;
-import com.protectline.bpmninjs.jsproject.blocksfromelement.JsProjectBlocksBuilder;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElement;
+import com.protectline.bpmninjs.jsproject.blocksfromelement.BlockFromElementResult;
+import com.protectline.bpmninjs.xmlparser.Element;
+import com.protectline.bpmninjs.common.block.Block;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,24 +17,24 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class JsProjectBlocksBuilderTest {
 
-    JsProjectBlocksBuilder jsProjectBlocksBuilder;
+    MainFactory mainFactory;
+    FileUtil fileUtil;
 
     @BeforeEach
     void setup() throws IOException, URISyntaxException {
-        FileUtil files = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
-        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(files);
-        jsProjectBlocksBuilder = new JsProjectBlocksBuilder(mainFactory);
+        fileUtil = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
+        mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
     }
 
 
     @Test
     void should_parse_js_file() throws URISyntaxException, IOException {
         // Given
-        FileUtil files = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
-        var content = files.getJsRunnerFileContent("tus.prc.actionCombine");
+        JsProject jsProject = new JsProjectImpl("tus.prc.actionCombine", fileUtil, mainFactory);
 
         // When
-        var blocksFromProject = jsProjectBlocksBuilder.parseJsToBlocks(content);
+        var elementsFromProject = jsProject.getElements();
+        var blocksFromProject = convertElementsToBlocks(elementsFromProject, mainFactory);
 
         // Then
         assertThat(blocksFromProject.size()).isEqualTo(20);
@@ -39,13 +42,12 @@ class JsProjectBlocksBuilderTest {
 
     @Test
     void should_parse_minimal_two_function_js_content() throws URISyntaxException, IOException {
-        // Given - Read minimal JS content from file
-        FileUtil files = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
-        var content = files.getJsRunnerFileContent("CreateCustomer_Dev_minimal");
+        // Given
+        JsProject jsProject = new JsProjectImpl("CreateCustomer_Dev_minimal", fileUtil, mainFactory);
 
-
-        // When - Parse the JS content directly
-        var blocksFromProject = jsProjectBlocksBuilder.parseJsToBlocks(content);
+        // When - Parse the JS content through JsProject interface
+        var elementsFromProject = jsProject.getElements();
+        var blocksFromProject = convertElementsToBlocks(elementsFromProject, mainFactory);
 
         // Then - Should parse 2 functions but currently only parses 1
         System.out.println("=== TEST RESULT ===");
@@ -57,6 +59,22 @@ class JsProjectBlocksBuilderTest {
         }
         
         assertThat(blocksFromProject.size()).isEqualTo(2);
+    }
+    
+    private java.util.List<Block> convertElementsToBlocks(java.util.List<Element> elements, MainFactory mainFactory) {
+        java.util.List<Block> allBlocks = new java.util.ArrayList<>();
+        
+        for (Element element : elements) {
+            try {
+                BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
+                BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
+                allBlocks.addAll(result.getBlocks());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("No parser found for element: " + element.getElementName());
+            }
+        }
+        
+        return allBlocks;
     }
 
 }

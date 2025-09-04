@@ -37,7 +37,7 @@ class SimpleXmlTest {
             .findFirst()
             .orElseThrow();
         assertThat(elementWithContent.getContent()).isEqualTo("content");
-        assertThat(elementWithContent.getAttributes()).containsEntry("attr", "\"value\"");
+        assertThat(elementWithContent.getAttributes()).containsEntry("attr", "value");
         
         // Verify self-closing element
         Element selfClosing = rootElement.getChildren().stream()
@@ -45,7 +45,7 @@ class SimpleXmlTest {
             .findFirst()
             .orElseThrow();
         assertThat(selfClosing.isSelfClosing()).isTrue();
-        assertThat(selfClosing.getAttributes()).containsEntry("attr", "\"value\"");
+        assertThat(selfClosing.getAttributes()).containsEntry("attr", "value");
         
         // Verify nested element
         Element parent = rootElement.getChildren().stream()

@@ -23,8 +23,8 @@ class ElementXmlGenerationTest {
         
         // Then
         assertThat(xml).contains("<element");
-        assertThat(xml).contains("id=test");
-        assertThat(xml).contains("name=testName");
+        assertThat(xml).contains("id=\"test\"");
+        assertThat(xml).contains("name=\"testName\"");
         assertThat(xml).contains(" />");
         assertThat(xml).doesNotContain("</element>");
     }
@@ -40,7 +40,7 @@ class ElementXmlGenerationTest {
         String xml = element.toXml();
         
         // Then
-        assertThat(xml.trim()).isEqualTo("<test attr=value>content</test>");
+        assertThat(xml.trim()).isEqualTo("<test attr=\"value\">content</test>");
     }
 
     @Test

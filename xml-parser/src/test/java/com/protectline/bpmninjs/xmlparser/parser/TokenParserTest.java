@@ -296,7 +296,7 @@ class TokenParserTest {
         assertThat(elements).hasSize(1);
         Element element = elements.get(0);
         assertThat(element.getElementName()).isEqualTo("function");
-        assertThat(element.getAttributes()).containsEntry("id", "\"https://test\"");
+        assertThat(element.getAttributes()).containsEntry("id", "https://test");
         assertThat(element.getContent()).isEqualTo("function d(){}");
     }
 
@@ -364,8 +364,8 @@ class TokenParserTest {
         
         // Attributes - both URLs should be correctly reconstructed with all their slashes
         assertThat(element.getAttributes()).hasSize(2);
-        assertThat(element.getAttributes()).containsEntry("xmlns:bpmn", "\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
-        assertThat(element.getAttributes()).containsEntry("xmlns:bpmndi", "\"http://www.omg.org/spec/BPMN/20100524/DI\"");
+        assertThat(element.getAttributes()).containsEntry("xmlns:bpmn", "http://www.omg.org/spec/BPMN/20100524/MODEL");
+        assertThat(element.getAttributes()).containsEntry("xmlns:bpmndi", "http://www.omg.org/spec/BPMN/20100524/DI");
         
         // Verify attribute order - xmlns:bpmn should appear before xmlns:bpmndi
         List<String> attributeKeys = new java.util.ArrayList<>(element.getAttributes().keySet());
@@ -374,10 +374,10 @@ class TokenParserTest {
         
         // Verify exact URL reconstruction
         String bpmnUrl = element.getAttributes().get("xmlns:bpmn");
-        assertThat(bpmnUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
+        assertThat(bpmnUrl).isEqualTo("http://www.omg.org/spec/BPMN/20100524/MODEL");
         
         String bpmndiUrl = element.getAttributes().get("xmlns:bpmndi");
-        assertThat(bpmndiUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/DI\"");
+        assertThat(bpmndiUrl).isEqualTo("http://www.omg.org/spec/BPMN/20100524/DI");
     }
 
     @Test
@@ -426,10 +426,10 @@ class TokenParserTest {
         
         // Verify all attributes are parsed correctly
         assertThat(element.getAttributes()).hasSize(4);
-        assertThat(element.getAttributes()).containsEntry("id", "\"test123\"");
-        assertThat(element.getAttributes()).containsEntry("name", "\"TestElement\"");
-        assertThat(element.getAttributes()).containsEntry("type", "\"task\"");
-        assertThat(element.getAttributes()).containsEntry("version", "\"1.0\"");
+        assertThat(element.getAttributes()).containsEntry("id", "test123");
+        assertThat(element.getAttributes()).containsEntry("name", "TestElement");
+        assertThat(element.getAttributes()).containsEntry("type", "task");
+        assertThat(element.getAttributes()).containsEntry("version", "1.0");
         
         // Verify attribute order preservation - critical assertion
         List<String> actualAttributeOrder = new java.util.ArrayList<>(element.getAttributes().keySet());

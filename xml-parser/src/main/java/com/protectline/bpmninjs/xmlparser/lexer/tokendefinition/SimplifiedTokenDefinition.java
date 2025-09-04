@@ -237,8 +237,7 @@ public class SimplifiedTokenDefinition {
                     
                     // Si on rencontre une QUOTE, collecter tout jusqu'à la QUOTE fermante
                     if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.QUOTE) {
-                        valueBuilder.append(tokens.get(i).getValue()); // Ajouter la quote ouvrante
-                        i++; // Skip opening quote
+                        i++; // Skip opening quote (ne pas l'ajouter à la valeur)
                         
                         // Collecter tous les tokens jusqu'à la quote fermante
                         while (i < tokens.size() && tokens.get(i).getType() != TOKEN_TYPE.QUOTE) {
@@ -246,9 +245,8 @@ public class SimplifiedTokenDefinition {
                             i++;
                         }
                         
-                        // Ajouter la quote fermante si présente
+                        // Skipper la quote fermante si présente (ne pas l'ajouter à la valeur)
                         if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.QUOTE) {
-                            valueBuilder.append(tokens.get(i).getValue());
                             i++; // Skip closing quote
                         }
                     } else if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.STRING) {

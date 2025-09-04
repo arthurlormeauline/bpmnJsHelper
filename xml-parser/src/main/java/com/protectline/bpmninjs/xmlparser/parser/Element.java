@@ -159,7 +159,7 @@ public class Element {
     
     private void appendAttributes(StringBuilder xml) {
         for (Map.Entry<String, String> attr : attributes.entrySet()) {
-            xml.append(" ").append(attr.getKey()).append("=").append(attr.getValue());
+            xml.append(" ").append(attr.getKey()).append("=\"").append(attr.getValue()).append("\"");
         }
     }
     

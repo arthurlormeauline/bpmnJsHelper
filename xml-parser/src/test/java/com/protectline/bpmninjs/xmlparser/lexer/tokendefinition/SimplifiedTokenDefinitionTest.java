@@ -35,7 +35,7 @@ class SimplifiedTokenDefinitionTest {
         assertThat(result.nextIndex).isEqualTo(10); // Should have consumed all tokens
         assertThat(result.openMark.getElementName()).isEqualTo("bpmn:definitions");
         assertThat(result.openMark.getAttributes()).hasSize(1);
-        assertThat(result.openMark.getAttributes()).containsEntry("xmlns:bpmn", "\"https://test\"");
+        assertThat(result.openMark.getAttributes()).containsEntry("xmlns:bpmn", "https://test");
     }
 
     @Test
@@ -89,15 +89,15 @@ class SimplifiedTokenDefinitionTest {
         
         // Critical verification: BOTH attributes should be present
         assertThat(result.openMark.getAttributes()).hasSize(2);
-        assertThat(result.openMark.getAttributes()).containsEntry("xmlns:bpmn", "\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
-        assertThat(result.openMark.getAttributes()).containsEntry("xmlns:bpmndi", "\"http://www.omg.org/spec/BPMN/20100524/DI\"");
+        assertThat(result.openMark.getAttributes()).containsEntry("xmlns:bpmn", "http://www.omg.org/spec/BPMN/20100524/MODEL");
+        assertThat(result.openMark.getAttributes()).containsEntry("xmlns:bpmndi", "http://www.omg.org/spec/BPMN/20100524/DI");
         
         // Verify exact URL reconstruction
         String bpmnUrl = result.openMark.getAttributes().get("xmlns:bpmn");
-        assertThat(bpmnUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
+        assertThat(bpmnUrl).isEqualTo("http://www.omg.org/spec/BPMN/20100524/MODEL");
         
         String bpmndiUrl = result.openMark.getAttributes().get("xmlns:bpmndi");
-        assertThat(bpmndiUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/DI\"");
+        assertThat(bpmndiUrl).isEqualTo("http://www.omg.org/spec/BPMN/20100524/DI");
     }
 
     private static void debugTokenList(String testName, List<Token> tokens) {

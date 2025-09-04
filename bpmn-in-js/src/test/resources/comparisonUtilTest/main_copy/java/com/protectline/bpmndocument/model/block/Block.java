@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.bpmndocument.model.block;
+package com.protectline.bpmninjs.bpmndocument.api.model.block;
 
 public class Block {
 }

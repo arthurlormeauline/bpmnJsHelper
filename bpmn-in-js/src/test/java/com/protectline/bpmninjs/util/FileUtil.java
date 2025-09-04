@@ -42,10 +42,6 @@ public class FileUtil {
         // back up expected file to restore at the end of comparison
         var backUpExpected = Files.readString(expectedModify);
 
-        // change expected by a read write without changing it --> this add some attributes to XML without changing the process
-        var modelInstance = Bpmn.readModelFromFile(expectedModify.toFile());
-        Bpmn.writeModelToFile(expectedModify.toFile(), modelInstance);
-
         String expectedContent = Files.readString(expectedModify);
 
         Diff myDiff = DiffBuilder.compare(expectedContent)

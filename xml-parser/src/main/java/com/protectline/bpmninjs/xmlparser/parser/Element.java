@@ -23,7 +23,7 @@ public class Element {
         this.content = content;
         this.children = new ArrayList<>();
         this.isSelfClosing = false;
-        this.isXmlDeclaration = false;
+        this.isXmlDeclaration = "xml".equals(elementName);
     }
     
     public Element(String elementName, Map<String, String> attributes, List<Element> children) {
@@ -32,7 +32,7 @@ public class Element {
         this.content = "";
         this.children = new ArrayList<>(children);
         this.isSelfClosing = false;
-        this.isXmlDeclaration = false;
+        this.isXmlDeclaration = "xml".equals(elementName);
     }
     
     public Element(String elementName, Map<String, String> attributes, boolean isSelfClosing) {
@@ -50,7 +50,7 @@ public class Element {
         this.content = content;
         this.children = new ArrayList<>(children);
         this.isSelfClosing = false;
-        this.isXmlDeclaration = false;
+        this.isXmlDeclaration = "xml".equals(elementName);
     }
     
     public String getElementName() {

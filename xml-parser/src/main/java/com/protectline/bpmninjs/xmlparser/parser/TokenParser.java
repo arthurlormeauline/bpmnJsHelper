@@ -19,7 +19,7 @@ public class TokenParser {
     public List<Element> parseXmlAndGetElements(List<Token> tokens) {
         // Pour la compatibilité descendante, utiliser l'artificial root mais 
         // ne retourner que ses enfants, pas l'artificial root lui-même
-        Element artificialRoot = parseTokensToArtificialRoot(tokens);
+        Element artificialRoot = parseTokens(tokens);
         List<Element> allElements = new ArrayList<>();
         
         // Collecter tous les éléments des enfants, mais pas l'artificial root
@@ -31,7 +31,7 @@ public class TokenParser {
     }
 
     public Element parseXml(List<Token> tokens) {
-        Element artificialRoot = parseTokensToArtificialRoot(tokens);
+        Element artificialRoot = parseTokens(tokens);
         
         // Trouver le premier élément non-déclaration XML comme document root
         Element documentRoot = null;
@@ -46,7 +46,7 @@ public class TokenParser {
         return documentRoot != null ? documentRoot : artificialRoot;
     }
     
-    private Element parseTokensToArtificialRoot(List<Token> tokens) {
+    private Element parseTokens(List<Token> tokens) {
         // Vérifier si les tokens sont déjà simplifiés (pour la compatibilité avec les tests)
         boolean alreadySimplified = tokens.stream()
                 .anyMatch(token -> token.getType() == TOKEN_TYPE.OPEN_MARK ||

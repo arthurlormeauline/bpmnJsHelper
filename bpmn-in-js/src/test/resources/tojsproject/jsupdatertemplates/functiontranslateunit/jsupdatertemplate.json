@@ -1,8 +1,0 @@
-[
-  {
-    "name": "FUNCTION",
-    "element" :"function",
-    "template": "//<function id=**id**>\n**name**() {\n**content**\n}\n//</function>\n\n",
-    "flag": "//<FUNCTIONS>"
-  }
-]

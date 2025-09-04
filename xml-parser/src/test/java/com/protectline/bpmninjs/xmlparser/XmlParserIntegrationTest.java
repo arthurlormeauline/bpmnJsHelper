@@ -1,5 +1,9 @@
 package com.protectline.bpmninjs.xmlparser;
 
+import com.protectline.bpmninjs.xmlparser.util.LexerFactory;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
+import com.protectline.bpmninjs.xmlparser.parser.TokenParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,10 +29,9 @@ class XmlParserIntegrationTest {
             """;
 
         // When
-        Lexer lexer = LexerFactory.createJsProjectLexer();
-        List<Token> tokens = lexer.tokenize(jsContent);
+        List<Token> tokens = LexerFactory.tokenizeJsProject(jsContent);
         TokenParser parser = new TokenParser();
-        List<Element> elements = parser.parseTokensToElements(tokens);
+        List<Element> elements = parser.parseXmlAndGetElements(tokens);
 
         // Then
         assertThat(elements).hasSize(2);
@@ -40,7 +43,7 @@ class XmlParserIntegrationTest {
             .orElseThrow();
             
         assertThat(mainElement.getAttributes()).isEmpty();
-        assertThat(mainElement.getContent()).isEqualTo("\nconsole.log('Starting workflow');\n\nconsole.log('Workflow complete');\n");
+        assertThat(mainElement.getContent()).isEqualTo("console.log('Starting workflow');\n\nconsole.log('Workflow complete');");
 
         // Function element
         List<Element> functionElements = elements.stream()
@@ -67,10 +70,9 @@ class XmlParserIntegrationTest {
             """;
 
         // When
-        Lexer lexer = LexerFactory.createBpmnLexer();
-        List<Token> tokens = lexer.tokenize(bpmnContent);
+        List<Token> tokens = LexerFactory.tokenizeBpmn(bpmnContent);
         TokenParser parser = new TokenParser();
-        List<Element> elements = parser.parseTokensToElements(tokens);
+        List<Element> elements = parser.parseXmlAndGetElements(tokens);
 
         // Then
         assertThat(elements).hasSize(3); // process, startEvent, task, endEvent
@@ -82,7 +84,7 @@ class XmlParserIntegrationTest {
             .orElseThrow();
             
         assertThat(processElement.getAttributes()).containsExactly(
-            entry("id", "\"Process_1\"")
+            entry("id", "Process_1")
         );
         
         // Task element
@@ -92,8 +94,8 @@ class XmlParserIntegrationTest {
             .orElseThrow();
             
         assertThat(taskElement.getAttributes()).containsExactly(
-            entry("name", "\"Process Data\""),
-            entry("id", "\"task1\"")
+            entry("id", "task1"),
+            entry("name", "Process Data")
         );
     }
 
@@ -104,8 +106,8 @@ class XmlParserIntegrationTest {
         String bpmnFormat = "<task>BPMN Content</task>";
 
         // When
-        List<Element> jsElements = parseContent(jsFormat, LexerFactory.createJsProjectLexer());
-        List<Element> bpmnElements = parseContent(bpmnFormat, LexerFactory.createBpmnLexer());
+        List<Element> jsElements = parseJsContent(jsFormat);
+        List<Element> bpmnElements = parseBpmnContent(bpmnFormat);
 
         // Then
         assertThat(jsElements).hasSize(1);
@@ -117,9 +119,15 @@ class XmlParserIntegrationTest {
         assertThat(bpmnElements.get(0).getContent()).isEqualTo("BPMN Content");
     }
 
-    private List<Element> parseContent(String content, Lexer lexer) {
-        List<Token> tokens = lexer.tokenize(content);
+    private List<Element> parseJsContent(String content) {
+        List<Token> tokens = LexerFactory.tokenizeJsProject(content);
         TokenParser parser = new TokenParser();
-        return parser.parseTokensToElements(tokens);
+        return parser.parseXmlAndGetElements(tokens);
+    }
+    
+    private List<Element> parseBpmnContent(String content) {
+        List<Token> tokens = LexerFactory.tokenizeBpmn(content);
+        TokenParser parser = new TokenParser();
+        return parser.parseXmlAndGetElements(tokens);
     }
 }

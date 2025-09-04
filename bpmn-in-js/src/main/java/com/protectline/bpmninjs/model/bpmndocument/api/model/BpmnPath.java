@@ -1,0 +1,12 @@
+package com.protectline.bpmninjs.model.bpmndocument.api.model;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+public class BpmnPath {
+    private final String id;
+}

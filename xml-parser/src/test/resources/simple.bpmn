@@ -1,0 +1,6 @@
+<root>
+    <parent attr="value">
+        <child>content</child>
+        <selfClosing id="test" />
+    </parent>
+</root>

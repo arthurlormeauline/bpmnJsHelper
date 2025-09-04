@@ -1,0 +1,25 @@
+Module de travail : xml-parser
+But : completer le parsing xml pour le rendre compatible avec le format bpmn
+contraintes :
+    - on ne travaille que dans le module xml-parser
+    - on n'utilise aucune librairie supplémentaire (autre que dans le jdk de base)
+
+Ce qu'il manque pour que le parsing du bpmn soit complet :
+- pour l'instant on ne gère pas les balises seules de type [<][ELEMENT] ([STRING:attribut][=][STRING:valeur attribut][/][>]
+il faut les détecter au moment du parsing je crois, ou alors de la simplification, juste après le Lexer, en tout cas
+au même moment qu'on génère les OPEN_MARK et les CLOSE_MARK (faudra du coup ajouter un nouvel élément au model pour définir ces éléments
+seuls)
+- On va changer aussi le model de Element. Je voudrais en faire un arbre récursif plus proche du model xml, c'est à dire qu'un
+Element doit avoir une liste de children de type Element
+    - du coup il faut prévoir aussi une méthode supplémentaire de traverser d'arbre pour garder la méthode getElements qui doit retourner
+    une liste d'element
+    - on pourra ajouter une nouvelle méthode getRootElement qui donne l'element root (à ce propos : l'element root sera considéré comme le document, c'est à dire qu'il
+    ne correspondra à aucune balise réelle, n'aura aucun attributs, et aura en enfant les Elements racine du document
+
+- il faut aussi prévoir un méthode qui écrit le fichier à partir de l'Element root.
+
+
+- prévoir un test end to end (que tu peux implémenter avant même le code de production pour faire du tdd) qui prend un des bpmn réels exemple
+(tu peux copier celui là et le mettre dans les resources du module : bpmn-in-js/src/test/resources/backAndForth/backup/CreateCustomer_Dev.bpmn)
+qui le copie en le renommant en ajoutant "_backup.bpmn" à la fin, on le parse, on supprime le fichier, on le ré ecrit dans un fichier,
+il doit être égal au fichier back-up

@@ -22,6 +22,7 @@ public class BpmnTokenDefinition implements TokenDefinition {
             case CLOSE -> List.of(">", "?>");
             case EQUALS -> List.of("=");
             case END_SYMBOL -> List.of("/");
+            case QUOTE -> List.of("\"");
             default -> throw new IllegalArgumentException("No strings for this type : " + type);
         };
     }
@@ -33,6 +34,7 @@ public class BpmnTokenDefinition implements TokenDefinition {
             case ">", "?>" -> CLOSE;
             case "=" -> EQUALS;
             case "/" -> END_SYMBOL;
+            case "\"" -> QUOTE;
             default -> STRING;
         };
     }

@@ -226,7 +226,7 @@ public class SimplifiedTokenDefinition {
             
             int attributeIndex = 0;
             
-            // Parser les séquences (EQUALS, value) jusqu'au stopToken
+            // Parser les séquences (EQUALS, value) et nouveaux attributs jusqu'au stopToken
             while (i < tokens.size() && tokens.get(i).getType() != stopToken) {
                 if (tokens.get(i).getType() == TOKEN_TYPE.EQUALS) {
                     i++; // Skip EQUALS
@@ -265,6 +265,13 @@ public class SimplifiedTokenDefinition {
                     }
                     
                     attributeIndex++;
+                } else if (tokens.get(i).getType() == TOKEN_TYPE.STRING) {
+                    // Nouveau nom d'attribut trouvé (ex: " xmlns:bpmndi")
+                    String newAttrName = tokens.get(i).getValue().trim();
+                    if (!newAttrName.isEmpty()) {
+                        attributeNames.add(newAttrName);
+                    }
+                    i++;
                 } else {
                     i++;
                 }

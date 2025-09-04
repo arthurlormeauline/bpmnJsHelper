@@ -19,6 +19,7 @@ public class JsProjectTokenDefinition implements TokenDefinition {
             case CLOSE -> List.of(">");
             case EQUALS -> List.of("=");
             case END_SYMBOL -> List.of("/");
+            case QUOTE -> List.of("\"");
             default -> throw new IllegalArgumentException("No strings for this type : " + type);
         };
     }
@@ -33,6 +34,8 @@ public class JsProjectTokenDefinition implements TokenDefinition {
             return EQUALS;
         }else if(str.equals("/")){
             return END_SYMBOL;
+        }else if(str.equals("\"")){
+            return QUOTE;
         }
         return STRING;
     }

@@ -4,7 +4,7 @@ import com.protectline.bpmninjs.model.bpmndocument.api.model.BpmnPath;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.NodeType;
 import com.protectline.bpmninjs.model.common.block.Block;
 import com.protectline.bpmninjs.application.function.tojsproject.jsupdater.FunctionUpdater;
-import com.protectline.bpmninjs.application.template.Template;
+import com.protectline.bpmninjs.model.template.Template;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

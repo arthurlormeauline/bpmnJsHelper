@@ -1,8 +1,8 @@
-package com.protectline.bpmninjs.application.entrypoint.tojsproject;
+package com.protectline.bpmninjs.engine.mainfactory.entrypoint.tojsproject;
 
 import com.protectline.bpmninjs.model.common.block.Block;
 import com.protectline.bpmninjs.engine.tojsproject.spi.JsUpdater;
-import com.protectline.bpmninjs.application.template.Template;
+import com.protectline.bpmninjs.model.template.Template;
 
 import java.util.List;
 

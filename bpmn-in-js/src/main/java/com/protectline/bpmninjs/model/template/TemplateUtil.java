@@ -1,9 +1,7 @@
-package com.protectline.bpmninjs.application.template.persist;
+package com.protectline.bpmninjs.model.template;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.protectline.bpmninjs.engine.files.FileUtil;
-import com.protectline.bpmninjs.application.template.Template;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,11 +11,9 @@ import java.util.stream.Collectors;
 public class TemplateUtil {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static List<Template> getTemplate(FileUtil fileUtil, String subFolder) throws IOException {
-        Path templatesFile = fileUtil.getJsUpdaterTemplatesJsonFile().getParent()
-                .resolve(subFolder).resolve("jsupdatertemplate.json");
+    public static List<Template> loadFromFile(Path templateJsonFile) throws IOException {
         List<TemplateJson> jsonTemplates = objectMapper.readValue(
-            templatesFile.toFile(), 
+            templateJsonFile.toFile(), 
             new TypeReference<List<TemplateJson>>() {}
         );
         return jsonTemplates.stream()

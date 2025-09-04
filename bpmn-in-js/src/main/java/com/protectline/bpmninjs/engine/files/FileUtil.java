@@ -41,10 +41,6 @@ public class FileUtil {
        return Files.readString(getJsProjectDirectory(process).resolve("BpmnRunner.js"));
     }
 
-    public Path getUpdaterTemplateDirectory(String processName) {
-        return workingDirectory.resolve(UPDATER_TEMPLATE);
-    }
-
     public Path getBpmnDirectory() {
         return workingDirectory.resolve(INPUT);
     }

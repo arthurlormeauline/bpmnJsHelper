@@ -5,7 +5,7 @@ import com.protectline.bpmninjs.model.bpmndocument.api.model.NodeType;
 import com.protectline.bpmninjs.model.common.block.Block;
 import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.engine.tobpmn.jstoblocks.BlockFromElementResult;
-import com.protectline.bpmninjs.application.template.Template;
+import com.protectline.bpmninjs.model.template.Template;
 
 import java.util.ArrayList;
 import java.util.List;

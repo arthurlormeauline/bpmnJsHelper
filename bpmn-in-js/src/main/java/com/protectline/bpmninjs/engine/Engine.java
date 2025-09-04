@@ -1,18 +1,25 @@
 package com.protectline.bpmninjs.engine;
 
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
+import com.protectline.bpmninjs.engine.mainfactory.TranslateUnitAbstractFactory;
 import com.protectline.bpmninjs.engine.tobpmn.JsProjectToBpmn;
 import com.protectline.bpmninjs.engine.tojsproject.BpmnToJS;
 import com.protectline.bpmninjs.engine.files.FileUtil;
-import com.protectline.bpmninjs.application.DefaultTranslateUnitFactoryProvider;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.List;
 
-public class Application {
+public class Engine {
 
-    public static void run(String[] args) throws URISyntaxException, IOException {
+    List<TranslateUnitAbstractFactory> translateUnitFactories;
+
+    public Engine(List<TranslateUnitAbstractFactory> translateUnitFactories){
+        this.translateUnitFactories = translateUnitFactories;
+    }
+
+    public void run(String[] args) throws URISyntaxException, IOException {
         if (args.length > 2 || args.length < 1) {
             System.out.println("usage : javac [app] processName [options : -toJs | -toBpmn]");
         }
@@ -30,25 +37,21 @@ public class Application {
         }
     }
 
-    private static void toBpmn(String process) throws URISyntaxException, IOException {
+    private void toBpmn(String process) throws URISyntaxException, IOException {
         System.out.println("Update bpmn file from js project");
         Path workingDirectory = Path.of("data");
         FileUtil fileUtil = new FileUtil(workingDirectory);
-        MainFactory mainFactory = createMainFactoryWithDefaults(fileUtil);
+        MainFactory mainFactory = new MainFactory(fileUtil, translateUnitFactories);
         JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil, mainFactory);
         toBpmn.updateBpmn(process);
     }
 
-    private static void toJsProject(String process) throws URISyntaxException, IOException {
+    private void toJsProject(String process) throws URISyntaxException, IOException {
         System.out.println("Create js project from bpmn file");
         Path workingDirectory = Path.of("data");
         FileUtil fileUtil = new FileUtil(workingDirectory);
-        var mainFactory = createMainFactoryWithDefaults(fileUtil);
+        var mainFactory = new MainFactory(fileUtil, translateUnitFactories);
         BpmnToJS toJs = new BpmnToJS(fileUtil, mainFactory);
         toJs.createProject(process);
-    }
-    
-    private static MainFactory createMainFactoryWithDefaults(FileUtil fileUtil) throws IOException {
-        return new MainFactory(fileUtil, new DefaultTranslateUnitFactoryProvider());
     }
 }

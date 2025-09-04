@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.application.template;
+package com.protectline.bpmninjs.model.template;
 
 import lombok.Getter;
 

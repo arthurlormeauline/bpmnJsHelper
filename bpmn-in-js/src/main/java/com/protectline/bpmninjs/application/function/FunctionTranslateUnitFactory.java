@@ -1,6 +1,5 @@
 package com.protectline.bpmninjs.application.function;
 
-import com.protectline.bpmninjs.engine.files.FileUtil;
 import com.protectline.bpmninjs.engine.mainfactory.TranslateUnitAbstractFactory;
 import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
 import com.protectline.bpmninjs.engine.tobpmn.spi.DocumentUpdater;
@@ -14,14 +13,19 @@ import com.protectline.bpmninjs.application.function.tobpmn.fromjsprojecttoblock
 import com.protectline.bpmninjs.application.function.tobpmn.fromjsprojecttoblock.updateblock.UpdateFunctionBlocks;
 import com.protectline.bpmninjs.application.function.tojsproject.blockbuilder.FunctionBlockBuilder;
 import com.protectline.bpmninjs.application.function.tojsproject.jsupdater.FunctionUpdater;
-import com.protectline.bpmninjs.application.template.Template;
-import com.protectline.bpmninjs.application.template.persist.TemplateUtil;
+import com.protectline.bpmninjs.model.template.Template;
+import com.protectline.bpmninjs.model.template.TemplateUtil;
 
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactory {
 
+    private static final Path TEMPLATE_FILE = getTemplateFile();
+    
     private final Template template;
     private List<String> names;
     private BlockBuilder blockBuilder;
@@ -30,9 +34,9 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     private BlockType blockType;
     private FunctionUpdater functionUpdater;
 
-    public FunctionTranslateUnitFactory(FileUtil fileUtil) {
+    public FunctionTranslateUnitFactory() {
         try {
-            this.template = TemplateUtil.getTemplate(fileUtil, "functiontranslateunit").get(0);
+            this.template = TemplateUtil.loadFromFile(TEMPLATE_FILE).get(0);
             this.blockBuilder = new FunctionBlockBuilder();
             this.names = List.of("function");
             this.blockType = BlockType.FUNCTION;
@@ -42,6 +46,15 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load function templates", e);
+        }
+    }
+
+    private static Path getTemplateFile() {
+        try {
+            return Paths.get(FunctionTranslateUnitFactory.class.getClassLoader()
+                .getResource("templates/functiontranslateunit/jsupdatertemplate.json").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Failed to locate function template file", e);
         }
     }
 
@@ -56,7 +69,7 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     }
 
     @Override
-    public Optional<BlockFromElement> createBlockFromElement(FileUtil fileUtil, String elementName) {
+    public Optional<BlockFromElement> createBlockFromElement() {
         return Optional.of(blockFromElement);
     }
 
@@ -76,7 +89,7 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     }
 
     @Override
-    public Optional<JsUpdater> createJsUpdater(BlockType type, FileUtil fileUtil) {
+    public Optional<JsUpdater> createJsUpdater() {
         return Optional.of(functionUpdater);
     }
 }

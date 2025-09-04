@@ -33,7 +33,7 @@ public class Application {
 
     private static void toBpmn(String process) throws URISyntaxException, IOException {
         System.out.println("Update bpmn file from js project");
-        Path workingDirectory = Path.of(Resources.getResource("/").toURI());
+        Path workingDirectory = Path.of("data");
         FileUtil fileUtil = new FileUtil(workingDirectory);
         MainFactory mainFactory = createMainFactoryWithDefaults(fileUtil);
         JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil, mainFactory);
@@ -42,7 +42,7 @@ public class Application {
 
     private static void toJsProject(String process) throws URISyntaxException, IOException {
         System.out.println("Create js project from bpmn file");
-        Path workingDirectory = Path.of(Resources.getResource("/").toURI());
+        Path workingDirectory = Path.of("data");
         FileUtil fileUtil = new FileUtil(workingDirectory);
         var mainFactory = createMainFactoryWithDefaults(fileUtil);
         BpmnToJS toJs = new BpmnToJS(fileUtil, mainFactory);

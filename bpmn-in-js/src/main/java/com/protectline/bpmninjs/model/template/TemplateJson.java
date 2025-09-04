@@ -1,8 +1,7 @@
-package com.protectline.bpmninjs.application.template.persist;
+package com.protectline.bpmninjs.model.template;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.protectline.bpmninjs.application.template.Template;
 import lombok.Getter;
 
 @Getter

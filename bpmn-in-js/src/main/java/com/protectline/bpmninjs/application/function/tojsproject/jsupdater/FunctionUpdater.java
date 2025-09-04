@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.application.function.tojsproject.jsupdater;
 import com.protectline.bpmninjs.model.common.block.Block;
 import com.protectline.bpmninjs.model.common.block.BlockType;
 import com.protectline.bpmninjs.engine.tojsproject.spi.JsUpdater;
-import com.protectline.bpmninjs.application.template.Template;
+import com.protectline.bpmninjs.model.template.Template;
 
 import java.text.Normalizer;
 import java.util.List;

@@ -1,5 +1,6 @@
 package com.protectline.bpmninjs.engine.mainfactory;
 
+import com.protectline.bpmninjs.engine.mainfactory.entrypoint.EntryPointTranslateUnitFactory;
 import com.protectline.bpmninjs.engine.tobpmn.spi.DocumentUpdater;
 import com.protectline.bpmninjs.engine.tobpmn.spi.UpdateBlock;
 import com.protectline.bpmninjs.engine.tojsproject.spi.BlockBuilder;
@@ -23,12 +24,14 @@ public class MainFactory {
     private final List<TranslateUnitAbstractFactory> translateFactories;
     private final Map<String, TranslateUnitAbstractFactory> factoryByElement;
 
-    public MainFactory(FileUtil fileUtil, TranslateUnitFactoryProvider factoryProvider) throws IOException {
+    public MainFactory(FileUtil fileUtil, List<TranslateUnitAbstractFactory> translateFactories) throws IOException {
         this.fileUtil = fileUtil;
         this.translateFactories = new ArrayList<>();
         this.factoryByElement = new HashMap<>();
 
-        for (TranslateUnitAbstractFactory factory : factoryProvider.getTranslateUnitFactories(fileUtil)) {
+        addTranslateFactory(new EntryPointTranslateUnitFactory(fileUtil.getWorkingDirectory()));
+
+        for (TranslateUnitAbstractFactory factory : translateFactories) {
             addTranslateFactory(factory);
         }
     }
@@ -67,7 +70,7 @@ public class MainFactory {
             throw new UnsupportedOperationException("No factory found to handle element: " + element);
         }
         
-        Optional<BlockFromElement> builder = factory.createBlockFromElement(fileUtil, element);
+        Optional<BlockFromElement> builder = factory.createBlockFromElement();
         if (builder.isPresent()) {
             return builder.get();
         }
@@ -93,7 +96,7 @@ public class MainFactory {
                 .filter(factory -> factory.getElementNames().contains("main"))
                 .findFirst()
                 .ifPresent(factory -> {
-                    factory.createJsUpdater(null, fileUtil).ifPresent(updaters::add);
+                    factory.createJsUpdater().ifPresent(updaters::add);
                 });
         
         var blockTypes = blocks.stream().map(Block::getType).distinct().toList();
@@ -102,7 +105,7 @@ public class MainFactory {
                     .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(blockType))
                     .findFirst()
                     .ifPresent(factory -> {
-                        factory.createJsUpdater(blockType, fileUtil).ifPresent(updaters::add);
+                        factory.createJsUpdater().ifPresent(updaters::add);
                     });
         }
         

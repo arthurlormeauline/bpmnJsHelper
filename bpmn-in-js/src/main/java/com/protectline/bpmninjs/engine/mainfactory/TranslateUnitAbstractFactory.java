@@ -8,7 +8,7 @@ import com.protectline.bpmninjs.engine.tojsproject.spi.JsUpdater;
 import com.protectline.bpmninjs.model.common.block.Block;
 import com.protectline.bpmninjs.model.common.block.BlockType;
 import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
-import com.protectline.bpmninjs.application.template.Template;
+import com.protectline.bpmninjs.model.template.Template;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +19,7 @@ public interface TranslateUnitAbstractFactory {
 
     Optional<BlockBuilder> createBlockBuilder();
 
-    Optional<BlockFromElement> createBlockFromElement(FileUtil fileUtil, String elementName);
+    Optional<BlockFromElement> createBlockFromElement();
 
     Optional<UpdateBlock> createUpdateBlockFromJs(BlockType type);
 
@@ -27,5 +27,5 @@ public interface TranslateUnitAbstractFactory {
 
     Optional<BlockType> getBlockType();
 
-    Optional<JsUpdater> createJsUpdater(BlockType type, FileUtil fileUtil);
+    Optional<JsUpdater> createJsUpdater();
 }

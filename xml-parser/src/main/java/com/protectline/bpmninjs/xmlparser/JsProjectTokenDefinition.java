@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs.xmlparser;
 
-import java.util.Optional;
+import java.util.List;
 
 import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
 
@@ -9,16 +9,14 @@ import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
  */
 public class JsProjectTokenDefinition implements TokenDefinition {
     
-
-
     @Override
-    public String getTypeValue(TOKEN_TYPE type) {
+    public List<String> getTypeValues(TOKEN_TYPE type) {
         return switch (type) {
-            case OPEN -> "//<";
-            case CLOSE -> ">";
-            case EQUALS -> "=";
-            case END_SYMBOL -> "/";
-            default -> throw new IllegalArgumentException("No strign for this type : " + type);
+            case OPEN -> List.of("//<");
+            case CLOSE -> List.of(">");
+            case EQUALS -> List.of("=");
+            case END_SYMBOL -> List.of("/");
+            default -> throw new IllegalArgumentException("No strings for this type : " + type);
         };
     }
 
@@ -35,6 +33,4 @@ public class JsProjectTokenDefinition implements TokenDefinition {
         }
         return STRING;
     }
-
-
 }

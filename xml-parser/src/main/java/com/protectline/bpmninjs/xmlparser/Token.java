@@ -40,6 +40,13 @@ public class Token {
         throw new IllegalStateException("Token is not a CLOSE_MARK");
     }
     
+    public SelfCloseMark getSelfCloseMark() {
+        if (type == TOKEN_TYPE.SELF_CLOSE_MARK && value instanceof SelfCloseMark) {
+            return (SelfCloseMark) value;
+        }
+        throw new IllegalStateException("Token is not a SELF_CLOSE_MARK");
+    }
+    
     public String getStringValue() {
         if (value instanceof String) {
             return (String) value;

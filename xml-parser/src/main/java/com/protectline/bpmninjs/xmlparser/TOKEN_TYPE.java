@@ -14,7 +14,8 @@ public enum TOKEN_TYPE {
     BLANK,        // séquence d'espaces, tabs, newlines
     
     // Tokens complexes (token parser - étape intermédiaire)
-    OPEN_MARK,    // balise ouvrante avec attributs
-    CONTENT,      // contenu sous forme de string
-    CLOSE_MARK    // balise fermante
+    OPEN_MARK,      // balise ouvrante avec attributs
+    CONTENT,        // contenu sous forme de string
+    CLOSE_MARK,     // balise fermante
+    SELF_CLOSE_MARK // balise auto-fermante avec attributs
 }

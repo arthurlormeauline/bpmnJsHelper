@@ -35,7 +35,7 @@ class TokenParserTest {
         );
 
         // When
-        List<Element> elements = tokenParser.parseTokensToElements(tokens);
+        List<Element> elements = tokenParser.parseXmlAndGetElements(tokens);
 
         // Then
         assertThat(elements).hasSize(1);
@@ -62,7 +62,7 @@ class TokenParserTest {
         );
 
         // When
-        List<Element> elements = tokenParser.parseTokensToElements(tokens);
+        List<Element> elements = tokenParser.parseXmlAndGetElements(tokens);
 
         // Then
         assertThat(elements).hasSize(1);
@@ -88,7 +88,7 @@ class TokenParserTest {
         );
 
         // When
-        List<Element> elements = tokenParser.parseTokensToElements(tokens);
+        List<Element> elements = tokenParser.parseXmlAndGetElements(tokens);
 
         // Then
         assertThat(elements).hasSize(1);
@@ -113,7 +113,7 @@ class TokenParserTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> tokenParser.parseTokensToElements(tokens))
+        assertThatThrownBy(() -> tokenParser.parseXmlAndGetElements(tokens))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("Mismatched tags: function != main");
     }
@@ -130,7 +130,7 @@ class TokenParserTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> tokenParser.parseTokensToElements(tokens))
+        assertThatThrownBy(() -> tokenParser.parseXmlAndGetElements(tokens))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("Missing CLOSE_MARK for element: function");
     }

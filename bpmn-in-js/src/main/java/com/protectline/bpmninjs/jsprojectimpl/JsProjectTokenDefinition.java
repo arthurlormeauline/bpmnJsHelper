@@ -3,30 +3,37 @@ package com.protectline.bpmninjs.jsprojectimpl;
 import com.protectline.bpmninjs.xmlparser.TOKEN_TYPE;
 import com.protectline.bpmninjs.xmlparser.TokenDefinition;
 
+import java.util.List;
+
+import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
+
+/**
+ * Définition des tokens pour les projets JavaScript (//<element>)
+ */
 public class JsProjectTokenDefinition implements TokenDefinition {
     
     @Override
-    public String getTypeValue(TOKEN_TYPE type) {
+    public List<String> getTypeValues(TOKEN_TYPE type) {
         return switch (type) {
-            case OPEN -> "//<";
-            case CLOSE -> ">";
-            case EQUALS -> "=";
-            case END_SYMBOL -> "/";
-            default -> throw new IllegalArgumentException("No string for this type: " + type);
+            case OPEN -> List.of("//<");
+            case CLOSE -> List.of(">");
+            case EQUALS -> List.of("=");
+            case END_SYMBOL -> List.of("/");
+            default -> throw new IllegalArgumentException("No strings for this type : " + type);
         };
     }
 
     @Override
     public TOKEN_TYPE getType(String str) {
         if (str.equals("//<")){
-            return TOKEN_TYPE.OPEN;
+            return OPEN;
         }else if(str.equals(">")){
-            return TOKEN_TYPE.CLOSE;
+            return CLOSE;
         }else if(str.equals("=")){
-            return TOKEN_TYPE.EQUALS;
+            return EQUALS;
         }else if(str.equals("/")){
-            return TOKEN_TYPE.END_SYMBOL;
+            return END_SYMBOL;
         }
-        return TOKEN_TYPE.STRING;
+        return STRING;
     }
 }

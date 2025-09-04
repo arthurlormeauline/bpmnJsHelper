@@ -11,8 +11,14 @@ public class TokenSimplifier {
         int i = 0;
         
         while (i < tokens.size()) {
-            // Vérifier d'abord CLOSE_MARK car il est plus spécifique (a le / avant >)
-            if (SimplifiedTokenDefinition.isCloseMark(tokens, i)) {
+            // Vérifier d'abord SELF_CLOSE_MARK car il est plus spécifique
+            if (SimplifiedTokenDefinition.isSelfCloseMark(tokens, i)) {
+                SimplifiedTokenDefinition.SelfCloseMarkResult selfCloseMark = SimplifiedTokenDefinition.parseSelfCloseMark(tokens, i);
+                result.add(new Token(TOKEN_TYPE.SELF_CLOSE_MARK, selfCloseMark.selfCloseMark));
+                i = selfCloseMark.nextIndex;
+                
+            // Puis vérifier CLOSE_MARK car il est plus spécifique que OPEN_MARK (a le / avant >)
+            } else if (SimplifiedTokenDefinition.isCloseMark(tokens, i)) {
                 SimplifiedTokenDefinition.CloseMarkResult closeMark = SimplifiedTokenDefinition.parseCloseMark(tokens, i);
                 result.add(new Token(TOKEN_TYPE.CLOSE_MARK, closeMark.closeMark));
                 i = closeMark.nextIndex;
@@ -25,7 +31,10 @@ public class TokenSimplifier {
             } else {
                 // Collecter les tokens restants comme CONTENT
                 StringBuilder content = new StringBuilder();
-                while (i < tokens.size() && !SimplifiedTokenDefinition.isOpenMark(tokens, i) && !SimplifiedTokenDefinition.isCloseMark(tokens, i)) {
+                while (i < tokens.size() && 
+                       !SimplifiedTokenDefinition.isSelfCloseMark(tokens, i) &&
+                       !SimplifiedTokenDefinition.isOpenMark(tokens, i) && 
+                       !SimplifiedTokenDefinition.isCloseMark(tokens, i)) {
                     content.append(tokens.get(i).getValue());
                     i++;
                 }

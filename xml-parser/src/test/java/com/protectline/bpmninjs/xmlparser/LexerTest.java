@@ -11,76 +11,74 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
 
 class LexerTest {
 
     @Test
     void should_tokenize_js_project_simple_function_tag() {
         // Given
-        Lexer lexer = new Lexer(new JsProjectTokenDefinition());
         String input = "//<function id=230>function d(){}//</function>";
 
         // When
-        List<Token> tokens = lexer.tokenize(input);
+        List<Token> tokens = LexerFactory.tokenizeJsProject(input);
 
         // Then
         assertThat(tokens).containsExactly(
-            new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.STRING, "function id"),
-            new Token(TOKEN_TYPE.EQUALS, "="),
-            new Token(TOKEN_TYPE.STRING, "230"),
-            new Token(TOKEN_TYPE.CLOSE, ">"),
-            new Token(TOKEN_TYPE.STRING, "function d(){}"),
-            new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-            new Token(TOKEN_TYPE.STRING, "function"),
-            new Token(TOKEN_TYPE.CLOSE, ">")
+            new Token(OPEN, "//<"),
+            new Token(STRING, "function id"),
+            new Token(EQUALS, "="),
+            new Token(STRING, "230"),
+            new Token(CLOSE, ">"),
+            new Token(STRING, "function d(){}"),
+            new Token(OPEN, "//<"),
+            new Token(END_SYMBOL, "/"),
+            new Token(STRING, "function"),
+            new Token(CLOSE, ">")
         );
     }
 
     @Test
     void should_tokenize_bpmn_simple_task() {
         // Given
-        Lexer lexer = new Lexer(new BpmnTokenDefinition());
         String input = "<bpmn:task id=\"task1\">Some content</bpmn:task>";
 
         // When
-        List<Token> tokens = lexer.tokenize(input);
+        List<Token> tokens = LexerFactory.tokenizeBpmn(input);
 
         // Then
         assertThat(tokens).containsExactly(
-            new Token(TOKEN_TYPE.OPEN, "<"),
-            new Token(TOKEN_TYPE.STRING, "bpmn:task id"),
-            new Token(TOKEN_TYPE.EQUALS, "="),
-            new Token(TOKEN_TYPE.STRING, "\"task1\""),
-            new Token(TOKEN_TYPE.CLOSE, ">"),
-            new Token(TOKEN_TYPE.STRING, "Some content"),
-            new Token(TOKEN_TYPE.OPEN, "<"),
-            new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-            new Token(TOKEN_TYPE.STRING, "bpmn:task"),
-            new Token(TOKEN_TYPE.CLOSE, ">")
+            new Token(OPEN, "<"),
+            new Token(STRING, "bpmn:task id"),
+            new Token(EQUALS, "="),
+            new Token(STRING, "\"task1\""),
+            new Token(CLOSE, ">"),
+            new Token(STRING, "Some content"),
+            new Token(OPEN, "<"),
+            new Token(END_SYMBOL, "/"),
+            new Token(STRING, "bpmn:task"),
+            new Token(CLOSE, ">")
         );
     }
 
     @Test
     void should_tokenize_js_project_with_spaces_and_newlines() {
         // Given
-        Lexer lexer = new Lexer(new JsProjectTokenDefinition());
         String input = "//<main>\n\nsome content\n//</main>";
 
         // When
-        List<Token> tokens = lexer.tokenize(input);
+        List<Token> tokens = LexerFactory.tokenizeJsProject(input);
 
         // Then
         assertThat(tokens).containsExactly(
-                new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.STRING, "main"),
-            new Token(TOKEN_TYPE.CLOSE, ">"),
-            new Token(TOKEN_TYPE.STRING, "\n\nsome content\n"),
-                new Token(TOKEN_TYPE.OPEN, "//<"),
-            new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-            new Token(TOKEN_TYPE.STRING, "main"),
-            new Token(TOKEN_TYPE.CLOSE, ">")
+                new Token(OPEN, "//<"),
+            new Token(STRING, "main"),
+            new Token(CLOSE, ">"),
+            new Token(STRING, "\n\nsome content\n"),
+                new Token(OPEN, "//<"),
+            new Token(END_SYMBOL, "/"),
+            new Token(STRING, "main"),
+            new Token(CLOSE, ">")
         );
     }
 
@@ -91,22 +89,20 @@ class LexerTest {
         String bpmnInput = "<task>content</task>";
 
         // When
-        List<Token> jsTokens = LexerFactory.createJsProjectLexer().tokenize(jsInput);
-        List<Token> bpmnTokens = LexerFactory.createBpmnLexer().tokenize(bpmnInput);
+        List<Token> jsTokens = LexerFactory.tokenizeJsProject(jsInput);
+        List<Token> bpmnTokens = LexerFactory.tokenizeBpmn(bpmnInput);
 
         // Then
         assertThat(jsTokens).hasSize(8);
-        assertThat(jsTokens.get(0)).isEqualTo(new Token(TOKEN_TYPE.OPEN, "//<"));
+        assertThat(jsTokens.get(0)).isEqualTo(new Token(OPEN, "//<"));
         
         assertThat(bpmnTokens).hasSize(8);
-        assertThat(bpmnTokens.get(0)).isEqualTo(new Token(TOKEN_TYPE.OPEN, "<"));
+        assertThat(bpmnTokens.get(0)).isEqualTo(new Token(OPEN, "<"));
     }
 
     @Test
     void should_debug_tokenize_minimal_test_content() throws Exception {
         // Given
-        Lexer lexer = new Lexer(new JsProjectTokenDefinition());
-
         var resourcePath = this.getClass().getClassLoader().getResourceAsStream("tobpmn/output/CreateCustomer_Dev_minimal/BpmnRunner.js");
 
         String jsContent;
@@ -118,7 +114,7 @@ class LexerTest {
         }
 
         // When
-        List<Token> tokens = lexer.tokenize(jsContent);
+        List<Token> tokens = LexerFactory.tokenizeJsProject(jsContent);
 
         // Then - Log all tokens for debugging
         System.out.println("=== LEXER DEBUG: Found " + tokens.size() + " tokens ===");
@@ -134,14 +130,14 @@ class LexerTest {
 
         // Count function tokens specifically
         long functionTokens = tokens.stream()
-                .filter(token -> token.getType() == TOKEN_TYPE.ELEMENT && "function".equals(token.getValue()))
+                .filter(token -> token.getType() == STRING && "function".equals(token.getValue()))
                 .count();
         System.out.println("Found " + functionTokens + " function element tokens");
 
         // Look for function IDs
         for (int i = 0; i < tokens.size(); i++) {
             Token token = tokens.get(i);
-            if (token.getType() == TOKEN_TYPE.ELEMENT && "function".equals(token.getValue())) {
+            if (token.getType() == STRING && "function".equals(token.getValue())) {
                 // Look ahead for id attribute
                 for (int j = i + 1; j < Math.min(i + 10, tokens.size()); j++) {
                     Token nextToken = tokens.get(j);
@@ -161,7 +157,6 @@ class LexerTest {
     @Test
     void should_debug_apostrophe_issue() throws Exception {
         // Given
-        Lexer lexer = new Lexer(new JsProjectTokenDefinition());
         var resourcePath = this.getClass().getClassLoader().getResourceAsStream("apostrophe_test.js");
         String jsContent;
         if (resourcePath != null) {
@@ -175,7 +170,7 @@ class LexerTest {
         System.out.println("Content length: " + jsContent.length());
 
         // When
-        List<Token> tokens = lexer.tokenize(jsContent);
+        List<Token> tokens = LexerFactory.tokenizeJsProject(jsContent);
 
         // Then - Log all tokens for debugging
         System.out.println("=== APOSTROPHE LEXER DEBUG: Found " + tokens.size() + " tokens ===");
@@ -197,10 +192,9 @@ class LexerTest {
     @MethodSource("provideWordTokenTestCases")
     void should_parse_words_with_special_tokens(String input, List<Token> expectedTokens) {
         // Given
-        Lexer lexer = new Lexer(new JsProjectTokenDefinition());
 
         // When
-        List<Token> tokens = lexer.tokenize(input);
+        List<Token> tokens = LexerFactory.tokenizeJsProject(input);
 
         // Then
         if (expectedTokens == null) {
@@ -216,93 +210,93 @@ class LexerTest {
         return Stream.of(
 //            // Cas simples
             Arguments.of("un/test", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "un"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "test")
+                new Token(STRING, "un"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "test")
             )),
 
             Arguments.of("un/autre=test", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "un"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "autre"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "test")
+                new Token(STRING, "un"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "autre"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "test")
             )),
 
             // Test pour le bug : tokens spéciaux après des caractères normaux puis d'autres tokens spéciaux
             Arguments.of("start/middle=end/final", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "start"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "middle"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "end"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "final")
+                new Token(STRING, "start"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "middle"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "end"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "final")
             )),
 
             Arguments.of("/test", Arrays.asList(
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "test")
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "test")
             )),
 
             Arguments.of("test/", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "test"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/")
+                new Token(STRING, "test"),
+                new Token(END_SYMBOL, "/")
             )),
 
             Arguments.of("avant/milieu/après", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "avant"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "milieu"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "après")
+                new Token(STRING, "avant"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "milieu"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "après")
             )),
 
             Arguments.of("var=value", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "var"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "value")
+                new Token(STRING, "var"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "value")
             )),
 
             Arguments.of("//<function", Arrays.asList(
-                new Token(TOKEN_TYPE.OPEN, "//<"),
-                new Token(TOKEN_TYPE.STRING, "function")
+                new Token(OPEN, "//<"),
+                new Token(STRING, "function")
             )),
 
             Arguments.of("id=abc123>", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "id"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "abc123"),
-                new Token(TOKEN_TYPE.CLOSE, ">")
+                new Token(STRING, "id"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "abc123"),
+                new Token(CLOSE, ">")
             )),
 
             Arguments.of("a=b=c", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "a"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "b"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "c")
+                new Token(STRING, "a"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "b"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "c")
             )),
 
             Arguments.of("path//double", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "path"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "double")
+                new Token(STRING, "path"),
+                new Token(END_SYMBOL, "/"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "double")
             )),
 
             Arguments.of(">close", Arrays.asList(
-                new Token(TOKEN_TYPE.CLOSE, ">"),
-                new Token(TOKEN_TYPE.STRING, "close")
+                new Token(CLOSE, ">"),
+                new Token(STRING, "close")
             )),
 
             Arguments.of("mix/>=/test", Arrays.asList(
-                new Token(TOKEN_TYPE.STRING, "mix"),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.CLOSE, ">"),
-                new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "test")
+                new Token(STRING, "mix"),
+                new Token(END_SYMBOL, "/"),
+                new Token(CLOSE, ">"),
+                new Token(EQUALS, "="),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "test")
             ))
         );
     }

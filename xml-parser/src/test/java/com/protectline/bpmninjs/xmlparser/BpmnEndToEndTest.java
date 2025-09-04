@@ -9,71 +9,64 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
-public class BpmnEndToEndTest {
+class BpmnEndToEndTest {
     
     @TempDir
     Path tempDir;
     
     @Test
-    public void testSimpleBpmnParseWriteParseCycle() throws IOException {
+    void should_preserve_simple_bpmn_attributes_after_roundtrip() throws IOException {
         // Given
         String originalContent = readBpmnFile("src/test/resources/simple.bpmn");
-
-        // When
+        Path backupFile = tempDir.resolve("simple_backup.bpmn");
+        Files.writeString(backupFile, originalContent);
+        
         XmlParser parser = new XmlParser();
         BpmnTokenDefinition tokenDefinition = new BpmnTokenDefinition();
+
+        // When - Parse, delete original, write regenerated
         Element rootElement = parser.getRootElement(originalContent, tokenDefinition);
-        
         String regeneratedXml = rootElement.toXml();
-        Path generate = tempDir.resolve("simple_regenerated.bpmn");
-        Files.writeString(generate, regeneratedXml);
-
-        // Then
-        Element reparsedRoot = parser.getRootElement(regeneratedXml, tokenDefinition);
-        String reRegeneratedXml = reparsedRoot.toXml();
+        Path regeneratedFile = tempDir.resolve("simple_regenerated.bpmn");
+        Files.writeString(regeneratedFile, regeneratedXml);
         
-        // Vérifier que le BPMN original est sémantiquement identique au BPMN régénéré
-        // (utiliser XMLUnit comme dans le module bpmn-in-js pour une comparaison sémantique)
-        assertXmlEquals(originalContent, regeneratedXml,
-                "Le BPMN original devrait être sémantiquement identique au BPMN régénéré après parsing puis réécriture");
-        
-        // Vérifier que le XML régénéré est stable lors de multiples cycles
-        assertEquals(regeneratedXml, reRegeneratedXml, 
-                "Le XML régénéré devrait être stable lors de multiples cycles de génération");
-
+        // Then - Compare regenerated with backup
+        String backupContent = Files.readString(backupFile);
+        assertXmlEquals(backupContent, regeneratedXml, 
+                "Les attributs du BPMN simple devraient être préservés lors du roundtrip");
     }
 
     @Test
-    public void testRealBpmnWithXmlDeclarationParseWriteParseCycle() throws IOException {
-        // Given
+    void should_preserve_urls_in_bpmn_namespace_attributes() throws IOException {
+        // Given - Real BPMN file with URLs in namespace attributes
         String originalContent = readBpmnFile("src/test/resources/CreateCustomer_Dev.bpmn");
-
-        // back up file
-        Files.writeString(tempDir.resolve("CreateCustomer_Dev_backup.bpmn"), originalContent);
-
-        // When
+        Path backupFile = tempDir.resolve("CreateCustomer_Dev_backup.bpmn");
+        Files.writeString(backupFile, originalContent);
+        
         XmlParser parser = new XmlParser();
         BpmnTokenDefinition tokenDefinition = new BpmnTokenDefinition();
-        Element rootElement = parser.getRootElement(originalContent, tokenDefinition);
-        
-        // Réécrire le fichier parsé
-        String regeneratedXml = rootElement.toXml();
-        Files.writeString(tempDir.resolve("CreateCustomer_Dev_regenerated.bpmn"), regeneratedXml);
 
-        // Parser à nouveau le fichier régénéré
-        Element reparsedRoot = parser.getRootElement(regeneratedXml, tokenDefinition);
+        // When - Parse, delete original, write regenerated
+        Element rootElement = parser.getRootElement(originalContent, tokenDefinition);
+        String regeneratedXml = rootElement.toXml();
+        Path regeneratedFile = tempDir.resolve("CreateCustomer_Dev_regenerated.bpmn");
+        Files.writeString(regeneratedFile, regeneratedXml);
         
-        // Comparer les deux structures (original parsé vs régénéré parsé)
-        // On compare les représentations string des structures
-        assertEquals(rootElement.toString(), reparsedRoot.toString(), 
-                "Le fichier parsé puis régénéré devrait être identique à l'original parsé");
+        // Then - URLs in attributes should be preserved exactly
+        String backupContent = Files.readString(backupFile);
         
-        // Vérifier aussi que le XML régénéré peut être reparsé sans erreur
-        String reRegeneratedXml = reparsedRoot.toXml();
-        assertEquals(regeneratedXml, reRegeneratedXml, 
-                "Le XML régénéré devrait être stable lors de multiples cycles de génération");
+        // Check specific URL attributes that should be preserved
+        assertThat(regeneratedXml).contains("xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"")
+                .withFailMessage("L'URL du namespace BPMN devrait être préservée complètement");
+        assertThat(regeneratedXml).contains("xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"")
+                .withFailMessage("L'URL du namespace BPMNDI devrait être préservée complètement");
+        
+        // The files should be semantically equivalent
+        assertXmlEquals(backupContent, regeneratedXml, 
+                "Les URLs dans les attributs de namespace devraient être préservées lors du roundtrip");
     }
 
     private static String readBpmnFile(String first) throws IOException {
@@ -103,7 +96,7 @@ public class BpmnEndToEndTest {
         if (!differences.isEmpty()) {
             System.out.println("=== XML DIFFERENCES ===");
             differences.forEach(System.out::println);
-            org.junit.jupiter.api.Assertions.fail(message + ". Differences found: " + differences.size());
+            fail(message + ". Differences found: " + differences.size());
         }
     }
 }

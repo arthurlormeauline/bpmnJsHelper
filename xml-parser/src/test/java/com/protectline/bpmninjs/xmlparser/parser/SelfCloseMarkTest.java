@@ -5,42 +5,54 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class SelfCloseMarkTest {
+class SelfCloseMarkTest {
 
     @Test
-    public void testSelfCloseMarkCreation() {
+    void should_create_self_closing_mark_with_element_name_and_attributes() {
+        // Given
         Map<String, String> attributes = new HashMap<>();
         attributes.put("id", "test");
         attributes.put("name", "testName");
         
+        // When
         SelfCloseMark selfCloseMark = new SelfCloseMark("element", attributes);
         
-        assertEquals("element", selfCloseMark.getElementName());
-        assertEquals(attributes, selfCloseMark.getAttributes());
-        assertEquals("test", selfCloseMark.getAttributes().get("id"));
-        assertEquals("testName", selfCloseMark.getAttributes().get("name"));
+        // Then
+        assertThat(selfCloseMark.getElementName()).isEqualTo("element");
+        assertThat(selfCloseMark.getAttributes()).isEqualTo(attributes);
+        assertThat(selfCloseMark.getAttributes()).containsEntry("id", "test");
+        assertThat(selfCloseMark.getAttributes()).containsEntry("name", "testName");
     }
 
     @Test
-    public void testSelfCloseMarkToString() {
+    void should_have_meaningful_toString_representation() {
+        // Given
         Map<String, String> attributes = new HashMap<>();
         attributes.put("attr", "value");
         
+        // When
         SelfCloseMark selfCloseMark = new SelfCloseMark("test", attributes);
         String stringRepr = selfCloseMark.toString();
         
-        assertTrue(stringRepr.contains("test"));
-        assertTrue(stringRepr.contains("attr"));
-        assertTrue(stringRepr.contains("value"));
+        // Then
+        assertThat(stringRepr).contains("SelfCloseMark");
+        assertThat(stringRepr).contains("test");
+        assertThat(stringRepr).contains("attr");
+        assertThat(stringRepr).contains("value");
     }
 
     @Test
-    public void testSelfCloseMarkWithEmptyAttributes() {
-        SelfCloseMark selfCloseMark = new SelfCloseMark("element", new HashMap<>());
+    void should_handle_empty_attributes() {
+        // Given
+        Map<String, String> emptyAttributes = new HashMap<>();
         
-        assertEquals("element", selfCloseMark.getElementName());
-        assertTrue(selfCloseMark.getAttributes().isEmpty());
+        // When
+        SelfCloseMark selfCloseMark = new SelfCloseMark("element", emptyAttributes);
+        
+        // Then
+        assertThat(selfCloseMark.getElementName()).isEqualTo("element");
+        assertThat(selfCloseMark.getAttributes()).isEmpty();
     }
 }

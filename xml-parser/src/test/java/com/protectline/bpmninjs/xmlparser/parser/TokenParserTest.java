@@ -265,4 +265,36 @@ class TokenParserTest {
         assertThat(allElements.get(1).getElementName()).isEqualTo("second");
         assertThat(allElements.get(2).getElementName()).isEqualTo("third");
     }
+
+    @Test
+    void should_reconstruct_url_attribute_from_tokenized_slashes() {
+        // Given - Token sequence from LexerTest.should_handle_url_in_attribute
+        // Input was: //<function id="https://test">function d(){}//</function>
+        // Lexer correctly tokenizes URL with "/" as END_SYMBOL tokens
+        List<Token> tokens = Arrays.asList(
+                new Token(TOKEN_TYPE.OPEN, "//<"),
+                new Token(TOKEN_TYPE.STRING, "function id"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.STRING, "\"https:"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "test\""),
+                new Token(TOKEN_TYPE.CLOSE, ">"),
+                new Token(TOKEN_TYPE.STRING, "function d(){}"),
+                new Token(TOKEN_TYPE.OPEN, "//<"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "function"),
+                new Token(TOKEN_TYPE.CLOSE, ">")
+        );
+
+        // When
+        List<Element> elements = tokenParser.parseXmlAndGetElements(tokens);
+
+        // Then - Parser should reconstruct the complete URL in the attribute
+        assertThat(elements).hasSize(1);
+        Element element = elements.get(0);
+        assertThat(element.getElementName()).isEqualTo("function");
+        assertThat(element.getAttributes()).containsEntry("id", "\"https://test\"");
+        assertThat(element.getContent()).isEqualTo("function d(){}");
+    }
 }

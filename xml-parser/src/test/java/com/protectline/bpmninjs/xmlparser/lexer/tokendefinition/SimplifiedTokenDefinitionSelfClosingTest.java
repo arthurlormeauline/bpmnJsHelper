@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class SimplifiedTokenDefinitionSelfClosingTest {
+class SimplifiedTokenDefinitionSelfClosingTest {
 
     @Test
-    public void testIsSelfCloseMark() {
-        // Pattern: [OPEN, STRING, END_SYMBOL, CLOSE] = <element />
+    void should_detect_self_closing_mark_pattern() {
+        // Given - Pattern: [OPEN, STRING, END_SYMBOL, CLOSE] = <element />
         List<Token> tokens = List.of(
             new Token(TOKEN_TYPE.OPEN, "<"),
             new Token(TOKEN_TYPE.STRING, "element"),
@@ -20,14 +20,15 @@ public class SimplifiedTokenDefinitionSelfClosingTest {
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
         
-        assertTrue(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 0));
-        assertFalse(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 1));
-        assertFalse(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 2));
+        // When & Then
+        assertThat(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 0)).isTrue();
+        assertThat(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 1)).isFalse();
+        assertThat(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 2)).isFalse();
     }
 
     @Test
-    public void testIsSelfCloseMarkWithAttributes() {
-        // Pattern: [OPEN, STRING, EQUALS, STRING, END_SYMBOL, CLOSE] = <element attr="value" />
+    void should_detect_self_closing_mark_pattern_with_attributes() {
+        // Given - Pattern: [OPEN, STRING, EQUALS, STRING, END_SYMBOL, CLOSE] = <element attr="value" />
         List<Token> tokens = List.of(
             new Token(TOKEN_TYPE.OPEN, "<"),
             new Token(TOKEN_TYPE.STRING, "element attr"),
@@ -37,11 +38,13 @@ public class SimplifiedTokenDefinitionSelfClosingTest {
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
         
-        assertTrue(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 0));
+        // When & Then
+        assertThat(SimplifiedTokenDefinition.isSelfCloseMark(tokens, 0)).isTrue();
     }
 
     @Test
-    public void testParseSelfCloseMarkSimple() {
+    void should_parse_simple_self_closing_mark() {
+        // Given
         List<Token> tokens = List.of(
             new Token(TOKEN_TYPE.OPEN, "<"),
             new Token(TOKEN_TYPE.STRING, "element"),
@@ -49,16 +52,19 @@ public class SimplifiedTokenDefinitionSelfClosingTest {
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
         
+        // When
         SimplifiedTokenDefinition.SelfCloseMarkResult result = 
             SimplifiedTokenDefinition.parseSelfCloseMark(tokens, 0);
         
-        assertEquals("element", result.selfCloseMark.getElementName());
-        assertTrue(result.selfCloseMark.getAttributes().isEmpty());
-        assertEquals(4, result.nextIndex);
+        // Then
+        assertThat(result.selfCloseMark.getElementName()).isEqualTo("element");
+        assertThat(result.selfCloseMark.getAttributes()).isEmpty();
+        assertThat(result.nextIndex).isEqualTo(4);
     }
 
     @Test
-    public void testParseSelfCloseMarkWithSingleAttribute() {
+    void should_parse_self_closing_mark_with_single_attribute() {
+        // Given
         List<Token> tokens = List.of(
             new Token(TOKEN_TYPE.OPEN, "<"),
             new Token(TOKEN_TYPE.STRING, "element attr"),
@@ -68,17 +74,20 @@ public class SimplifiedTokenDefinitionSelfClosingTest {
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
         
+        // When
         SimplifiedTokenDefinition.SelfCloseMarkResult result = 
             SimplifiedTokenDefinition.parseSelfCloseMark(tokens, 0);
         
-        assertEquals("element", result.selfCloseMark.getElementName());
-        assertEquals(1, result.selfCloseMark.getAttributes().size());
-        assertEquals("\"value\"", result.selfCloseMark.getAttributes().get("attr"));
-        assertEquals(6, result.nextIndex);
+        // Then
+        assertThat(result.selfCloseMark.getElementName()).isEqualTo("element");
+        assertThat(result.selfCloseMark.getAttributes()).hasSize(1);
+        assertThat(result.selfCloseMark.getAttributes()).containsEntry("attr", "\"value\"");
+        assertThat(result.nextIndex).isEqualTo(6);
     }
 
     @Test
-    public void testParseSelfCloseMarkWithMultipleAttributes() {
+    void should_parse_self_closing_mark_with_multiple_attributes() {
+        // Given
         List<Token> tokens = List.of(
             new Token(TOKEN_TYPE.OPEN, "<"),
             new Token(TOKEN_TYPE.STRING, "element id name"),
@@ -90,13 +99,15 @@ public class SimplifiedTokenDefinitionSelfClosingTest {
             new Token(TOKEN_TYPE.CLOSE, ">")
         );
         
+        // When
         SimplifiedTokenDefinition.SelfCloseMarkResult result = 
             SimplifiedTokenDefinition.parseSelfCloseMark(tokens, 0);
         
-        assertEquals("element", result.selfCloseMark.getElementName());
-        assertEquals(2, result.selfCloseMark.getAttributes().size());
-        assertEquals("\"test\"", result.selfCloseMark.getAttributes().get("id"));
-        assertEquals("\"testName\"", result.selfCloseMark.getAttributes().get("name"));
-        assertEquals(8, result.nextIndex);
+        // Then
+        assertThat(result.selfCloseMark.getElementName()).isEqualTo("element");
+        assertThat(result.selfCloseMark.getAttributes()).hasSize(2);
+        assertThat(result.selfCloseMark.getAttributes()).containsEntry("id", "\"test\"");
+        assertThat(result.selfCloseMark.getAttributes()).containsEntry("name", "\"testName\"");
+        assertThat(result.nextIndex).isEqualTo(8);
     }
 }

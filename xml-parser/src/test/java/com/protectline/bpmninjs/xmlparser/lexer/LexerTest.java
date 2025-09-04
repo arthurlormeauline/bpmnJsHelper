@@ -16,6 +16,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LexerTest {
 
     @Test
+    void should_handle_url_in_attribute() {
+        // Given
+        String input = "//<function id=\"https://test\">function d(){}//</function>";
+
+        // When
+        List<Token> tokens = LexerFactory.tokenizeJsProject(input);
+
+        // Then
+        assertThat(tokens).containsExactly(
+                new Token(OPEN, "//<"),
+                new Token(STRING, "function id"),
+                new Token(EQUALS, "="),
+                new Token(STRING, "\"https:"),
+                new Token(END_SYMBOL, "/"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "test\""),
+                new Token(CLOSE, ">"),
+                new Token(STRING, "function d(){}"),
+                new Token(OPEN, "//<"),
+                new Token(END_SYMBOL, "/"),
+                new Token(STRING, "function"),
+                new Token(CLOSE, ">")
+        );
+    }
+    @Test
     void should_tokenize_js_project_simple_function_tag() {
         // Given
         String input = "//<function id=230>function d(){}//</function>";

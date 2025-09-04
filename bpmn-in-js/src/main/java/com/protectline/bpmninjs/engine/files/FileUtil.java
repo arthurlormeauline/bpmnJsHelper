@@ -13,8 +13,6 @@ public class FileUtil {
     private static final String INPUT = "input";
     private static final String BLOCKS = "blocks";
     private static final String OUTPUT = "output";
-    private static final String JS_TEMPLATE = "template";
-    private static final String UPDATER_TEMPLATE= "jsupdatertemplates";
 
     public Path getWorkingDirectory() {
         return workingDirectory;
@@ -45,24 +43,11 @@ public class FileUtil {
         return workingDirectory.resolve(INPUT);
     }
 
-    public Path getTemplateDirectory() {
-        return workingDirectory.resolve(JS_TEMPLATE);
-    }
 
     public void deleteJsDirectoryIfExists(String  process) throws IOException {
         var directory = getJsProjectDirectory(process);
         if (Files.exists(directory)) {
             FileUtils.deleteDirectory(directory.toFile());
         }
-    }
-
-    public void copyTemplateToJsDirectory(String process) throws IOException {
-        var templateSource= getTemplateDirectory();
-        var destination = getJsProjectDirectory(process);
-        FileUtils.copyDirectory(templateSource.toFile(), destination.toFile());
-    }
-
-    public Path getJsUpdaterTemplatesJsonFile() {
-        return workingDirectory.resolve("jsupdatertemplates/jsupdatertemplates.json");
     }
 }

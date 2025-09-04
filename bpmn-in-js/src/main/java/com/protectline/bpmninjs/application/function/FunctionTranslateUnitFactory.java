@@ -52,7 +52,7 @@ public class FunctionTranslateUnitFactory implements TranslateUnitAbstractFactor
     private static Path getTemplateFile() {
         try {
             return Paths.get(FunctionTranslateUnitFactory.class.getClassLoader()
-                .getResource("templates/functiontranslateunit/jsupdatertemplate.json").toURI());
+                .getResource("factorytemplates/functiontranslateunit/jsupdatertemplate.json").toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException("Failed to locate function template file", e);
         }

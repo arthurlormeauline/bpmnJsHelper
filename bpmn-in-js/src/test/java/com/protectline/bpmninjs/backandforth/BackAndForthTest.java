@@ -2,8 +2,8 @@ package com.protectline.bpmninjs.backandforth;
 
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import com.protectline.bpmninjs.engine.tobpmn.JsProjectToBpmn;
-import com.protectline.bpmninjs.engine.tojsproject.BpmnToJS;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.engine.tojsproject.BpmnToJsProject;
+import com.protectline.bpmninjs.engine.files.FileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -21,7 +21,7 @@ class BackAndForthTest {
 
     @TempDir
     private Path tempDir;
-    private FileUtil fileUtil;
+    private FileService fileService;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -53,14 +53,14 @@ class BackAndForthTest {
                   });
         }
         
-        this.fileUtil = new FileUtil(testWorkingDirectory);
+        this.fileService = new FileService(testWorkingDirectory);
     }
 
 
     @Test
     void should_create_jsProject_and_create_bpmn_back_again_for_all_files() throws IOException {
-        var inputPath = fileUtil.getBpmnDirectory();
-        var workDir = fileUtil.getWorkingDirectory();
+        var inputPath = fileService.getBpmnDirectory();
+        var workDir = fileService.getWorkingDirectory();
 
         File[] bpmnFiles = inputPath.toFile().listFiles(
                 (dir, name) -> name.toLowerCase().endsWith(".bpmn"));
@@ -72,15 +72,15 @@ class BackAndForthTest {
         for (File bpmnFile : bpmnFiles) {
             String processName = bpmnFile.getName().replace(".bpmn", "");
 
-            BpmnToJS bpmnToJs = new BpmnToJS(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
-            bpmnToJs.createProject(processName);
+            BpmnToJsProject bpmnToJsProject = new BpmnToJsProject(fileService, MainFactoryTestUtil.createWithDefaults(fileService));
+            bpmnToJsProject.createProject(processName);
 
             // Vérifier que le projet JS a été créé
-            Path outputDir = fileUtil.getJsProjectDirectory(processName);
+            Path outputDir = fileService.getJsProjectDirectory(processName);
             assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
             assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
+            JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileService, MainFactoryTestUtil.createWithDefaults(fileService));
             jsProjectToBpmn.updateBpmn(processName);
 
             assertTrue(Files.exists(bpmnFile.toPath()),
@@ -95,18 +95,18 @@ class BackAndForthTest {
     @Test
     void should_create_jsProject_and_create_bpmn_back_again() throws IOException {
         var process = "CreateCustomer_Dev";
-        var bpmnFile = fileUtil.getBpmnFile(process);
-        var workDir = fileUtil.getWorkingDirectory();
+        var bpmnFile = fileService.getBpmnFile(process);
+        var workDir = fileService.getWorkingDirectory();
 
-        BpmnToJS bpmnToJs = new BpmnToJS(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
-        bpmnToJs.createProject(process);
+        BpmnToJsProject bpmnToJsProject = new BpmnToJsProject(fileService, MainFactoryTestUtil.createWithDefaults(fileService));
+        bpmnToJsProject.createProject(process);
 
         // Vérifier que le projet JS a été créé
-        Path outputDir = fileUtil.getJsProjectDirectory(process);
+        Path outputDir = fileService.getJsProjectDirectory(process);
         assertTrue(Files.exists(outputDir), "JS project directory should exist: " + outputDir);
         assertTrue(Files.list(outputDir).findAny().isPresent(), "JS project directory should not be empty: " + outputDir);
 
-        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
+        JsProjectToBpmn jsProjectToBpmn = new JsProjectToBpmn(fileService, MainFactoryTestUtil.createWithDefaults(fileService));
         jsProjectToBpmn.updateBpmn(process);
 
         assertTrue(Files.exists(bpmnFile),

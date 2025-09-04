@@ -1,9 +1,9 @@
 package com.protectline.bpmninjs.engine.tojsproject.blockstojsproject;
 
-import com.protectline.bpmninjs.model.common.block.persist.BlockUtil;
+import com.protectline.bpmninjs.model.block.persist.BlockUtil;
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.engine.files.FileService;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,14 +20,14 @@ import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 class FromBlockToJsProjectTest {
 
     private FromBlockToJsProject fromBlockToJsProject;
-    private FileUtil fileUtil;
+    private FileService fileService;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
         Path workingDirectory = getResourcePath(FromBlockToJsProjectTest.class, "tojsproject");
-        fileUtil = new FileUtil(workingDirectory);
-        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
-        fromBlockToJsProject = new FromBlockToJsProject(fileUtil, new BlockUtil(), mainFactory);
+        fileService = new FileService(workingDirectory);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileService);
+        fromBlockToJsProject = new FromBlockToJsProject(fileService, new BlockUtil(), mainFactory);
         
         Path sourceDir = workingDirectory.resolve("expectedblocks").resolve("simplify");
         Path targetDir = workingDirectory.resolve("blocks").resolve("simplify");
@@ -55,7 +55,7 @@ class FromBlockToJsProjectTest {
         fromBlockToJsProject.updateJsProjectFromBlocks(process);
 
         // Then
-        assertJsProjectIsEqualToExpected(fileUtil, process);
+        assertJsProjectIsEqualToExpected(fileService, process);
     }
 
 }

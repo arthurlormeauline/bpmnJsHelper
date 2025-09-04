@@ -1,13 +1,12 @@
 package com.protectline.bpmninjs.engine.tojsproject.blockstojsproject;
 
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
-import com.protectline.bpmninjs.model.common.block.persist.BlockUtil;
-import com.protectline.bpmninjs.model.common.block.Block;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.model.block.persist.BlockUtil;
+import com.protectline.bpmninjs.model.block.Block;
+import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.model.jsproject.JsProjectImpl;
 import com.protectline.bpmninjs.engine.tojsproject.spi.JsUpdater;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,27 +15,27 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import static com.protectline.bpmninjs.model.common.block.persist.BlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.model.block.persist.BlockUtil.readBlocksFromFile;
 
 public class FromBlockToJsProject {
 
-    private final FileUtil fileUtil;
+    private final FileService fileService;
     private final BlockUtil blockUtil;
     private final MainFactory mainFactory;
 
-    public FromBlockToJsProject(FileUtil fileUtil, BlockUtil blockUtil, MainFactory mainFactory) throws IOException {
-        this.fileUtil = fileUtil;
+    public FromBlockToJsProject(FileService fileService, BlockUtil blockUtil, MainFactory mainFactory) throws IOException {
+        this.fileService = fileService;
         this.blockUtil = blockUtil;
         this.mainFactory = mainFactory;
     }
 
     public void updateJsProjectFromBlocks(String process) throws IOException {
-        List<Block> blocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
+        List<Block> blocks = readBlocksFromFile(fileService.getBlocksFile(process));
         
-        fileUtil.deleteJsDirectoryIfExists(process);
+        fileService.deleteJsDirectoryIfExists(process);
         copyTemplateToJsDirectory(process);
         
-        JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
+        JsProject jsProject = new JsProjectImpl(process, fileService, mainFactory);
         
         String jsContent = jsProject.getJsContent();
         var updaters = mainFactory.getJsUpdaters(blocks);
@@ -50,7 +49,7 @@ public class FromBlockToJsProject {
     }
     
     private void copyTemplateToJsDirectory(String process) throws IOException {
-        Path destination = fileUtil.getJsProjectDirectory(process);
+        Path destination = fileService.getJsProjectDirectory(process);
         Files.createDirectories(destination);
         
         // Copy the 3 template files from resources

@@ -2,7 +2,7 @@ package com.protectline.bpmninjs.engine.tojsproject.stub;
 
 import com.protectline.bpmninjs.model.bpmndocument.api.model.BpmnPath;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.NodeType;
-import com.protectline.bpmninjs.model.common.block.Block;
+import com.protectline.bpmninjs.model.block.Block;
 
 import java.util.List;
 import java.util.Objects;

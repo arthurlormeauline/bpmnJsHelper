@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import static com.protectline.bpmninjs.util.FileUtil.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,6 +34,25 @@ class BackAndForthTest {
 
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
+        
+        // Créer le dossier backup et copier les fichiers originaux pour comparaison
+        Path backupDir = testWorkingDirectory.resolve("backup");
+        Files.createDirectories(backupDir);
+        Path inputDir = testWorkingDirectory.resolve("input");
+        
+        // Copier tous les fichiers .bpmn de input vers backup
+        try (var stream = Files.list(inputDir)) {
+            stream.filter(path -> path.toString().toLowerCase().endsWith(".bpmn"))
+                  .forEach(bpmnFile -> {
+                      try {
+                          Path backupFile = backupDir.resolve(bpmnFile.getFileName());
+                          Files.copy(bpmnFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                      } catch (IOException e) {
+                          throw new RuntimeException("Failed to copy backup file: " + bpmnFile, e);
+                      }
+                  });
+        }
+        
         this.fileUtil = new FileUtil(testWorkingDirectory);
     }
 

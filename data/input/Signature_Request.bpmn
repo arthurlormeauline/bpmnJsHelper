@@ -1,0 +1,3934 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_122ruoj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:process id="Signature" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1aut1gp</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_139u5vc" messageRef="Message_0p95kva" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0ukgode" name="Initiate the Signature Request">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var documents = execution.getVariable('documents');
+var signatureName = S(documents).prop("signatureName").value();
+
+'{"signatureName":"' + signatureName + '"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_document');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/signature/' + orderCode + '/initiate';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Initiate the Signature Request');
+var response = connector.getVariable('response')
+print("resp Initiate the Signature Request" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+  execution.setVariable("signatureRequestId", S(response).prop("signatureRequestId").value());
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1rqneyo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qi4tib</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0kl20ni" name="activate the signature Request">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_document');
+var signatureRequestId = execution.getVariable('signatureRequestId');
+
+url_tb+'/api/v1/signature/' + signatureRequestId + '/activate';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('activate the signature Request');
+var response = connector.getVariable('response')
+print("resp activate the signature Request" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+  execution.setVariable("signatureLink", S(response).prop("signatureLink").value());
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0fj3d87</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j1cdq9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0o5c8sz" name="Add a signer to documents">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var order = execution.getVariable('order');
+var prospect = S(order).prop("prospect");
+var firstName = S(prospect).prop("firstName").value();
+var lastName = S(prospect).prop("lastName").value();
+var contactInformation = S(prospect).prop("contactInformation");
+var email = S(contactInformation).prop("email").value();
+var mobile = S(contactInformation).prop("mobile").value();
+var signableDocuments = execution.getVariable('signableDocuments').toString();
+var signer = '{"first_name":"' + firstName + '",' +
+'"last_name":"' + lastName + '",' +
+'"email":"' + email + '",' +
+'"phone_number":"' + mobile + '"}';
+
+var u = '{"seller":' + seller + ',' +
+'"signer":' + signer + ',' +
+'"documents":' + signableDocuments + '}';
+print(u);
+
+
+'{"seller":' + seller + ',' +
+'"signer":' + signer + ',' +
+'"documents":' + signableDocuments + '}'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_document');
+var signatureRequestId = execution.getVariable('signatureRequestId');
+
+url_tb+'/api/v1/signature/' + signatureRequestId + '/signers';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Add a signer to documents');
+var response = connector.getVariable('response')
+print("resp Add a signer to documents" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0se3lt3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fj3d87</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1cw6n5h">
+      <bpmn:incoming>Flow_1kzjchd</bpmn:incoming>
+      <bpmn:outgoing>Flow_00blgeh</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ujeb6x</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ijj5hx</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Event_0g3px46">
+      <bpmn:incoming>Flow_1b7ikuc</bpmn:incoming>
+      <bpmn:incoming>Flow_0vyxxds</bpmn:incoming>
+      <bpmn:incoming>Flow_0b08mcz</bpmn:incoming>
+      <bpmn:incoming>Flow_1fd618l</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateCatchEvent id="Event_19q0i27">
+      <bpmn:incoming>Flow_0b6us0j</bpmn:incoming>
+      <bpmn:outgoing>Flow_0w5acrw</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0johemf">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P30D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Activity_055looc" name="Get order data">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_order');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/order/' + orderCode;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Get order data');
+var response = connector.getVariable('response')
+print("resp Get order data" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  
+
+// Récupérer la variable JSON response
+var jsonResponse = JSON.parse(response);
+
+// Vérifier si response est défini et n'est pas null
+if (jsonResponse) {
+    delete jsonResponse.order.orderItems;
+    delete jsonResponse.order.discountCodes;
+ // Convertir l'objet modifiedResponse en JSON
+    var modifiedResponseJSON = JSON.stringify(jsonResponse);
+    print("jsonResponse" + modifiedResponseJSON);
+    execution.setVariable("order", modifiedResponseJSON);
+    execution.setVariable("responseMessage", modifiedResponseJSON);
+} else {
+    console.error("La variable 'response' est null ou non définie.");
+}
+
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1dtzube</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qtj49a</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1aut1gp" sourceRef="StartEvent_1" targetRef="ServiceTask_1a1r9y3" />
+    <bpmn:sequenceFlow id="Flow_0qtj49a" sourceRef="Activity_055looc" targetRef="Activity_19qbur9" />
+    <bpmn:sequenceFlow id="Flow_0fj3d87" sourceRef="Activity_0o5c8sz" targetRef="Activity_0kl20ni" />
+    <bpmn:sequenceFlow id="Flow_0j1cdq9" sourceRef="Activity_0kl20ni" targetRef="save_signature_request" />
+    <bpmn:sequenceFlow id="Flow_00blgeh" name="signature_request.activated" sourceRef="Gateway_1cw6n5h" targetRef="Gateway_1578sau">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eventName=='signature_request.done'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0w5acrw" sourceRef="Event_19q0i27" targetRef="Activity_1jv7ann" />
+    <bpmn:serviceTask id="Activity_19qbur9" name="Get seller data">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_seller');
+var seller = execution.getVariable('seller');
+var sellerCode = S(seller).prop("sellerCode").value();
+var order = execution.getVariable('order');
+var prospect = S(order).prop("prospect");
+var customerCategory = S(prospect).prop("customerCategory").value();
+
+url_tb+'/api/seller/v2/sellers/' + sellerCode + '/customerCategory/' + customerCategory + '/documents';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Get seller data');
+var response = connector.getVariable('response')
+print("resp Get seller data" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+  execution.setVariable("documents", response);
+  execution.setVariable("_documents", S(response).prop("documents"));
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qtj49a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0cc7907</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0cc7907" sourceRef="Activity_19qbur9" targetRef="get_reminder_contexte" />
+    <bpmn:subProcess id="SubProcess_085n162" triggeredByEvent="true">
+      <bpmn:userTask id="UserTask_0pdqhnx" name="Review Task">
+        <bpmn:incoming>SequenceFlow_02hvc3v</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1kqhl73</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="EndEvent_19wiclb">
+        <bpmn:incoming>SequenceFlow_0jg7ptp</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:scriptTask id="ScriptTask_1k0uuxl" name="Return to Last Task" camunda:asyncAfter="true" scriptFormat="JavaScript">
+        <bpmn:incoming>SequenceFlow_1oka6jq</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_1kqhl73</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0jg7ptp</bpmn:outgoing>
+        <bpmn:script>print('Return to flow is Running');
+var errorTaskId = execution.getVariable('errorTaskId');
+if(errorTaskId == null) {
+  print('No where to go back to');
+} else {
+if(execution.getProcessDefinition().findActivity(errorTaskId).isMultiInstance()) {
+  var activityId = errorTaskId+'#multiInstanceBody';
+} else {
+  var activityId = errorTaskId;
+}
+execution.getProcessEngineServices()
+  .getRuntimeService()
+  .createProcessInstanceModification(execution.getProcessInstanceId())
+  .startBeforeActivity(activityId)
+  .execute();
+}</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:exclusiveGateway id="ExclusiveGateway_0fofy8h">
+        <bpmn:incoming>SequenceFlow_02noohs</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0naabt8</bpmn:outgoing>
+        <bpmn:outgoing>SequenceFlow_02hvc3v</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Task_1atrp8f" name="Refresh Token">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="url">
+                <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_keycloack');
+url_tb+'/realms/Protectline/protocol/openid-connect/token'</camunda:script>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="content-type">application/x-www-form-urlencoded</camunda:entry>
+                  <camunda:entry key="Accept">application/json</camunda:entry>
+                  <camunda:entry key="authorization">Basic ${basicToken}</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+              <camunda:outputParameter name="Output_1b9kukr">
+                <camunda:script scriptFormat="JavaScript">obj = JSON.parse(connector.getVariable('response'));
+var execution = connector.getParentVariableScope();
+execution.setVariable('token',obj.access_token);</camunda:script>
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_0naabt8</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1oka6jq</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1oka6jq" sourceRef="Task_1atrp8f" targetRef="ScriptTask_1k0uuxl" />
+      <bpmn:sequenceFlow id="SequenceFlow_0naabt8" sourceRef="ExclusiveGateway_0fofy8h" targetRef="Task_1atrp8f">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${httpCode == 401}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="SequenceFlow_02hvc3v" sourceRef="ExclusiveGateway_0fofy8h" targetRef="UserTask_0pdqhnx">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${httpCode != 401}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="SequenceFlow_0jg7ptp" sourceRef="ScriptTask_1k0uuxl" targetRef="EndEvent_19wiclb" />
+      <bpmn:sequenceFlow id="SequenceFlow_1kqhl73" sourceRef="UserTask_0pdqhnx" targetRef="ScriptTask_1k0uuxl" />
+      <bpmn:sequenceFlow id="SequenceFlow_02noohs" sourceRef="StartEvent_03idx0z" targetRef="ExclusiveGateway_0fofy8h" />
+      <bpmn:startEvent id="StartEvent_03idx0z">
+        <bpmn:outgoing>SequenceFlow_02noohs</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_11l36l8" errorRef="Error_0xamf5e" camunda:errorMessageVariable="errorTaskId" />
+      </bpmn:startEvent>
+    </bpmn:subProcess>
+    <bpmn:serviceTask id="ServiceTask_1a1r9y3" name="Get keycloak token">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_keycloack');
+url_tb+'/realms/Protectline/protocol/openid-connect/token'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="authorization">Basic ${basicToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+            <camunda:outputParameter name="Output_1tcqe5d">
+              <camunda:script scriptFormat="JavaScript">obj = JSON.parse(connector.getVariable('response'));
+var execution = connector.getParentVariableScope();
+execution.setVariable('token',obj.access_token);</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1aut1gp</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dtzube</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1dtzube" sourceRef="ServiceTask_1a1r9y3" targetRef="Activity_055looc" />
+    <bpmn:serviceTask id="ServiceTask_0xe0swy" name="Send Order">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_order');
+url_tb+'/api/v1/orders/prospect/order/'+ order_code</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">
+var email = execution.getVariable('email');
+
+'{"email":"' + email + '"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">print('Send Order');
+var resp = connector.getVariable('response')
+print('resp Send Order ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_05r1jl7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1b7ikuc</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1b7ikuc" sourceRef="ServiceTask_0xe0swy" targetRef="Event_0g3px46" />
+    <bpmn:serviceTask id="Activity_00dka6g" name="Generate document">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var order = execution.getVariable('order');
+var orderCode = execution.getVariable('order_code');
+var doc = execution.getVariable('document');
+var document = S(doc).prop("document");
+var templateDocument = S(document).prop("template").value();
+var jasper = S(document).prop("jasper").value();
+var payload = '{"orderCode":"' + orderCode + '",' +
+'"templateDocument":"' + templateDocument + '",' +
+'"jasper":' + jasper + '}';
+print("payload generate document=" + payload);
+'{"orderCode":"' + orderCode + '",' +
+'"templateDocument":"' + templateDocument + '",' +
+'"jasper":' + jasper + '}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_document');
+
+url_tb+'/api/v1/document/generate';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Generate document');
+var response = connector.getVariable('response')
+print("resp Generate document" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+var doc = execution.getVariable('document');
+print("doc=" + doc);
+var document = S(doc).prop("document");
+print("document="+ document)
+var order = doc.prop("order").value();
+print("order="+ order)
+
+  var fields = S(document).prop("fields").toString();
+print("fields="+ fields)
+ var nature = S(document).prop("nature").toString();
+print("nature="+ nature)
+     var generatedDocument = '{"filePath":"' + S(response).prop("documentName").value() + '",' +
+       '"order":' + order + ',' +
+ '"nature":' + nature + ',' +
+  '"fields":' + fields + '}';
+print("generatedDocument=" + generatedDocument);
+
+       
+
+  if(!connector.hasVariable('generatedDocuments')) {
+    var generatedDocuments = S("[]").elements();
+  } else {
+    var generatedDocuments = S(connector.getVariable('generatedDocuments')).elements();
+  }
+print("generatedDocuments=" + generatedDocuments);
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+  generatedDocuments.add(generatedDocument);
+print("generatedDocuments=" + generatedDocuments.toString());
+
+  execution.setVariable("generatedDocuments", generatedDocuments.toString());
+
+  execution.setVariable("_generatedDocuments", S(generatedDocuments.toString()));
+
+  /* Remove consumed element*/
+  var _documents = execution.getVariable("_documents");
+print("_documents=" + _documents);
+print("removeDoc=" + doc);
+  _documents.remove(doc);
+print("_documentsAfter removeDoc=" + _documents);
+  execution.setVariable("_documents", _documents)
+
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qi4tib</bpmn:incoming>
+      <bpmn:outgoing>Flow_05j5yxf</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${_documents.elements()}" camunda:elementVariable="document" />
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0qi4tib" sourceRef="Activity_0ukgode" targetRef="Activity_00dka6g" />
+    <bpmn:serviceTask id="Activity_06rdhkk" name="Upload documents to sign">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var generatedDocument = S(execution.getVariable('generatedDocument'));
+print("generatedDocument=" + generatedDocument);
+
+var filePath = S(generatedDocument).prop("filePath").value();
+var nature = S(generatedDocument).prop("nature").value();
+var payload ='{"filePath":"' + filePath + '",' +
+'"nature":' + nature + '}';
+print("payload generate document=" + payload);
+'{"filePath":"' + filePath + '",' +
+'"nature":"' + nature + '"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_document');
+var signatureRequestId = execution.getVariable('signatureRequestId');
+
+url_tb+'/api/v1/signature/' + signatureRequestId + '/uploadToSign';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Upload documents to sign');
+var response = connector.getVariable('response')
+print("resp Upload documents to sign" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  var genDoc = execution.getVariable('generatedDocument');
+print("genDoc=" + genDoc);
+
+  var generatedDocument = S(genDoc);
+print("generatedDocument=" + generatedDocument);
+
+ if(!connector.hasVariable('uploadedDocuments')) {
+    var uploadedDocuments = S("[]").elements();
+  } else {
+    var uploadedDocuments = S(connector.getVariable('uploadedDocuments')).elements();
+  }
+print("uploadedDocuments=" + uploadedDocuments);
+
+ if(!connector.hasVariable('signableDocuments')) {
+    var signableDocuments = S("[]").elements();
+  } else {
+    var signableDocuments = S(connector.getVariable('signableDocuments')).elements();
+  }
+print("signableDocuments=" + signableDocuments);
+
+var order = generatedDocument.prop("order").value();
+print("order=" + order);
+
+var fields = generatedDocument.prop("fields").elements();
+print("fields=" + fields);
+
+if (!fields || fields.length === 0) {
+var uploadedDocument = '{"document_id":"' + S(response).prop("documentIdToSign").value() + '",' +
+  '"order":"' + order + '"}';
+print("uploadedDocument=" + uploadedDocument);
+
+  uploadedDocuments.add(uploadedDocument);
+print("signableDocuments=" + signableDocuments);
+} else {
+for (var i=0; i &lt; fields.size(); i++) {
+print("field:" +fields[i].prop("type").value());
+
+
+if(fields[i].hasProp("mention")){
+var mention = fields[i].prop("mention").value();
+}  else {
+  var mention = null;
+}
+var uploadedDocument = '{"document_id":"' + S(response).prop("documentIdToSign").value() + '",' +
+  '"type":"' + fields[i].prop("type").value() + '",' +
+  '"page":"' + fields[i].prop("page").value() + '",' +
+  '"width":"' + fields[i].prop("width").value() + '",' +
+  '"height":"' + fields[i].prop("height").value() + '",' +
+  '"x":"' + fields[i].prop("x").value() + '",' +
+  '"y":"' + fields[i].prop("y").value() + '",' +
+  '"mention":"' + mention + '",' +
+  '"order":"' + order + '"}';
+print("uploadedDocument=" + uploadedDocument);
+  signableDocuments.add(uploadedDocument);
+  uploadedDocuments.add(uploadedDocument);
+print("uploadedDocuments=" + uploadedDocuments);
+}
+}
+ 
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+  execution.setVariable("uploadedDocuments", uploadedDocuments.toString());
+  execution.setVariable("_uploadedDocuments", S(uploadedDocuments.toString()));
+  execution.setVariable("signableDocuments", signableDocuments.toString());
+  execution.setVariable("_signableDocuments", S(signableDocuments.toString()));
+  /* Remove consumed element*/
+  var _generatedDocuments = execution.getVariable("_generatedDocuments");
+print("_generatedDocuments=" + _generatedDocuments);
+print("removegenDoc=" + _generatedDocuments);
+  _generatedDocuments.remove(genDoc);
+print("_generatedDocumentsAfterRemoveGenDoc=" + _generatedDocuments);
+  execution.setVariable("_generatedDocuments", _generatedDocuments)
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_05j5yxf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qc9reb</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${_generatedDocuments.elements()}" camunda:elementVariable="generatedDocument" />
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_05j5yxf" sourceRef="Activity_00dka6g" targetRef="Activity_06rdhkk" />
+    <bpmn:sequenceFlow id="Flow_0qc9reb" sourceRef="Activity_06rdhkk" targetRef="Activity_1mp56ik" />
+    <bpmn:serviceTask id="Activity_0n9u62m" name="Update pre order rejected">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_order');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/order/' + orderCode + '/status';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">'{"status":"REJECTED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_0m638gf">
+              <camunda:script scriptFormat="JavaScript">print('Update pre order rejected');
+var resp = connector.getVariable('response')
+print('resp Update pre order rejected ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1uzvm2m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d8uon9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1g6xkgu" name="update pre order accepted">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_order');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/order/' + orderCode + '/status';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">'{"status":"SIGNED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_0m638gf">
+              <camunda:script scriptFormat="JavaScript">print('Update pre order accepted');
+var resp = connector.getVariable('response')
+print('resp Update pre order accepted ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ev425s</bpmn:incoming>
+      <bpmn:incoming>Flow_12yjo69</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d2dvpk</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0d2dvpk" sourceRef="Activity_1g6xkgu" targetRef="Activity_1opm7t0" />
+    <bpmn:sequenceFlow id="Flow_0d8uon9" sourceRef="Activity_0n9u62m" targetRef="Activity_0bu0r8t" />
+    <bpmn:serviceTask id="Activity_1jv7ann" name="Delete order">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_order');
+var prospectCode = execution.getVariable('prospect_code');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/prospect/' + prospectCode + '/order/' + orderCode;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">DELETE</camunda:inputParameter>
+            <camunda:outputParameter name="Output_3c9461l">
+              <camunda:script scriptFormat="JavaScript">print('Delete order');
+var resp = connector.getVariable('response')
+print('resp Delete order ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0w5acrw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d15y4p</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1mp56ik" name="Update document order">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">print("update document order");
+var uploadedDocument = execution.getVariable('uploadedDocument');
+print("uploadedDocument=" + uploadedDocument);
+var orderDocument = S(uploadedDocument).prop("order").value();
+print("orderDocument=" + orderDocument);
+var uploadedDocuments = execution.getVariable('uploadedDocuments');
+print("uploadedDocuments=" + S(uploadedDocuments).elements());
+var jsArray = S(uploadedDocuments).elements().toArray();
+print("jsArray=" + jsArray);
+var body = '{"insert_after_id":null}';
+
+for (var i=0; i &lt; jsArray.length; i++) {
+var order = parseInt(jsArray[i].prop("order").value());
+print("order" + i + "=" + order);
+var insertAfterCode = parseInt(orderDocument)- 1;
+print("insertAfterCode=" + insertAfterCode.toString());
+
+if(order === insertAfterCode) {
+body = '{"insert_after_id":"' + jsArray[i].prop("document_id").value() + '"}';
+break;
+}
+}
+print("body=" + body);
+body</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_document');
+var signatureRequestId = execution.getVariable('signatureRequestId');
+var uploadedDocument = execution.getVariable('uploadedDocument');
+var documentId = S(uploadedDocument).prop("document_id").value();
+
+url_tb+'/api/v1/signature/' + signatureRequestId + '/documents/' + documentId;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_1712bc2">
+              <camunda:script scriptFormat="JavaScript">print('Update document order');
+var response = connector.getVariable('response')
+print("resp Update document order" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+
+ 
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+
+
+  /* Remove consumed element*/
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qc9reb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0se3lt3</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${_uploadedDocuments.elements()}" camunda:elementVariable="uploadedDocument" />
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0se3lt3" sourceRef="Activity_1mp56ik" targetRef="Activity_0o5c8sz" />
+    <bpmn:serviceTask id="get_reminder_contexte" name="Get Reminder contexte">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">print("get reminder contexte ");
+var url_tb= execution.getVariable('url_crm_seller');
+var seller = execution.getVariable('seller');
+var parentSeller= S(seller).prop("parentSeller").value();
+
+url_tb+'/api/seller/v2/sellers/' + parentSeller + '/reminder';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="get_reminder_contexte_output">
+              <camunda:script scriptFormat="javascript">print('Get Reminder contexte');
+var response = connector.getVariable('response')
+print("resp Get Reminder contexte" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+
+  var response = connector.getVariable('response');
+  var execution = connector.getParentVariableScope();
+  execution.setVariable("reminders", response);
+  elements = S(response).elements().toArray();
+  execution.setVariable('remainingReminder', elements.length);
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0cc7907</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rqneyo</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1rqneyo" sourceRef="get_reminder_contexte" targetRef="Activity_0ukgode" />
+    <bpmn:receiveTask id="waiting_for_yousign_event" name="waiting for yousign event " messageRef="Message_2j0h10a">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1bqr53h</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kzjchd</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:sequenceFlow id="Flow_1kzjchd" name="" sourceRef="waiting_for_yousign_event" targetRef="Gateway_1cw6n5h" />
+    <bpmn:serviceTask id="send_EMAIL_reminder" name="Send EMAIL reminder">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_notifications');
+url_tb+'/api/v1/notifications/email'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">print("send EMAIL reminder");
+var from = execution.getVariable('email_sender');
+
+var order = execution.getVariable('order');
+
+var prospect = S(order).prop("prospect");
+print("prospect");
+var prospectId = S(prospect).prop("id").value();
+var firstName = S(prospect).prop("firstName").value();
+var lastName = S(prospect).prop("lastName").value();
+var contactInformation = S(prospect).prop("contactInformation");
+var email = S(contactInformation).prop("email").value();
+var mobile = S(contactInformation).prop("mobile").value();
+
+var prospectCode = execution.getVariable('prospect_code');
+var signatureLink= execution.getVariable('signatureLink');
+
+if(from === 'MProtegee'){
+var options= '[{"key": "identifiant", "value": "'+prospectCode+'"},'+
+       '{"key": "mobile","value":"'+ mobile  +'"},'+
+       '{"key": "email","value":"'+ email +'" },'+
+        '{"key": "signature_link","value": "'+ signatureLink+'"}]';
+}else{
+var options= '[{"key": "prospectCode", "value": "'+prospectCode+'"},'+
+       '{"key": "mobile","value":"'+ mobile  +'"},'+
+       '{"key": "email","value":"'+ email +'" },'+
+       '{"key": "firstname","value": "'+firstName+'"},'+
+       '{"key": "lastname","value": "'+lastName +'"},'+
+        '{"key": "signature_link","value": "'+ signatureLink+'"}]';
+}
+
+var reminder = execution.getVariable('current_reminder');
+var subject =  S(reminder ).prop("subject").value();
+var template = S(reminder ).prop("templateCode").value();
+
+'{"from":"' + from+ '",' +
+'"options":' + options+ ',' +
+'"subject":"' + subject  + '",'+ 
+'"template":"' + template + '",' + 
+'"to":"' + email + '"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer {$token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_send_EMAIL_reminder">
+              <camunda:script scriptFormat="js">print('Send EMAIL reminder Output');
+var resp = connector.getVariable('response');
+print('response :  ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print('respStatusCode : ' + respStatusCode );
+
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>email</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ugoh8x</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="send_SMS_reminder" name="Send SMS reminder">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer {$token}</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_notifications');
+url_tb+'/api/v1/notifications/sms'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">print("send SMS reminder");
+var from = execution.getVariable('email_sender');
+
+var order = execution.getVariable('order');
+var prospect = S(order).prop("prospect");
+
+var contactInformation = S(prospect).prop("contactInformation");
+var mobile = S(contactInformation).prop("mobile").value();
+
+var options= '[]';
+
+var reminder = execution.getVariable('current_reminder');
+var template = S(reminder).prop("templateCode").value();
+
+'{"from":"' + from+ '",' +
+'"options":' + options+ ',' +
+'"template":"' + template + '",' + 
+'"to":"' + mobile + '"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_send_SMS_reminder">
+              <camunda:script scriptFormat="js">print('Send SMS reminder Output');
+var resp = connector.getVariable('response');
+print('response :  ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print('respStatusCode : ' + respStatusCode );
+
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>sms</bpmn:incoming>
+      <bpmn:outgoing>Flow_1sxn8ia</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="set_status_reminder" name="Set status reminder">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer {$token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_order');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/order/'+orderCode+'/reminder';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">print('Set status reminder');
+var reminder = execution.getVariable('current_reminder');
+var reminderCode = S(reminder).prop("code");
+var parentSeller = S(reminder).prop("parentSeller");
+ '{ "code": '+reminderCode +
+',"parentSeller":'+ parentSeller+'}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="set_status_reminder_Output">
+              <camunda:script scriptFormat="js">print('Set status reminder Output');
+var resp = connector.getVariable('response');
+print('response :  ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print('respStatusCode : ' + respStatusCode );
+
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ugoh8x</bpmn:incoming>
+      <bpmn:incoming>Flow_1sxn8ia</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sdn4zl</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1xa0fos" name="Reminder type?">
+      <bpmn:incoming>Flow_1t3lttt</bpmn:incoming>
+      <bpmn:outgoing>email</bpmn:outgoing>
+      <bpmn:outgoing>sms</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="email" name="EMAIL" sourceRef="Gateway_1xa0fos" targetRef="send_EMAIL_reminder">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${current_reminder.prop("type").value()=='EMAIL'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="sms" name="SMS" sourceRef="Gateway_1xa0fos" targetRef="send_SMS_reminder">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${current_reminder.prop("type").value()=='SMS'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0ugoh8x" sourceRef="send_EMAIL_reminder" targetRef="set_status_reminder" />
+    <bpmn:sequenceFlow id="Flow_1sxn8ia" sourceRef="send_SMS_reminder" targetRef="set_status_reminder" />
+    <bpmn:sequenceFlow id="Flow_0sdn4zl" sourceRef="set_status_reminder" targetRef="Activity_1rfn93x" />
+    <bpmn:sequenceFlow id="Flow_1t3lttt" sourceRef="Gateway_1afpedb" targetRef="Gateway_1xa0fos">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${remindingPeriod!= "expired"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:boundaryEvent id="waiting_for_yousign_event_timer" attachedToRef="waiting_for_yousign_event">
+      <bpmn:outgoing>Flow_10oghzj</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0fjzeq0">
+        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">${next_timer_date}</bpmn:timeDate>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:exclusiveGateway id="Gateway_1afpedb">
+      <bpmn:incoming>Flow_10oghzj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1t3lttt</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1a7t4w4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_10oghzj" sourceRef="waiting_for_yousign_event_timer" targetRef="Gateway_1afpedb" />
+    <bpmn:sequenceFlow id="Flow_1a7t4w4" name="reminding period expired" sourceRef="Gateway_1afpedb" targetRef="Gateway_03jmi57">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${remindingPeriod=="expired"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_03jmi57">
+      <bpmn:incoming>Flow_1a7t4w4</bpmn:incoming>
+      <bpmn:incoming>Flow_0ujeb6x</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uzvm2m</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1uzvm2m" sourceRef="Gateway_03jmi57" targetRef="Activity_0n9u62m" />
+    <bpmn:sequenceFlow id="Flow_0ujeb6x" sourceRef="Gateway_1cw6n5h" targetRef="Gateway_03jmi57">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eventName=='signature_request.expired'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:scriptTask id="Activity_1rfn93x" name="Set next reminder" scriptFormat="javascript">
+      <bpmn:incoming>Flow_0sdn4zl</bpmn:incoming>
+      <bpmn:incoming>Flow_005mlhb</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bqr53h</bpmn:outgoing>
+      <bpmn:script>print('Set next reminder');
+var reminders = execution.getVariable('reminders');
+elements =  S(reminders).elements().toArray();
+var currentReminder = execution.getVariable('current_reminder');
+
+var remainingReminder = execution.getVariable('remainingReminder');
+
+if(remainingReminder &gt; 0){
+execution.setVariable('remainingReminder', remainingReminder -1);
+var nextReminder = elements[elements.length - remainingReminder];
+execution.setVariable('current_reminder', nextReminder);
+print("nextReminder ");
+print(nextReminder);
+var nextTimer = nextReminder.prop("timer").value();
+
+var nextTimerDate = new Date(Date.now() + ( nextTimer *24 * 3600 * 1000 ));  
+
+var formattedDate = nextTimerDate.toISOString();
+execution.setVariable('next_timer_date',formattedDate);
+execution.setVariable('remindingPeriod' , " ");
+}else{
+var nextTimerDate = new Date(Date.now() + (24 * 24 * 3600  * 1000 )); // 24 jours 
+
+var formattedDate = nextTimerDate.toISOString();
+execution.setVariable('next_timer_date',formattedDate);
+execution.setVariable('remindingPeriod' , "expired");
+
+}
+</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1bqr53h" sourceRef="Activity_1rfn93x" targetRef="waiting_for_yousign_event" />
+    <bpmn:serviceTask id="update_pre_order_pending" name="update pre order pending">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="js">'{"status":"PENDING"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="js">var url_tb= execution.getVariable('url_crm_order');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/order/' + orderCode + '/status';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:outputParameter name="Output_update_pre_order_pending">
+              <camunda:script scriptFormat="js">print('update pre order pending');
+var response = connector.getVariable('response')
+print("resp update pre order pending" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+ 
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1aog2r7</bpmn:incoming>
+      <bpmn:outgoing>Flow_005mlhb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_005mlhb" sourceRef="update_pre_order_pending" targetRef="Activity_1rfn93x" />
+    <bpmn:serviceTask id="save_signature_request" name="Save signatureRequest">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="js">var signatureLink = execution.getVariable("signatureLink");
+var signatureRequestId = execution.getVariable('signatureRequestId');
+print("signatureRequestId ");
+print(signatureRequestId );
+var date = new Date();
+var formattedDate = date.toISOString();
+print(formattedDate);
+'{"signatureLink":"' + signatureLink+ '",' +
+'"date":"' + formattedDate + '",' +
+'"signatureRequest":"' + signatureRequestId + '",'+ 
+'"status":"PENDING"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="js">var url_tlb = execution.getVariable("url_crm_order");
+var orderCode = execution.getVariable("order_code");
+url_tlb + '/api/v1/orders/order/'+orderCode+'/signatureRequest';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:outputParameter name="Output_save_signature_request">
+              <camunda:script scriptFormat="js">print('Save signatureRequest');
+var response = connector.getVariable('response')
+print("resp Save signatureRequest" + response);
+var respHeader = connector.getVariable("headers");
+var respStatusCode = connector.getVariable("statusCode");
+print("status code" + respStatusCode);
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if (
+  respStatusCode == 200 ||
+  respStatusCode == 201 ||
+  respStatusCode == 202 ||
+  respStatusCode == 204
+) {
+  print("no error");
+
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "SUCCESS");
+  execution.setVariable("responseMessage", response);
+ 
+} else {
+  execution.setVariable("httpCode", respStatusCode);
+  execution.setVariable("state", "FAIL");
+  execution.setVariable("responseMessage", response);
+  /*solve incident if exist*/
+  print("incientId : " + execution.getVariable("incidentId"));
+  if (execution.getVariable("incidentId") != null) {
+    execution
+      .getProcessEngineServices()
+      .getRuntimeService()
+      .createIncidentQuery()
+      .incidentId(execution.getVariable("incidentId"))
+      .singleResult()
+      .resolve();
+    execution.setVariable("incidentId", null);
+  }
+  /* end solving incident*/
+  /* create incident*/
+
+  var IncidentEntity = Java.type(
+    "org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity"
+  );
+  var IncidentContext = Java.type(
+    "org.camunda.bpm.engine.impl.incident.IncidentContext"
+  );
+  var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope();
+  context.setActivityId(parentScope.getCurrentActivityId());
+  context.setExecutionId(parentScope.getProcessInstanceId());
+  context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+  var newIncident = IncidentEntity.createAndInsertIncident(
+    "Api Fail",
+    context,
+    response
+  );
+  newIncident.id;
+  execution.setVariable("incidentId", newIncident.id);
+  print("incientId" + newIncident.id);
+  /*end create incident*/
+  throw new org.camunda.bpm.engine.delegate.BpmnError("CheckError", activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0j1cdq9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1y82du4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1y82du4" sourceRef="save_signature_request" targetRef="Activity_08eb66a" />
+    <bpmn:serviceTask id="Activity_1opm7t0" name="Send email download signed file">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_notifications');
+url_tb+'/api/v1/notifications/email/emailDocSigned';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">var signatureLink = execution.getVariable('signatureLink');
+var ord = execution.getVariable('order');
+var prospect = S(ord).prop("prospect");
+var firstName = S(prospect).prop("firstName").value();
+var lastName = S(prospect).prop("lastName").value();
+var contactInformation = S(prospect).prop("contactInformation");
+var targetName = prospect.prop("target").prop("name").value();
+var email = S(contactInformation).prop("email").value();
+var mobile = S(contactInformation).prop("mobile").value();
+var prospectCode = execution.getVariable('prospect_code');
+var subscriptionCode = execution.getVariable('order_code');
+var seller = S(prospect).prop("seller"); 
+var sellerCode = S(seller).prop("sellerCode").value();
+var order = S(ord).prop("order");
+
+var subscriptionDate = S(order).prop("date").value(); 
+var offerDescription = S(order).prop("description").value(); 
+var price = S(order).prop("amountWithTax").value(); 
+
+var subscriptionAddress = S(prospect).prop("subscriptionAddress"); 
+var addressLine1 =  S(subscriptionAddress).prop("addressLine1").value(); 
+var addressLine2 = S(subscriptionAddress).prop("addressLine2").value(); 
+var addressLine3 = S(subscriptionAddress).prop("addressLine3").value();  
+var zipCode = S(subscriptionAddress).prop("postalCode").value(); 
+var locality = S(subscriptionAddress).prop("locality").value();  
+
+var address = 
+'{"addressLine1":"' + addressLine1 + '",' +
+(addressLine2 !== null ? '"addressLine2":"' + addressLine2 + '",' : '') +
+(addressLine3 !== null ? '"addressLine3":"' + addressLine3 + '",' : '') +
+'"zipCode":"' + zipCode + '",' + 
+'"locality":"' + locality + '"}';
+
+print(address)
+
+'{"signatureLink":"' + signatureLink+ '",' +
+'"email":"' + email+ '",' +
+'"firstName":"' + firstName  + '",'+ 
+'"lastName":"' + lastName + '",' + 
+'"mobile":"' + mobile + '",' + 
+'"subscriptionCode":"' + subscriptionCode + '",' +
+'"identifiant":"' + prospectCode  + '",'+ 
+'"seller":"' + sellerCode + '",' + 
+'"subscriptionDate":"' + subscriptionDate + '",' + 
+'"offerDescription":"' + offerDescription + '",' + 
+'"price":"' + price + '",' +
+'"targetName":"' + targetName + '",' + 
+'"address":' + address + '}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2f48ofd">
+              <camunda:script scriptFormat="JavaScript">print('Send email download signed file');
+var resp = connector.getVariable('response')
+print('resp Send email download signed file ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204 || respStatusCode == 205) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0d2dvpk</bpmn:incoming>
+      <bpmn:outgoing>Flow_05r1jl7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_05r1jl7" sourceRef="Activity_1opm7t0" targetRef="ServiceTask_0xe0swy" />
+    <bpmn:serviceTask id="Activity_08eb66a" name="Send email with signature link">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_notifications');
+url_tb+'/api/v1/notifications/email/emailDocToSign';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">var signatureLink = execution.getVariable('signatureLink');
+var prospect = S(order).prop("prospect");
+var firstName = S(prospect).prop("firstName").value();
+var lastName = S(prospect).prop("lastName").value();
+var contactInformation = S(prospect).prop("contactInformation");
+var email = S(contactInformation).prop("email").value();
+var mobile = S(contactInformation).prop("mobile").value();
+var prospectCode = execution.getVariable('prospect_code');
+var seller = S(prospect).prop("seller"); 
+var sellerCode = S(seller).prop("sellerCode").value();
+
+
+'{"signatureLink":"' + signatureLink+ '",' +
+'"email":"' + email+ '",' +
+'"firstName":"' + firstName  + '",'+ 
+'"lastName":"' + lastName + '",' + 
+'"mobile":"' + mobile + '",' + 
+'"identifiant":"' + prospectCode  + '",'+ 
+'"seller":"' + sellerCode + '"}';
+</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2f48ofd">
+              <camunda:script scriptFormat="JavaScript">print('Send email with signature link');
+var resp = connector.getVariable('response')
+print('resp Send email with signature link ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204 || respStatusCode == 205) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1y82du4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hiwobw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0hiwobw" sourceRef="Activity_08eb66a" targetRef="Gateway_0bz4xn9" />
+    <bpmn:serviceTask id="Activity_1lhuchl" name="update pre order accepted">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_order');
+var orderCode = execution.getVariable('order_code');
+
+url_tb+'/api/v1/orders/order/' + orderCode + '/status';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">'{"status":"IN_PROGRESS"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_0m638gf">
+              <camunda:script scriptFormat="JavaScript">print('Update pre order IN_PROGRESS');
+var resp = connector.getVariable('response')
+print('resp Update pre order IN_PROGRESS ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0fxm5kr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0uz4nur</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1pvvh9x" name="Cancel the signature Request">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_document');
+var signatureRequestId = execution.getVariable('signatureRequestId');
+
+url_tb+'/api/v1/signature/' + signatureRequestId + '/cancel';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:outputParameter name="Output_0m638gf">
+              <camunda:script scriptFormat="JavaScript">print('Cancel the signature Request');
+var resp = connector.getVariable('response')
+print('resp Cancel the signature Request ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ijj5hx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1nsuf9l</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1vyqrl8" name="Delete the signature Request">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_document');
+var signatureRequestId = execution.getVariable('signatureRequestId');
+var prospectCode = execution.getVariable('prospect_code');
+
+url_tb+'/api/v1/signature/' + signatureRequestId + '/prospect/' + prospectCode;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">DELETE</camunda:inputParameter>
+            <camunda:outputParameter name="Output_0m638gf">
+              <camunda:script scriptFormat="JavaScript">print('Delete the signature Request');
+var resp = connector.getVariable('response')
+print('resp Delete the signature Request ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1nsuf9l</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fxm5kr</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1ijj5hx" name="Cancel signature" sourceRef="Gateway_1cw6n5h" targetRef="Activity_1pvvh9x">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eventName=='signature_request.canceled'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1nsuf9l" sourceRef="Activity_1pvvh9x" targetRef="Activity_1vyqrl8" />
+    <bpmn:sequenceFlow id="Flow_0fxm5kr" sourceRef="Activity_1vyqrl8" targetRef="Activity_1lhuchl" />
+    <bpmn:sequenceFlow id="Flow_0vyxxds" sourceRef="Gateway_116xamv" targetRef="Event_0g3px46" />
+    <bpmn:serviceTask id="Activity_0bu0r8t" name="Send email expired order">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Authorization">Bearer ${token}</camunda:entry>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="javascript">var url_tb= execution.getVariable('url_crm_notifications');
+url_tb+'/api/v1/notifications/email/emailDocExpired';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="javascript">var prospect = S(order).prop("prospect");
+var lastName = S(prospect).prop("lastName").value();
+var contactInformation = S(prospect).prop("contactInformation");
+var email = S(contactInformation).prop("email").value();
+var mobile = S(contactInformation).prop("mobile").value();
+var prospectCode = execution.getVariable('prospect_code');
+var firstName = S(prospect).prop("firstName").value();
+var seller = S(prospect).prop("seller"); 
+var parentSeller = S(seller).prop("parentSeller").value();
+
+'{"email":"' + email+ '",' +
+'"firstName":"' + firstName  + '",'+ 
+'"lastName":"' + lastName + '",' + 
+'"mobile":"' + mobile + '",' + 
+'"parentSeller":"' + parentSeller + '",' + 
+'"prospectCode":"' + prospectCode + '"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2f48ofd">
+              <camunda:script scriptFormat="JavaScript">print('Send email with signature link');
+var resp = connector.getVariable('response')
+print('resp Send email with signature link ' + resp);
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204 || respStatusCode == 205) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.id
+execution.setVariable('incidentId',newIncident.id);
+print('incientId'+newIncident.id);
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0d8uon9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b6us0j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0b6us0j" sourceRef="Activity_0bu0r8t" targetRef="Event_19q0i27" />
+    <bpmn:serviceTask id="Activity_1m1th5c" name="Add activity PROSPECT_DELETED">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospect_code');
+
+url_tb+'/api/prospect/v1/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">'{"activityName":"PROSPECT_DELETED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ybeapm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1g5c9m7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1g5c9m7" sourceRef="Activity_1m1th5c" targetRef="Activity_1rs1hck" />
+    <bpmn:serviceTask id="Activity_1rs1hck" name="Set status Prospect to DENIED">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospect_code');
+
+url_tb+'/api/prospect/v1/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">'{"activityName":"DENIED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1g5c9m7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b08mcz</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0b08mcz" sourceRef="Activity_1rs1hck" targetRef="Event_0g3px46" />
+    <bpmn:serviceTask id="Activity_1tcx8b5" name="Set status Prospect to CONTRACT SEND">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospect_code');
+
+url_tb+'/api/prospect/v1/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">'{"activityName":"CONTRACTSEND"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_14cmmzt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rtx97w</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1aog2r7" sourceRef="Gateway_0bz4xn9" targetRef="update_pre_order_pending" />
+    <bpmn:sequenceFlow id="Flow_14cmmzt" name="existe dans le pipeline lead prospect" sourceRef="Gateway_0bz4xn9" targetRef="Activity_1tcx8b5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${hasLeadProspectPipeline}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_1578sau" default="Flow_0ev425s">
+      <bpmn:incoming>Flow_00blgeh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d65nl8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ev425s</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0d65nl8" name="existe dans le pipeline lead prospect" sourceRef="Gateway_1578sau" targetRef="Activity_0fb6bjo">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${hasLeadProspectPipeline}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Activity_0fb6bjo" name="Set status Prospect to CONTRACT SIGNED">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospect_code');
+
+url_tb+'/api/prospect/v1/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">'{"activityName":"CONTRACTSIGNED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0d65nl8</bpmn:incoming>
+      <bpmn:outgoing>Flow_12yjo69</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0ev425s" sourceRef="Gateway_1578sau" targetRef="Activity_1g6xkgu" />
+    <bpmn:sequenceFlow id="Flow_12yjo69" sourceRef="Activity_0fb6bjo" targetRef="Activity_1g6xkgu" />
+    <bpmn:exclusiveGateway id="Gateway_0t6d7i6" default="Flow_1fd618l">
+      <bpmn:incoming>Flow_0d15y4p</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ybeapm</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1fd618l</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1ybeapm" name="existe dans le pipeline lead prospect" sourceRef="Gateway_0t6d7i6" targetRef="Activity_1m1th5c">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${hasLeadProspectPipeline}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0d15y4p" sourceRef="Activity_1jv7ann" targetRef="Gateway_0t6d7i6" />
+    <bpmn:sequenceFlow id="Flow_1fd618l" sourceRef="Gateway_0t6d7i6" targetRef="Event_0g3px46" />
+    <bpmn:exclusiveGateway id="Gateway_116xamv" default="Flow_0vyxxds">
+      <bpmn:incoming>Flow_0uz4nur</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kxhpu7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0vyxxds</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_154yax8" name="Add activity SIGNATURE_CANCELED">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospect_code');
+
+url_tb+'/api/prospect/v1/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">'{"activityName":"SIGNATURE_CANCELED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1kxhpu7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ar43x3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1kxhpu7" name="existe dans le pipeline lead prospect" sourceRef="Gateway_116xamv" targetRef="Activity_154yax8">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${hasLeadProspectPipeline}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0uz4nur" sourceRef="Activity_1lhuchl" targetRef="Gateway_116xamv" />
+    <bpmn:endEvent id="Event_0hkeyn6">
+      <bpmn:incoming>Flow_0ar43x3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ar43x3" sourceRef="Activity_154yax8" targetRef="Event_0hkeyn6" />
+    <bpmn:endEvent id="Event_17rf7bn">
+      <bpmn:incoming>Flow_0rtx97w</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0rtx97w" sourceRef="Activity_1tcx8b5" targetRef="Event_17rf7bn" />
+    <bpmn:inclusiveGateway id="Gateway_0bz4xn9">
+      <bpmn:incoming>Flow_0hiwobw</bpmn:incoming>
+      <bpmn:outgoing>Flow_1aog2r7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_14cmmzt</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+    <bpmn:textAnnotation id="TextAnnotation_0ci4tir">
+      <bpmn:text>Je génère une  signatureRequestId</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0bit0cy">
+      <bpmn:text>processus lancé apres avoie saisie les données prospects et sélectionné l'offre et les options</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1qs61b4">
+      <bpmn:text>Activation de la signature. Récupération du signature_link</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0bg0oab">
+      <bpmn:text>J'uloard le doucment à signer. Il y a plusieurs documents.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1lv2brx">
+      <bpmn:text>J'ajoute sur les documents  la zone de signature</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_02m8wzg">
+      <bpmn:text>Je génère un document</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0o2ke3z">
+      <bpmn:text>Processus en attente webhook yousign</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_079tu79">
+      <bpmn:text>Je lance le processus Subscription</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1s7swnb" sourceRef="StartEvent_1" targetRef="TextAnnotation_0bit0cy" />
+    <bpmn:association id="Association_15s7gqi" sourceRef="Activity_0ukgode" targetRef="TextAnnotation_0ci4tir" />
+    <bpmn:association id="Association_1a19jal" sourceRef="Activity_0kl20ni" targetRef="TextAnnotation_1qs61b4" />
+    <bpmn:association id="Association_1wk7s4n" sourceRef="Activity_0o5c8sz" targetRef="TextAnnotation_1lv2brx" />
+    <bpmn:association id="Association_1rgm27g" sourceRef="Activity_00dka6g" targetRef="TextAnnotation_02m8wzg" />
+    <bpmn:association id="Association_0jdmypr" sourceRef="TextAnnotation_079tu79" targetRef="ServiceTask_0xe0swy" />
+    <bpmn:association id="Association_1xxxsxa" sourceRef="TextAnnotation_0bg0oab" targetRef="Activity_06rdhkk" />
+    <bpmn:textAnnotation id="TextAnnotation_09osfe2">
+      <bpmn:text>order documents</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_00vd1zw" sourceRef="TextAnnotation_09osfe2" targetRef="Activity_1mp56ik" />
+    <bpmn:association id="Association_1w40yg4" sourceRef="TextAnnotation_0o2ke3z" targetRef="waiting_for_yousign_event" />
+  </bpmn:process>
+  <bpmn:message id="Message_0p95kva" name="signature_request" />
+  <bpmn:message id="Message_2j0h10a" name="yousignWebhhook" />
+  <bpmn:error id="Error_0a8hc3i" name="Error_27erg8r" />
+  <bpmn:error id="Error_0xamf5e" name="Error_21e2s34" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Signature">
+      <bpmndi:BPMNEdge id="Flow_0rtx97w_di" bpmnElement="Flow_0rtx97w">
+        <di:waypoint x="2090" y="680" />
+        <di:waypoint x="2192" y="680" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ar43x3_di" bpmnElement="Flow_0ar43x3">
+        <di:waypoint x="3690" y="130" />
+        <di:waypoint x="3782" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uz4nur_di" bpmnElement="Flow_0uz4nur">
+        <di:waypoint x="3290" y="130" />
+        <di:waypoint x="3425" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_19xd1nn" bpmnElement="Flow_1kxhpu7">
+        <di:waypoint x="3475" y="130" />
+        <di:waypoint x="3590" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3506" y="80" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fd618l_di" bpmnElement="Flow_1fd618l">
+        <di:waypoint x="3450" y="575" />
+        <di:waypoint x="3450" y="338" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d15y4p_di" bpmnElement="Flow_0d15y4p">
+        <di:waypoint x="3360" y="600" />
+        <di:waypoint x="3425" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ybeapm_di" bpmnElement="Flow_1ybeapm">
+        <di:waypoint x="3475" y="600" />
+        <di:waypoint x="3590" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3476" y="550" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12yjo69_di" bpmnElement="Flow_12yjo69">
+        <di:waypoint x="2820" y="460" />
+        <di:waypoint x="2950" y="460" />
+        <di:waypoint x="2950" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ev425s_di" bpmnElement="Flow_0ev425s">
+        <di:waypoint x="2795" y="320" />
+        <di:waypoint x="2900" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d65nl8_di" bpmnElement="Flow_0d65nl8">
+        <di:waypoint x="2770" y="345" />
+        <di:waypoint x="2770" y="420" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2726" y="350" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14cmmzt_di" bpmnElement="Flow_14cmmzt">
+        <di:waypoint x="2040" y="565" />
+        <di:waypoint x="2040" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1996" y="580" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1aog2r7_di" bpmnElement="Flow_1aog2r7">
+        <di:waypoint x="2065" y="540" />
+        <di:waypoint x="2130" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b08mcz_di" bpmnElement="Flow_0b08mcz">
+        <di:waypoint x="3640" y="400" />
+        <di:waypoint x="3640" y="320" />
+        <di:waypoint x="3468" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1g5c9m7_di" bpmnElement="Flow_1g5c9m7">
+        <di:waypoint x="3640" y="560" />
+        <di:waypoint x="3640" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b6us0j_di" bpmnElement="Flow_0b6us0j">
+        <di:waypoint x="3020" y="600" />
+        <di:waypoint x="3092" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vyxxds_di" bpmnElement="Flow_0vyxxds">
+        <di:waypoint x="3450" y="155" />
+        <di:waypoint x="3450" y="302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fxm5kr_di" bpmnElement="Flow_0fxm5kr">
+        <di:waypoint x="3100" y="130" />
+        <di:waypoint x="3190" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nsuf9l_di" bpmnElement="Flow_1nsuf9l">
+        <di:waypoint x="2880" y="130" />
+        <di:waypoint x="3000" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ijj5hx_di" bpmnElement="Flow_1ijj5hx">
+        <di:waypoint x="2610" y="295" />
+        <di:waypoint x="2610" y="130" />
+        <di:waypoint x="2780" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2584" y="210" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hiwobw_di" bpmnElement="Flow_0hiwobw">
+        <di:waypoint x="1966" y="540" />
+        <di:waypoint x="2015" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05r1jl7_di" bpmnElement="Flow_05r1jl7">
+        <di:waypoint x="3160" y="320" />
+        <di:waypoint x="3230" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1y82du4_di" bpmnElement="Flow_1y82du4">
+        <di:waypoint x="1841" y="540" />
+        <di:waypoint x="1866" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_005mlhb_di" bpmnElement="Flow_005mlhb">
+        <di:waypoint x="2230" y="540" />
+        <di:waypoint x="2250" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bqr53h_di" bpmnElement="Flow_1bqr53h">
+        <di:waypoint x="2350" y="540" />
+        <di:waypoint x="2410" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ujeb6x_di" bpmnElement="Flow_0ujeb6x">
+        <di:waypoint x="2610" y="345" />
+        <di:waypoint x="2610" y="575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uzvm2m_di" bpmnElement="Flow_1uzvm2m">
+        <di:waypoint x="2635" y="600" />
+        <di:waypoint x="2720" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a7t4w4_di" bpmnElement="Flow_1a7t4w4">
+        <di:waypoint x="2450" y="635" />
+        <di:waypoint x="2450" y="600" />
+        <di:waypoint x="2585" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2513" y="566" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10oghzj_di" bpmnElement="Flow_10oghzj">
+        <di:waypoint x="2450" y="598" />
+        <di:waypoint x="2450" y="635" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t3lttt_di" bpmnElement="Flow_1t3lttt">
+        <di:waypoint x="2450" y="685" />
+        <di:waypoint x="2450" y="734" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sdn4zl_di" bpmnElement="Flow_0sdn4zl">
+        <di:waypoint x="2840" y="840" />
+        <di:waypoint x="2840" y="960" />
+        <di:waypoint x="2300" y="960" />
+        <di:waypoint x="2300" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sxn8ia_di" bpmnElement="Flow_1sxn8ia">
+        <di:waypoint x="2660" y="860" />
+        <di:waypoint x="2720" y="860" />
+        <di:waypoint x="2720" y="800" />
+        <di:waypoint x="2790" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ugoh8x_di" bpmnElement="Flow_0ugoh8x">
+        <di:waypoint x="2650" y="760" />
+        <di:waypoint x="2720" y="760" />
+        <di:waypoint x="2720" y="800" />
+        <di:waypoint x="2790" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1211b84_di" bpmnElement="sms">
+        <di:waypoint x="2450" y="784" />
+        <di:waypoint x="2450" y="860" />
+        <di:waypoint x="2560" y="860" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2497" y="845" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11p9d0p_di" bpmnElement="email">
+        <di:waypoint x="2475" y="759" />
+        <di:waypoint x="2550" y="759" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2492" y="770" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kzjchd_di" bpmnElement="Flow_1kzjchd">
+        <di:waypoint x="2480" y="500" />
+        <di:waypoint x="2480" y="320" />
+        <di:waypoint x="2585" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2210" y="407" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rqneyo_di" bpmnElement="Flow_1rqneyo">
+        <di:waypoint x="846" y="540" />
+        <di:waypoint x="896" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0se3lt3_di" bpmnElement="Flow_0se3lt3">
+        <di:waypoint x="1466" y="540" />
+        <di:waypoint x="1491" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d8uon9_di" bpmnElement="Flow_0d8uon9">
+        <di:waypoint x="2820" y="600" />
+        <di:waypoint x="2920" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d2dvpk_di" bpmnElement="Flow_0d2dvpk">
+        <di:waypoint x="3000" y="320" />
+        <di:waypoint x="3060" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qc9reb_di" bpmnElement="Flow_0qc9reb">
+        <di:waypoint x="1326" y="540" />
+        <di:waypoint x="1366" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05j5yxf_di" bpmnElement="Flow_05j5yxf">
+        <di:waypoint x="1186" y="540" />
+        <di:waypoint x="1226" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qi4tib_di" bpmnElement="Flow_0qi4tib">
+        <di:waypoint x="996" y="540" />
+        <di:waypoint x="1086" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b7ikuc_di" bpmnElement="Flow_1b7ikuc">
+        <di:waypoint x="3330" y="320" />
+        <di:waypoint x="3432" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dtzube_di" bpmnElement="Flow_1dtzube">
+        <di:waypoint x="371" y="540" />
+        <di:waypoint x="461" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cc7907_di" bpmnElement="Flow_0cc7907">
+        <di:waypoint x="716" y="540" />
+        <di:waypoint x="746" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0w5acrw_di" bpmnElement="Flow_0w5acrw">
+        <di:waypoint x="3128" y="600" />
+        <di:waypoint x="3260" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00blgeh_di" bpmnElement="Flow_00blgeh">
+        <di:waypoint x="2635" y="320" />
+        <di:waypoint x="2745" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2630" y="286" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j1cdq9_di" bpmnElement="Flow_0j1cdq9">
+        <di:waypoint x="1721" y="540" />
+        <di:waypoint x="1741" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fj3d87_di" bpmnElement="Flow_0fj3d87">
+        <di:waypoint x="1591" y="540" />
+        <di:waypoint x="1621" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qtj49a_di" bpmnElement="Flow_0qtj49a">
+        <di:waypoint x="561" y="540" />
+        <di:waypoint x="616" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1aut1gp_di" bpmnElement="Flow_1aut1gp">
+        <di:waypoint x="189" y="540" />
+        <di:waypoint x="271" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0gll2jk_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="153" y="522" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1xj7uvr" bpmnElement="Activity_0ukgode">
+        <dc:Bounds x="896" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_06npdxh" bpmnElement="Activity_0kl20ni">
+        <dc:Bounds x="1621" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18y2ot6" bpmnElement="Activity_0o5c8sz">
+        <dc:Bounds x="1491" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1cw6n5h_di" bpmnElement="Gateway_1cw6n5h" isMarkerVisible="true">
+        <dc:Bounds x="2585" y="295" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0g3px46_di" bpmnElement="Event_0g3px46">
+        <dc:Bounds x="3432" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1b9ecet_di" bpmnElement="Event_19q0i27">
+        <dc:Bounds x="3092" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07ci2i5" bpmnElement="Activity_055looc">
+        <dc:Bounds x="461" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0cbe7nw" bpmnElement="Activity_19qbur9">
+        <dc:Bounds x="616" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_085n162_di" bpmnElement="SubProcess_085n162" isExpanded="true">
+        <dc:Bounds x="1370" y="760" width="740" height="363" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_02noohs_di" bpmnElement="SequenceFlow_02noohs">
+        <di:waypoint x="1439" y="941" />
+        <di:waypoint x="1496" y="941" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1kqhl73_di" bpmnElement="SequenceFlow_1kqhl73">
+        <di:waypoint x="1721" y="941" />
+        <di:waypoint x="1871" y="941" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0jg7ptp_di" bpmnElement="SequenceFlow_0jg7ptp">
+        <di:waypoint x="1971" y="941" />
+        <di:waypoint x="2043" y="941" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_02hvc3v_di" bpmnElement="SequenceFlow_02hvc3v">
+        <di:waypoint x="1546" y="941" />
+        <di:waypoint x="1621" y="941" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0naabt8_di" bpmnElement="SequenceFlow_0naabt8">
+        <di:waypoint x="1521" y="966" />
+        <di:waypoint x="1521" y="1056" />
+        <di:waypoint x="1621" y="1056" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1oka6jq_di" bpmnElement="SequenceFlow_1oka6jq">
+        <di:waypoint x="1721" y="1056" />
+        <di:waypoint x="1921" y="1056" />
+        <di:waypoint x="1921" y="981" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0pdqhnx_di" bpmnElement="UserTask_0pdqhnx">
+        <dc:Bounds x="1621" y="901" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_19wiclb_di" bpmnElement="EndEvent_19wiclb">
+        <dc:Bounds x="2043" y="923" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1k0uuxl_di" bpmnElement="ScriptTask_1k0uuxl">
+        <dc:Bounds x="1871" y="901" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0fofy8h_di" bpmnElement="ExclusiveGateway_0fofy8h" isMarkerVisible="true">
+        <dc:Bounds x="1496" y="916" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1sp384m_di" bpmnElement="Task_1atrp8f">
+        <dc:Bounds x="1621" y="1016" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wncxiu_di" bpmnElement="StartEvent_03idx0z">
+        <dc:Bounds x="1403" y="923" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1a1r9y3_di" bpmnElement="ServiceTask_1a1r9y3">
+        <dc:Bounds x="271" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0xe0swy_di" bpmnElement="ServiceTask_0xe0swy">
+        <dc:Bounds x="3230" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1lwaxqf" bpmnElement="Activity_00dka6g">
+        <dc:Bounds x="1086" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_19ci0qf" bpmnElement="Activity_06rdhkk">
+        <dc:Bounds x="1226" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18fjom6" bpmnElement="Activity_0n9u62m">
+        <dc:Bounds x="2720" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0dpire8" bpmnElement="Activity_1g6xkgu">
+        <dc:Bounds x="2900" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_06lbz3j" bpmnElement="Activity_1jv7ann">
+        <dc:Bounds x="3260" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1syuccf" bpmnElement="Activity_1mp56ik">
+        <dc:Bounds x="1366" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1j2qy4w_di" bpmnElement="get_reminder_contexte">
+        <dc:Bounds x="746" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qfvjh3_di" bpmnElement="waiting_for_yousign_event">
+        <dc:Bounds x="2410" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19crabd_di" bpmnElement="send_EMAIL_reminder">
+        <dc:Bounds x="2550" y="720" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0y29ndt_di" bpmnElement="send_SMS_reminder">
+        <dc:Bounds x="2560" y="820" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1cuwasl" bpmnElement="set_status_reminder">
+        <dc:Bounds x="2790" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1l8rpnf" bpmnElement="Gateway_1xa0fos" isMarkerVisible="true">
+        <dc:Bounds x="2425" y="734" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2371" y="791" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1afpedb_di" bpmnElement="Gateway_1afpedb" isMarkerVisible="true">
+        <dc:Bounds x="2425" y="635" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_03jmi57_di" bpmnElement="Gateway_03jmi57" isMarkerVisible="true">
+        <dc:Bounds x="2585" y="575" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18orny9" bpmnElement="Activity_1rfn93x">
+        <dc:Bounds x="2250" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nis87y_di" bpmnElement="update_pre_order_pending" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
+        <dc:Bounds x="2130" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0d2vqrd_di" bpmnElement="save_signature_request" bioc:stroke="#fb8c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#fb8c00">
+        <dc:Bounds x="1741" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_12w1y0b" bpmnElement="Activity_1opm7t0">
+        <dc:Bounds x="3060" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_17t8h8a" bpmnElement="Activity_08eb66a">
+        <dc:Bounds x="1866" y="500" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0gacku0" bpmnElement="Activity_1lhuchl">
+        <dc:Bounds x="3190" y="90" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_12h75l0" bpmnElement="Activity_1pvvh9x">
+        <dc:Bounds x="2780" y="90" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0p1mwqu" bpmnElement="Activity_1vyqrl8">
+        <dc:Bounds x="3000" y="90" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_04cboak" bpmnElement="Activity_0bu0r8t" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="2920" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_02xgobn" bpmnElement="Activity_1m1th5c">
+        <dc:Bounds x="3590" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0wwpl9v" bpmnElement="Activity_1rs1hck">
+        <dc:Bounds x="3590" y="400" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1jrstpa" bpmnElement="Activity_1tcx8b5">
+        <dc:Bounds x="1990" y="640" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1yk28px_di" bpmnElement="Gateway_1578sau" isMarkerVisible="true">
+        <dc:Bounds x="2745" y="295" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1c4pkp5" bpmnElement="Activity_0fb6bjo">
+        <dc:Bounds x="2720" y="420" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_10ziobz_di" bpmnElement="Gateway_0t6d7i6" isMarkerVisible="true">
+        <dc:Bounds x="3425" y="575" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_027l5rv" bpmnElement="Gateway_116xamv" isMarkerVisible="true">
+        <dc:Bounds x="3425" y="105" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1e4gmiq" bpmnElement="Activity_154yax8">
+        <dc:Bounds x="3590" y="90" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0hkeyn6_di" bpmnElement="Event_0hkeyn6">
+        <dc:Bounds x="3782" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17rf7bn_di" bpmnElement="Event_17rf7bn">
+        <dc:Bounds x="2192" y="662" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0mhmjen_di" bpmnElement="Gateway_0bz4xn9">
+        <dc:Bounds x="2015" y="515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0ci4tir_di" bpmnElement="TextAnnotation_0ci4tir">
+        <dc:Bounds x="1131" y="393" width="120" height="40" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0bit0cy_di" bpmnElement="TextAnnotation_0bit0cy">
+        <dc:Bounds x="341" y="360" width="218" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1qs61b4_di" bpmnElement="TextAnnotation_1qs61b4">
+        <dc:Bounds x="1831" y="393" width="170" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0bg0oab_di" bpmnElement="TextAnnotation_0bg0oab">
+        <dc:Bounds x="1381" y="393" width="130" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1lv2brx_di" bpmnElement="TextAnnotation_1lv2brx">
+        <dc:Bounds x="1671" y="390" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_02m8wzg_di" bpmnElement="TextAnnotation_02m8wzg">
+        <dc:Bounds x="1281" y="396" width="100" height="40" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0o2ke3z_di" bpmnElement="TextAnnotation_0o2ke3z">
+        <dc:Bounds x="2360" y="407" width="100" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_079tu79_di" bpmnElement="TextAnnotation_079tu79">
+        <dc:Bounds x="3170" y="420" width="100" height="53" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_06sb1tp" bpmnElement="TextAnnotation_09osfe2">
+        <dc:Bounds x="1521" y="396" width="130" height="30" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0p81fay_di" bpmnElement="waiting_for_yousign_event_timer">
+        <dc:Bounds x="2432" y="562" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1s7swnb_di" bpmnElement="Association_1s7swnb">
+        <di:waypoint x="186" y="531" />
+        <di:waypoint x="408" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_15s7gqi_di" bpmnElement="Association_15s7gqi">
+        <di:waypoint x="995" y="508" />
+        <di:waypoint x="1151" y="433" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1a19jal_di" bpmnElement="Association_1a19jal">
+        <di:waypoint x="1717" y="503" />
+        <di:waypoint x="1851" y="447" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1wk7s4n_di" bpmnElement="Association_1wk7s4n">
+        <di:waypoint x="1587" y="502" />
+        <di:waypoint x="1677" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1rgm27g_di" bpmnElement="Association_1rgm27g">
+        <di:waypoint x="1186" y="511" />
+        <di:waypoint x="1299" y="436" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0jdmypr_di" bpmnElement="Association_0jdmypr">
+        <di:waypoint x="3237" y="420" />
+        <di:waypoint x="3278" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1xxxsxa_di" bpmnElement="Association_1xxxsxa">
+        <di:waypoint x="1407" y="447" />
+        <di:waypoint x="1324" y="504" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_00vd1zw_di" bpmnElement="Association_00vd1zw">
+        <di:waypoint x="1565" y="426" />
+        <di:waypoint x="1461" y="501" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1w40yg4_di" bpmnElement="Association_1w40yg4">
+        <di:waypoint x="2434" y="473" />
+        <di:waypoint x="2453" y="500" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

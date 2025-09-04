@@ -6,6 +6,7 @@ public enum TOKEN_TYPE {
     CLOSE,        // >
     EQUALS,       // =
     END_SYMBOL,   // /
+    QUOTE,        // "
     ELEMENT,      //
     STRING,       //
     

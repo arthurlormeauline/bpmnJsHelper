@@ -226,26 +226,37 @@ public class SimplifiedTokenDefinition {
             
             int attributeIndex = 0;
             
-            // Parser les séquences (EQUALS, STRING) jusqu'au stopToken
+            // Parser les séquences (EQUALS, value) jusqu'au stopToken
             while (i < tokens.size() && tokens.get(i).getType() != stopToken) {
-                if (tokens.get(i).getType() == TOKEN_TYPE.EQUALS &&
-                    i + 1 < tokens.size() &&
-                    tokens.get(i + 1).getType() == TOKEN_TYPE.STRING) {
+                if (tokens.get(i).getType() == TOKEN_TYPE.EQUALS) {
+                    i++; // Skip EQUALS
                     
-                    String valueString = tokens.get(i + 1).getStringValue().trim();
+                    // Construire la valeur de l'attribut
+                    StringBuilder valueBuilder = new StringBuilder();
                     
-                    // Si la valeur contient des espaces après une valeur quotée, splitter
-                    String actualValue = valueString;
-                    if (valueString.startsWith("\"") && valueString.contains("\" ")) {
-                        int endQuoteIndex = valueString.indexOf("\" ") + 1;
-                        actualValue = valueString.substring(0, endQuoteIndex);
-                        String nextAttrName = valueString.substring(endQuoteIndex + 1).trim();
+                    // Si on rencontre une QUOTE, collecter tout jusqu'à la QUOTE fermante
+                    if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.QUOTE) {
+                        valueBuilder.append(tokens.get(i).getValue()); // Ajouter la quote ouvrante
+                        i++; // Skip opening quote
                         
-                        // Ajouter le prochain nom d'attribut à la liste
-                        if (!nextAttrName.isEmpty()) {
-                            attributeNames.add(nextAttrName);
+                        // Collecter tous les tokens jusqu'à la quote fermante
+                        while (i < tokens.size() && tokens.get(i).getType() != TOKEN_TYPE.QUOTE) {
+                            valueBuilder.append(tokens.get(i).getValue());
+                            i++;
                         }
+                        
+                        // Ajouter la quote fermante si présente
+                        if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.QUOTE) {
+                            valueBuilder.append(tokens.get(i).getValue());
+                            i++; // Skip closing quote
+                        }
+                    } else if (i < tokens.size() && tokens.get(i).getType() == TOKEN_TYPE.STRING) {
+                        // Valeur simple sans quotes
+                        valueBuilder.append(tokens.get(i).getValue());
+                        i++; // Skip STRING
                     }
+                    
+                    String actualValue = valueBuilder.toString();
                     
                     // Assigner l'attribut si on a un nom disponible
                     if (attributeIndex < attributeNames.size()) {
@@ -254,7 +265,6 @@ public class SimplifiedTokenDefinition {
                     }
                     
                     attributeIndex++;
-                    i += 2; // Skip EQUALS and STRING
                 } else {
                     i++;
                 }

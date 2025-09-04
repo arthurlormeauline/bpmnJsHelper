@@ -270,15 +270,17 @@ class TokenParserTest {
     void should_reconstruct_url_attribute_from_tokenized_slashes() {
         // Given - Token sequence from LexerTest.should_handle_url_in_attribute
         // Input was: //<function id="https://test">function d(){}//</function>
-        // Lexer correctly tokenizes URL with "/" as END_SYMBOL tokens
+        // Lexer correctly tokenizes URL with "/" as END_SYMBOL tokens and quotes as QUOTE tokens
         List<Token> tokens = Arrays.asList(
                 new Token(TOKEN_TYPE.OPEN, "//<"),
                 new Token(TOKEN_TYPE.STRING, "function id"),
                 new Token(TOKEN_TYPE.EQUALS, "="),
-                new Token(TOKEN_TYPE.STRING, "\"https:"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "https:"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
                 new Token(TOKEN_TYPE.END_SYMBOL, "/"),
-                new Token(TOKEN_TYPE.STRING, "test\""),
+                new Token(TOKEN_TYPE.STRING, "test"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
                 new Token(TOKEN_TYPE.CLOSE, ">"),
                 new Token(TOKEN_TYPE.STRING, "function d(){}"),
                 new Token(TOKEN_TYPE.OPEN, "//<"),
@@ -296,5 +298,80 @@ class TokenParserTest {
         assertThat(element.getElementName()).isEqualTo("function");
         assertThat(element.getAttributes()).containsEntry("id", "\"https://test\"");
         assertThat(element.getContent()).isEqualTo("function d(){}");
+    }
+
+    @Test
+    void should_reconstruct_multiple_consecutive_url_attributes() {
+        // Given - Real token sequence from LexerTest debug output (34 tokens total)
+        // Input: <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI">
+        List<Token> tokens = Arrays.asList(
+                // Structure discovered from lexer debug
+                new Token(TOKEN_TYPE.OPEN, "<"),
+                new Token(TOKEN_TYPE.STRING, "bpmn:definitions xmlns:bpmn"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "http:"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "www.omg.org"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "spec"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "BPMN"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "20100524"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "MODEL"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, " xmlns:bpmndi"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "http:"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "www.omg.org"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "spec"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "BPMN"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "20100524"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "DI"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.CLOSE, ">"),
+                // Content (simplified)
+                new Token(TOKEN_TYPE.STRING, "content"),
+                // Closing tag: </bpmn:definitions>
+                new Token(TOKEN_TYPE.OPEN, "<"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "bpmn:definitions"),
+                new Token(TOKEN_TYPE.CLOSE, ">")
+        );
+
+        // When
+        List<Element> elements = tokenParser.parseXmlAndGetElements(tokens);
+
+        // Then - Exhaustive verification
+        assertThat(elements).hasSize(1);
+        Element element = elements.get(0);
+        
+        // Element structure
+        assertThat(element.getElementName()).isEqualTo("bpmn:definitions");
+        assertThat(element.isSelfClosing()).isFalse();
+        assertThat(element.getContent()).isEqualTo("content");
+        assertThat(element.getChildren()).isEmpty();
+        
+        // Attributes - both URLs should be correctly reconstructed with all their slashes
+        assertThat(element.getAttributes()).hasSize(2);
+        assertThat(element.getAttributes()).containsEntry("xmlns:bpmn", "\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
+        assertThat(element.getAttributes()).containsEntry("xmlns:bpmndi", "\"http://www.omg.org/spec/BPMN/20100524/DI\"");
+        
+        // Verify exact URL reconstruction
+        String bpmnUrl = element.getAttributes().get("xmlns:bpmn");
+        assertThat(bpmnUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
+        
+        String bpmndiUrl = element.getAttributes().get("xmlns:bpmndi");
+        assertThat(bpmndiUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/DI\"");
     }
 }

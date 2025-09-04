@@ -28,10 +28,12 @@ class LexerTest {
                 new Token(OPEN, "//<"),
                 new Token(STRING, "function id"),
                 new Token(EQUALS, "="),
-                new Token(STRING, "\"https:"),
+                new Token(QUOTE, "\""),
+                new Token(STRING, "https:"),
                 new Token(END_SYMBOL, "/"),
                 new Token(END_SYMBOL, "/"),
-                new Token(STRING, "test\""),
+                new Token(STRING, "test"),
+                new Token(QUOTE, "\""),
                 new Token(CLOSE, ">"),
                 new Token(STRING, "function d(){}"),
                 new Token(OPEN, "//<"),
@@ -76,7 +78,9 @@ class LexerTest {
             new Token(OPEN, "<"),
             new Token(STRING, "bpmn:task id"),
             new Token(EQUALS, "="),
-            new Token(STRING, "\"task1\""),
+            new Token(QUOTE, "\""),
+            new Token(STRING, "task1"),
+            new Token(QUOTE, "\""),
             new Token(CLOSE, ">"),
             new Token(STRING, "Some content"),
             new Token(OPEN, "<"),
@@ -272,6 +276,72 @@ class LexerTest {
                 new Token(STRING, "test")
             ))
         );
+    }
+
+    @Test
+    void should_tokenize_multiple_consecutive_url_attributes() {
+        // Given - Input similar to real BPMN with multiple URL attributes
+        String input = "<bpmn:definitions xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\">";
+
+        // When
+        List<Token> tokens = LexerFactory.tokenizeBpmn(input);
+        
+        // Debug
+        debugTokenList("Multiple URL attributes", tokens);
+
+        // Then - Exhaustive assertions
+        assertThat(tokens).hasSize(21); // Exact expected size
+        
+        // Structure: OPEN + element_name + (EQUALS + QUOTE + url_parts + QUOTE) * 2 + CLOSE
+        assertThat(tokens.get(0)).isEqualTo(new Token(OPEN, "<"));
+        assertThat(tokens.get(1).getType()).isEqualTo(STRING);
+        assertThat(tokens.get(1).getValue()).contains("bpmn:definitions");
+        assertThat(tokens.get(1).getValue()).contains("xmlns:bpmn");
+        assertThat(tokens.get(1).getValue()).contains("xmlns:bpmndi");
+        
+        // First URL: xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        assertThat(tokens.get(2)).isEqualTo(new Token(EQUALS, "="));
+        assertThat(tokens.get(3)).isEqualTo(new Token(QUOTE, "\""));
+        assertThat(tokens.get(4)).isEqualTo(new Token(STRING, "http:"));
+        assertThat(tokens.get(5)).isEqualTo(new Token(END_SYMBOL, "/"));
+        assertThat(tokens.get(6)).isEqualTo(new Token(END_SYMBOL, "/"));
+        assertThat(tokens.get(7)).isEqualTo(new Token(STRING, "www.omg.org/spec/BPMN/20100524/MODEL"));
+        assertThat(tokens.get(8)).isEqualTo(new Token(QUOTE, "\""));
+        
+        // Space + next attribute name
+        assertThat(tokens.get(9).getType()).isEqualTo(STRING);
+        assertThat(tokens.get(9).getValue()).isEqualTo(" xmlns:bpmndi");
+        
+        // Second URL: xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+        assertThat(tokens.get(10)).isEqualTo(new Token(EQUALS, "="));
+        assertThat(tokens.get(11)).isEqualTo(new Token(QUOTE, "\""));
+        assertThat(tokens.get(12)).isEqualTo(new Token(STRING, "http:"));
+        assertThat(tokens.get(13)).isEqualTo(new Token(END_SYMBOL, "/"));
+        assertThat(tokens.get(14)).isEqualTo(new Token(END_SYMBOL, "/"));
+        assertThat(tokens.get(15)).isEqualTo(new Token(STRING, "www.omg.org/spec/BPMN/20100524/DI"));
+        assertThat(tokens.get(16)).isEqualTo(new Token(QUOTE, "\""));
+        
+        // Closing
+        assertThat(tokens.get(17)).isEqualTo(new Token(CLOSE, ">"));
+        
+        // Verify counts
+        long quoteCount = tokens.stream().filter(t -> t.getType() == QUOTE).count();
+        assertThat(quoteCount).isEqualTo(4);
+        
+        long slashCount = tokens.stream().filter(t -> t.getType() == END_SYMBOL).count();
+        assertThat(slashCount).isEqualTo(4);
+        
+        long equalsCount = tokens.stream().filter(t -> t.getType() == EQUALS).count();
+        assertThat(equalsCount).isEqualTo(2);
+    }
+
+    private static void debugTokenList(String testName, List<Token> tokens) {
+        System.out.println("=== TOKENIZATION DEBUG: " + testName + " ===");
+        System.out.println("Total tokens: " + tokens.size());
+        for (int i = 0; i < tokens.size(); i++) {
+            System.out.printf("%2d: %s%n", i, tokens.get(i));
+        }
+        System.out.println("=== END DEBUG ===");
     }
 
 }

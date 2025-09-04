@@ -24,7 +24,7 @@ public class LexerFactory {
      */
     public static List<Token> tokenizeJsProject(String content) {
         GenericLexer lexer = new GenericLexer();
-        return lexer.tokenize(content, List.of(CLOSE,OPEN,EQUALS,END_SYMBOL), new JsProjectTokenDefinition());
+        return lexer.tokenize(content, List.of(CLOSE,OPEN,EQUALS,END_SYMBOL,QUOTE), new JsProjectTokenDefinition());
     }
     
     /**
@@ -39,6 +39,6 @@ public class LexerFactory {
      */
     public static List<Token> tokenizeBpmn(String content) {
         GenericLexer lexer = new GenericLexer();
-        return lexer.tokenize(content, List.of(CLOSE,OPEN,EQUALS,END_SYMBOL), new BpmnTokenDefinition());
+        return lexer.tokenize(content, List.of(CLOSE,OPEN,EQUALS,END_SYMBOL,QUOTE), new BpmnTokenDefinition());
     }
 }

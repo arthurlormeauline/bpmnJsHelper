@@ -1,8 +1,8 @@
 package com.protectline.bpmninjs.util;
 
-import com.protectline.bpmninjs.application.files.FileUtil;
-import com.protectline.bpmninjs.translateunitfactory.DefaultTranslateUnitFactoryProvider;
-import com.protectline.bpmninjs.application.mainfactory.MainFactory;
+import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.application.DefaultTranslateUnitFactoryProvider;
+import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
 
 import java.io.IOException;
 

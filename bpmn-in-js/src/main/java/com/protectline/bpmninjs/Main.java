@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs;
 
-import com.protectline.bpmninjs.application.Application;
+import com.protectline.bpmninjs.engine.Application;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

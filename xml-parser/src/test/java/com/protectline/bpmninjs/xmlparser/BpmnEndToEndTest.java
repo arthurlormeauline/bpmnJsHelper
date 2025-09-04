@@ -35,6 +35,17 @@ class BpmnEndToEndTest {
         
         // Then - Compare regenerated with backup
         String backupContent = Files.readString(backupFile);
+        
+        // Check XML declaration preservation
+        assertThat(normalizeString(getFirstLine(regeneratedXml))).isEqualTo(normalizeString(getFirstLine(backupContent)))
+                .withFailMessage("La déclaration XML devrait être préservée identiquement");
+        
+        // Check that attributes are preserved (basic attribute order check)
+        assertThat(regeneratedXml).contains("attr=\"value\"")
+                .withFailMessage("Les attributs simples devraient être préservés");
+        assertThat(regeneratedXml).contains("id=\"test\"")
+                .withFailMessage("Les attributs des éléments auto-fermants devraient être préservés");
+        
         assertXmlEquals(backupContent, regeneratedXml, 
                 "Les attributs du BPMN simple devraient être préservés lors du roundtrip");
     }
@@ -58,11 +69,19 @@ class BpmnEndToEndTest {
         // Then - URLs in attributes should be preserved exactly
         String backupContent = Files.readString(backupFile);
         
+        // Check XML declaration preservation
+        assertThat(normalizeString(getFirstLine(regeneratedXml))).isEqualTo(normalizeString(getFirstLine(backupContent)))
+                .withFailMessage("La déclaration XML devrait être préservée identiquement");
+        
         // Check specific URL attributes that should be preserved
         assertThat(regeneratedXml).contains("xmlns:bpmn=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"")
                 .withFailMessage("L'URL du namespace BPMN devrait être préservée complètement");
         assertThat(regeneratedXml).contains("xmlns:bpmndi=\"http://www.omg.org/spec/BPMN/20100524/DI\"")
                 .withFailMessage("L'URL du namespace BPMNDI devrait être préservée complètement");
+                
+        // Check attribute order preservation in regenerated XML
+        assertAttributeOrder(regeneratedXml, "xmlns:bpmn", "xmlns:bpmndi", 
+                "Les attributs de namespace devraient apparaître dans le même ordre que dans le XML original");
         
         // The files should be semantically equivalent
         assertXmlEquals(backupContent, regeneratedXml, 
@@ -73,6 +92,40 @@ class BpmnEndToEndTest {
         Path originalBpmnPath = Path.of(first);
         String originalContent = Files.readString(originalBpmnPath);
         return originalContent;
+    }
+    
+    /**
+     * Extract the first line from a string
+     */
+    private static String getFirstLine(String content) {
+        if (content == null || content.isEmpty()) {
+            return "";
+        }
+        String[] lines = content.split("\n", 2);
+        return lines[0];
+    }
+    
+    /**
+     * Normalize string by trimming and handling line ending differences
+     */
+    private static String normalizeString(String content) {
+        if (content == null) {
+            return "";
+        }
+        return content.trim().replaceAll("\\r\\n|\\r|\\n", "\n");
+    }
+    
+    /**
+     * Assert that attributes appear in the expected order in XML content
+     */
+    private static void assertAttributeOrder(String xmlContent, String firstAttribute, String secondAttribute, String message) {
+        int firstIndex = xmlContent.indexOf(firstAttribute + "=");
+        int secondIndex = xmlContent.indexOf(secondAttribute + "=");
+        
+        assertThat(firstIndex).withFailMessage("Attribute '" + firstAttribute + "' not found in XML").isNotEqualTo(-1);
+        assertThat(secondIndex).withFailMessage("Attribute '" + secondAttribute + "' not found in XML").isNotEqualTo(-1);
+        assertThat(firstIndex).withFailMessage(message + " - " + firstAttribute + " should appear before " + secondAttribute)
+                .isLessThan(secondIndex);
     }
     
     /**

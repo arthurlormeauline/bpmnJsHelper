@@ -3,7 +3,7 @@ package com.protectline.bpmninjs.engine.tojsproject.bpmntoblocks;
 import com.protectline.bpmninjs.engine.tojsproject.spi.BlockFromBpmnNode;
 import com.protectline.bpmninjs.model.block.persist.BlockUtil;
 import com.protectline.bpmninjs.model.bpmndocument.api.BpmnDocument;
-import com.protectline.bpmninjs.model.bpmndocument.camundaimpl.BpmnCamundaDocument;
+import com.protectline.bpmninjs.model.bpmndocument.homemadeimpl.HomemadeBpmnDocument;
 import com.protectline.bpmninjs.model.block.Block;
 import com.protectline.bpmninjs.engine.files.FileService;
 
@@ -24,7 +24,7 @@ public class FromBpmnToBlocks {
     }
 
     public void createBlocksFromBpmn(String process) throws IOException {
-        BpmnDocument document = new BpmnCamundaDocument(fileService.getBpmnFile(process).toFile());
+        BpmnDocument document = new HomemadeBpmnDocument(fileService.getBpmnFile(process).toFile());
 
         List<Block> blocks = new MainBlockFromBpmnNode().
                 registerSubBlockBuilders(blockFromBpmnNodes)

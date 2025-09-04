@@ -367,11 +367,74 @@ class TokenParserTest {
         assertThat(element.getAttributes()).containsEntry("xmlns:bpmn", "\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
         assertThat(element.getAttributes()).containsEntry("xmlns:bpmndi", "\"http://www.omg.org/spec/BPMN/20100524/DI\"");
         
+        // Verify attribute order - xmlns:bpmn should appear before xmlns:bpmndi
+        List<String> attributeKeys = new java.util.ArrayList<>(element.getAttributes().keySet());
+        assertThat(attributeKeys).containsExactly("xmlns:bpmn", "xmlns:bpmndi")
+                .withFailMessage("Les attributs devraient être dans l'ordre d'apparition dans le XML");
+        
         // Verify exact URL reconstruction
         String bpmnUrl = element.getAttributes().get("xmlns:bpmn");
         assertThat(bpmnUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
         
         String bpmndiUrl = element.getAttributes().get("xmlns:bpmndi");
         assertThat(bpmndiUrl).isEqualTo("\"http://www.omg.org/spec/BPMN/20100524/DI\"");
+    }
+
+    @Test
+    void should_preserve_attribute_order_in_parsing() {
+        // Given - Element with multiple attributes in specific order: id, name, type, version
+        List<Token> tokens = Arrays.asList(
+                new Token(TOKEN_TYPE.OPEN, "<"),
+                new Token(TOKEN_TYPE.STRING, "element id"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "test123"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, " name"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "TestElement"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, " type"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "task"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, " version"),
+                new Token(TOKEN_TYPE.EQUALS, "="),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.STRING, "1.0"),
+                new Token(TOKEN_TYPE.QUOTE, "\""),
+                new Token(TOKEN_TYPE.CLOSE, ">"),
+                new Token(TOKEN_TYPE.STRING, "content"),
+                new Token(TOKEN_TYPE.OPEN, "<"),
+                new Token(TOKEN_TYPE.END_SYMBOL, "/"),
+                new Token(TOKEN_TYPE.STRING, "element"),
+                new Token(TOKEN_TYPE.CLOSE, ">")
+        );
+
+        // When
+        List<Element> elements = tokenParser.parseXmlAndGetElements(tokens);
+
+        // Then
+        assertThat(elements).hasSize(1);
+        Element element = elements.get(0);
+        
+        // Verify element structure
+        assertThat(element.getElementName()).isEqualTo("element");
+        assertThat(element.getContent()).isEqualTo("content");
+        
+        // Verify all attributes are parsed correctly
+        assertThat(element.getAttributes()).hasSize(4);
+        assertThat(element.getAttributes()).containsEntry("id", "\"test123\"");
+        assertThat(element.getAttributes()).containsEntry("name", "\"TestElement\"");
+        assertThat(element.getAttributes()).containsEntry("type", "\"task\"");
+        assertThat(element.getAttributes()).containsEntry("version", "\"1.0\"");
+        
+        // Verify attribute order preservation - critical assertion
+        List<String> actualAttributeOrder = new java.util.ArrayList<>(element.getAttributes().keySet());
+        List<String> expectedAttributeOrder = Arrays.asList("id", "name", "type", "version");
+        assertThat(actualAttributeOrder).containsExactlyElementsOf(expectedAttributeOrder)
+                .withFailMessage("L'ordre des attributs doit être préservé tel qu'il apparaît dans le XML source");
     }
 }

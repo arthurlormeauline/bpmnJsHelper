@@ -33,17 +33,20 @@ public class TokenParser {
     public Element parseXml(List<Token> tokens) {
         Element artificialRoot = parseTokens(tokens);
         
-        // Trouver le premier élément non-déclaration XML comme document root
-        Element documentRoot = null;
-        for (Element child : artificialRoot.getChildren()) {
-            if (!child.getElementName().equals("xml")) { // Skip XML declarations
-                documentRoot = child;
-                break;
-            }
-        }
+        // Vérifier s'il y a une déclaration XML
+        boolean hasXmlDeclaration = artificialRoot.getChildren().stream()
+                .anyMatch(Element::isXmlDeclaration);
         
-        // Return the document root if we found one, otherwise return the artificial root
-        return documentRoot != null ? documentRoot : artificialRoot;
+        if (hasXmlDeclaration) {
+            // S'il y a une déclaration XML, retourner le root artificiel qui contient tout
+            return artificialRoot;
+        } else {
+            // Comportement classique: retourner le premier élément réel
+            if (!artificialRoot.getChildren().isEmpty()) {
+                return artificialRoot.getChildren().get(0);
+            }
+            return artificialRoot;
+        }
     }
     
     private Element parseTokens(List<Token> tokens) {

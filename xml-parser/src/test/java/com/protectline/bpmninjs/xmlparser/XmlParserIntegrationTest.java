@@ -94,8 +94,8 @@ class XmlParserIntegrationTest {
             .orElseThrow();
             
         assertThat(taskElement.getAttributes()).containsExactly(
-            entry("name", "\"Process Data\""),
-            entry("id", "\"task1\"")
+            entry("id", "\"task1\""),
+            entry("name", "\"Process Data\"")
         );
     }
 

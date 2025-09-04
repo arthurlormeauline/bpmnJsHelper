@@ -2,7 +2,7 @@ package com.protectline.bpmninjs.engine.tobpmn.blockstobpmn;
 
 import com.protectline.bpmninjs.engine.tobpmn.spi.BpmnDocumentUpdater;
 import com.protectline.bpmninjs.model.bpmndocument.api.BpmnDocument;
-import com.protectline.bpmninjs.model.bpmndocument.camundaimpl.BpmnCamundaDocument;
+import com.protectline.bpmninjs.model.bpmndocument.homemadeimpl.HomemadeBpmnDocument;
 import com.protectline.bpmninjs.model.block.Block;
 import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
@@ -26,7 +26,7 @@ public class FromBlockToBpmn {
 
     public void updateBpmnFromBlocks(String process) throws IOException {
         File bpmnFile = fileService.getBpmnFile(process).toFile();
-        BpmnDocument document = new BpmnCamundaDocument(bpmnFile);
+        BpmnDocument document = new HomemadeBpmnDocument(bpmnFile);
 
         List<Block> blocks = readBlocksFromFile(fileService.getBlocksFile(process));
 

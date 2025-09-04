@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -207,7 +208,7 @@ public class SimplifiedTokenDefinition {
         String firstStringValue = tokens.get(startIndex + 1).getStringValue().trim();
         int i = startIndex + 2; // Skip OPEN and first STRING
         
-        Map<String, String> attributes = new HashMap<>();
+        Map<String, String> attributes = new LinkedHashMap<>();
         String elementName;
         
         // Si c'est juste [OPEN, STRING, stopToken], la STRING est l'elementName

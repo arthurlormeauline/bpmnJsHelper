@@ -1,6 +1,7 @@
 package com.protectline.bpmninjs.xmlparser.parser;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class Element {
     private final String content;
     private final List<Element> children;
     private final boolean isSelfClosing;
+    private final boolean isXmlDeclaration;
     
     public Element(String elementName, Map<String, String> attributes, String content) {
         this.elementName = elementName;
@@ -21,6 +23,7 @@ public class Element {
         this.content = content;
         this.children = new ArrayList<>();
         this.isSelfClosing = false;
+        this.isXmlDeclaration = false;
     }
     
     public Element(String elementName, Map<String, String> attributes, List<Element> children) {
@@ -29,6 +32,7 @@ public class Element {
         this.content = "";
         this.children = new ArrayList<>(children);
         this.isSelfClosing = false;
+        this.isXmlDeclaration = false;
     }
     
     public Element(String elementName, Map<String, String> attributes, boolean isSelfClosing) {
@@ -37,6 +41,7 @@ public class Element {
         this.content = "";
         this.children = new ArrayList<>();
         this.isSelfClosing = isSelfClosing;
+        this.isXmlDeclaration = "xml".equals(elementName);
     }
     
     public Element(String elementName, Map<String, String> attributes, String content, List<Element> children) {
@@ -45,6 +50,7 @@ public class Element {
         this.content = content;
         this.children = new ArrayList<>(children);
         this.isSelfClosing = false;
+        this.isXmlDeclaration = false;
     }
     
     public String getElementName() {
@@ -65,6 +71,10 @@ public class Element {
     
     public boolean isSelfClosing() {
         return isSelfClosing;
+    }
+    
+    public boolean isXmlDeclaration() {
+        return isXmlDeclaration;
     }
     
     public void addChild(Element child) {
@@ -110,7 +120,12 @@ public class Element {
             return xml.toString();
         }
         
-        if (isSelfClosing) {
+        // Cas spécial pour les déclarations XML
+        if (isXmlDeclaration) {
+            xml.append("<?").append(elementName);
+            appendAttributes(xml);
+            xml.append("?>\n");
+        } else if (isSelfClosing) {
             // Balise auto-fermante : <element attr="value" />
             xml.append(indent).append("<").append(elementName);
             appendAttributes(xml);

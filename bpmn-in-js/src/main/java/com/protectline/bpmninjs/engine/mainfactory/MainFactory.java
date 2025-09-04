@@ -1,14 +1,14 @@
 package com.protectline.bpmninjs.engine.mainfactory;
 
-import com.protectline.bpmninjs.engine.mainfactory.entrypoint.EntryPointTranslateUnitFactory;
-import com.protectline.bpmninjs.engine.tobpmn.spi.DocumentUpdater;
+import com.protectline.bpmninjs.engine.mainfactory.main.MainTranslateUnit;
+import com.protectline.bpmninjs.engine.tobpmn.spi.BpmnDocumentUpdater;
 import com.protectline.bpmninjs.engine.tobpmn.spi.UpdateBlock;
-import com.protectline.bpmninjs.engine.tojsproject.spi.BlockBuilder;
+import com.protectline.bpmninjs.engine.tojsproject.spi.BlockFromBpmnNode;
 import com.protectline.bpmninjs.engine.tojsproject.spi.JsUpdater;
-import com.protectline.bpmninjs.model.common.block.Block;
-import com.protectline.bpmninjs.model.common.block.BlockType;
-import com.protectline.bpmninjs.engine.files.FileUtil;
-import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
+import com.protectline.bpmninjs.model.block.Block;
+import com.protectline.bpmninjs.model.block.BlockType;
+import com.protectline.bpmninjs.engine.files.FileService;
+import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromJsNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,23 +20,23 @@ import java.util.Optional;
 
 public class MainFactory {
 
-    private final FileUtil fileUtil;
-    private final List<TranslateUnitAbstractFactory> translateFactories;
-    private final Map<String, TranslateUnitAbstractFactory> factoryByElement;
+    private final FileService fileService;
+    private final List<TranslateUnit> translateFactories;
+    private final Map<String, TranslateUnit> factoryByElement;
 
-    public MainFactory(FileUtil fileUtil, List<TranslateUnitAbstractFactory> translateFactories) throws IOException {
-        this.fileUtil = fileUtil;
+    public MainFactory(FileService fileService, List<TranslateUnit> translateFactories) throws IOException {
+        this.fileService = fileService;
         this.translateFactories = new ArrayList<>();
         this.factoryByElement = new HashMap<>();
 
-        addTranslateFactory(new EntryPointTranslateUnitFactory());
+        addTranslateFactory(new MainTranslateUnit());
 
-        for (TranslateUnitAbstractFactory factory : translateFactories) {
+        for (TranslateUnit factory : translateFactories) {
             addTranslateFactory(factory);
         }
     }
 
-    public void addTranslateFactory(TranslateUnitAbstractFactory factory) {
+    public void addTranslateFactory(TranslateUnit factory) {
         translateFactories.add(factory);
         
         List<String> elementNames = factory.getElementNames();
@@ -56,21 +56,21 @@ public class MainFactory {
                 .orElseThrow(() -> new IllegalArgumentException("No factory found for block type: " + type));
     }
 
-    public List<BlockBuilder> getBlockBuilders() {
+    public List<BlockFromBpmnNode> getBlockBuilders() {
         return translateFactories.stream()
-                .map(TranslateUnitAbstractFactory::createBlockBuilder)
+                .map(TranslateUnit::createBlockBuilder)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
     }
 
-    public BlockFromElement getBlockBuilder(String element) {
-        TranslateUnitAbstractFactory factory = factoryByElement.get(element);
+    public BlockFromJsNode getBlockBuilder(String element) {
+        TranslateUnit factory = factoryByElement.get(element);
         if (factory == null) {
             throw new UnsupportedOperationException("No factory found to handle element: " + element);
         }
         
-        Optional<BlockFromElement> builder = factory.createBlockFromElement();
+        Optional<BlockFromJsNode> builder = factory.createBlockFromElement();
         if (builder.isPresent()) {
             return builder.get();
         }
@@ -79,7 +79,7 @@ public class MainFactory {
     }
 
 
-    public DocumentUpdater getBpmnUpdater(Block block) {
+    public BpmnDocumentUpdater getBpmnUpdater(Block block) {
         return translateFactories.stream()
                 .filter(factory -> factory.getBlockType().isPresent() && factory.getBlockType().get().equals(block.getType()))
                 .findFirst()
@@ -91,7 +91,6 @@ public class MainFactory {
     public List<JsUpdater> getJsUpdaters(List<Block> blocks) {
         List<JsUpdater> updaters = new ArrayList<>();
         
-        // Ajouter l'EntryPoint updater
         translateFactories.stream()
                 .filter(factory -> factory.getElementNames().contains("main"))
                 .findFirst()

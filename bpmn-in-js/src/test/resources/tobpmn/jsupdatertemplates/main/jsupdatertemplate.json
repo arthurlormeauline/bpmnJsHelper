@@ -1,8 +1,0 @@
-[
-  {
-    "name": "MAIN",
-    "element" : "main",
-    "template": "//<main>\n\n//<FUNCTIONS>\n//</main>",
-    "flag": "//<MAIN>"
-  }
-]

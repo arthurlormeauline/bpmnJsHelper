@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.engine.tobpmn.jstoblocks;
 
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.engine.files.FileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -21,7 +21,7 @@ class FromJsProjectToBlocksTest {
     @TempDir
     Path tempDir;
 
-    private FileUtil fileUtil;
+    private FileService fileService;
     private FromJsProjectToBlocks fromJsProjectToBlocks;
 
     @BeforeEach
@@ -30,12 +30,12 @@ class FromJsProjectToBlocksTest {
         Path resourcesPath = getResourcePath(FromJsProjectToBlocksTest.class, TEST_DIRECTORY);
 
         var testWorkingDirectory = tempDir.resolve("testData");
-        fileUtil = new FileUtil(testWorkingDirectory);
+        fileService = new FileService(testWorkingDirectory);
         Files.createDirectories(testWorkingDirectory);
 
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
-        fromJsProjectToBlocks = new FromJsProjectToBlocks(fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
+        fromJsProjectToBlocks = new FromJsProjectToBlocks(fileService, MainFactoryTestUtil.createWithDefaults(fileService));
 
     }
 
@@ -66,7 +66,7 @@ class FromJsProjectToBlocksTest {
         fromJsProjectToBlocks.updateBlockFromJsProject(process);
 
         // Then
-        assertBlocksAreEqualToExpected(fileUtil, process);
+        assertBlocksAreEqualToExpected(fileService, process);
     }
 
     @Test
@@ -78,7 +78,7 @@ class FromJsProjectToBlocksTest {
         fromJsProjectToBlocks.updateBlockFromJsProject(process);
 
         // Then
-        assertBlocksAreEqualToExpected(fileUtil, process);
+        assertBlocksAreEqualToExpected(fileService, process);
     }
 
     @Test
@@ -90,7 +90,7 @@ class FromJsProjectToBlocksTest {
         fromJsProjectToBlocks.updateBlockFromJsProject(process);
 
         // Then
-        assertBlocksAreEqualToExpected(fileUtil, process);
+        assertBlocksAreEqualToExpected(fileService, process);
     }
 
     @Test
@@ -102,6 +102,6 @@ class FromJsProjectToBlocksTest {
         fromJsProjectToBlocks.updateBlockFromJsProject(process);
 
         // Then - Should successfully parse all 26 functions
-        assertBlocksAreEqualToExpected(fileUtil, process);
+        assertBlocksAreEqualToExpected(fileService, process);
     }
 }

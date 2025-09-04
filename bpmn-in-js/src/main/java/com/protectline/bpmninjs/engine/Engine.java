@@ -1,10 +1,10 @@
 package com.protectline.bpmninjs.engine;
 
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
-import com.protectline.bpmninjs.engine.mainfactory.TranslateUnitAbstractFactory;
+import com.protectline.bpmninjs.engine.mainfactory.TranslateUnit;
 import com.protectline.bpmninjs.engine.tobpmn.JsProjectToBpmn;
-import com.protectline.bpmninjs.engine.tojsproject.BpmnToJS;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.engine.tojsproject.BpmnToJsProject;
+import com.protectline.bpmninjs.engine.files.FileService;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,9 +13,9 @@ import java.util.List;
 
 public class Engine {
 
-    List<TranslateUnitAbstractFactory> translateUnitFactories;
+    List<TranslateUnit> translateUnitFactories;
 
-    public Engine(List<TranslateUnitAbstractFactory> translateUnitFactories){
+    public Engine(List<TranslateUnit> translateUnitFactories){
         this.translateUnitFactories = translateUnitFactories;
     }
 
@@ -37,21 +37,21 @@ public class Engine {
         }
     }
 
-    private void toBpmn(String process) throws URISyntaxException, IOException {
+    private void toBpmn(String process) throws IOException {
         System.out.println("Update bpmn file from js project");
         Path workingDirectory = Path.of("data");
-        FileUtil fileUtil = new FileUtil(workingDirectory);
-        MainFactory mainFactory = new MainFactory(fileUtil, translateUnitFactories);
-        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileUtil, mainFactory);
+        FileService fileService = new FileService(workingDirectory);
+        MainFactory mainFactory = new MainFactory(fileService, translateUnitFactories);
+        JsProjectToBpmn toBpmn = new JsProjectToBpmn(fileService, mainFactory);
         toBpmn.updateBpmn(process);
     }
 
-    private void toJsProject(String process) throws URISyntaxException, IOException {
+    private void toJsProject(String process) throws IOException {
         System.out.println("Create js project from bpmn file");
         Path workingDirectory = Path.of("data");
-        FileUtil fileUtil = new FileUtil(workingDirectory);
-        var mainFactory = new MainFactory(fileUtil, translateUnitFactories);
-        BpmnToJS toJs = new BpmnToJS(fileUtil, mainFactory);
+        FileService fileService = new FileService(workingDirectory);
+        var mainFactory = new MainFactory(fileService, translateUnitFactories);
+        BpmnToJsProject toJs = new BpmnToJsProject(fileService, mainFactory);
         toJs.createProject(process);
     }
 }

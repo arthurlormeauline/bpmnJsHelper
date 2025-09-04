@@ -1,6 +1,6 @@
 package com.protectline.bpmninjs.engine.tobpmn.blockstobpmn;
 
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ class FromBlockToBpmnTest {
     @TempDir
     private Path tempDir;
     private FromBlockToBpmn fromBlockToBpmn;
-    private FileUtil fileUtil;
+    private FileService fileService;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
@@ -27,21 +27,21 @@ class FromBlockToBpmnTest {
         Path resourcesPath = getResourcePath(FromBlockToBpmnTest.class, testDirectory);
 
         var testWorkingDirectory = tempDir.resolve("testData");
-        fileUtil = new FileUtil(testWorkingDirectory);
+        fileService = new FileService(testWorkingDirectory);
         Files.createDirectories(testWorkingDirectory);
 
         // Copier récursivement toute la structure
         copyDirectory(resourcesPath, testWorkingDirectory);
 
-        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
-        fromBlockToBpmn = new FromBlockToBpmn(fileUtil, mainFactory);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileService);
+        fromBlockToBpmn = new FromBlockToBpmn(fileService, mainFactory);
     }
 
     @Test
     void should_update_bpmn_document() throws IOException {
         // Given
         String processName = "simplifyInter";
-        var testWorkingDirectory = fileUtil.getWorkingDirectory();
+        var testWorkingDirectory = fileService.getWorkingDirectory();
         Path bpmnFile = testWorkingDirectory.resolve("input/simplifyInter.bpmn");
 
         // When

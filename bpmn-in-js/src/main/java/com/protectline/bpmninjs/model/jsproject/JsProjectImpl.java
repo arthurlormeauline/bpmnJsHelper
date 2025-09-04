@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.model.jsproject;
 
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.model.jsproject.api.JsNode;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.xmlparser.XmlParser;
@@ -13,21 +13,21 @@ import java.util.stream.Collectors;
 
 public class JsProjectImpl implements JsProject {
 
-    private final FileUtil fileUtil;
+    private final FileService fileService;
     private final MainFactory mainFactory;
     private final String process;
     private final XmlParser xmlParser;
 
-    public JsProjectImpl(String process, FileUtil fileUtil, MainFactory mainFactory) throws IOException {
+    public JsProjectImpl(String process, FileService fileService, MainFactory mainFactory) throws IOException {
         this.process = process;
-        this.fileUtil = fileUtil;
+        this.fileService = fileService;
         this.mainFactory = mainFactory;
         this.xmlParser = new XmlParser();
     }
 
     @Override
     public List<JsNode> getElements() throws IOException {
-        var jsContent = fileUtil.getJsRunnerFileContent(process);
+        var jsContent = fileService.getJsRunnerFileContent(process);
         var elements = xmlParser.parseXml(jsContent, new JsProjectTokenDefinition());
         return elements.stream()
                 .map(JsNodeImpl::new)
@@ -36,12 +36,12 @@ public class JsProjectImpl implements JsProject {
 
     @Override
     public String getJsContent() throws IOException {
-        return fileUtil.getJsRunnerFileContent(process);
+        return fileService.getJsRunnerFileContent(process);
     }
 
     @Override
     public void writeJsContent(String updatedContent) throws IOException {
-        java.nio.file.Path jsProjectDirectory = fileUtil.getJsProjectDirectory(process);
+        java.nio.file.Path jsProjectDirectory = fileService.getJsProjectDirectory(process);
         java.nio.file.Path bpmnRunnerFile = jsProjectDirectory.resolve("BpmnRunner.js");
         java.nio.file.Files.writeString(bpmnRunnerFile, updatedContent);
     }

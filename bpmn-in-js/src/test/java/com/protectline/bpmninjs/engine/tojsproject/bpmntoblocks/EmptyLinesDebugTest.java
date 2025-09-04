@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.engine.tojsproject.bpmntoblocks;
 
-import com.protectline.bpmninjs.model.common.block.persist.BlockUtil;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.model.block.persist.BlockUtil;
+import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,22 +11,22 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 
-import static com.protectline.bpmninjs.model.common.block.persist.BlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.model.block.persist.BlockUtil.readBlocksFromFile;
 import static com.protectline.bpmninjs.util.FileUtil.getResourcePath;
 
 class EmptyLinesDebugTest {
 
     private FromBpmnToBlocks fromBpmnToBlocks;
-    private FileUtil fileUtil;
+    private FileService fileService;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
         var testDirectory = "tojsproject";
         var resourcePath = getResourcePath(EmptyLinesDebugTest.class, testDirectory);
-        fileUtil = new FileUtil(resourcePath);
-        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        fileService = new FileService(resourcePath);
+        MainFactory mainFactory = MainFactoryTestUtil.createWithDefaults(fileService);
         BlockUtil blockUtil = new BlockUtil();
-        fromBpmnToBlocks = new FromBpmnToBlocks(fileUtil, mainFactory.getBlockBuilders(), blockUtil);
+        fromBpmnToBlocks = new FromBpmnToBlocks(fileService, mainFactory.getBlockBuilders(), blockUtil);
     }
 
     @Test
@@ -38,7 +38,7 @@ class EmptyLinesDebugTest {
         fromBpmnToBlocks.createBlocksFromBpmn(process);
 
         // Then - Lire le fichier généré et l'afficher pour debug
-        var actualBlocksFile = fileUtil.getBlocksFile(process);
+        var actualBlocksFile = fileService.getBlocksFile(process);
         var actualBlocks = readBlocksFromFile(actualBlocksFile);
         
         System.out.println("=== FICHIER GÉNÉRÉ ===");

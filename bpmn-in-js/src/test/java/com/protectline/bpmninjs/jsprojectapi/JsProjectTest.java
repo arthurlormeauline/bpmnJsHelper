@@ -4,10 +4,10 @@ import com.protectline.bpmninjs.model.jsproject.api.JsNode;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.model.jsproject.JsProjectImpl;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
-import com.protectline.bpmninjs.model.common.block.Block;
-import com.protectline.bpmninjs.engine.files.FileUtil;
-import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
-import com.protectline.bpmninjs.engine.tobpmn.jstoblocks.BlockFromElementResult;
+import com.protectline.bpmninjs.model.block.Block;
+import com.protectline.bpmninjs.engine.files.FileService;
+import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromJsNode;
+import com.protectline.bpmninjs.engine.tobpmn.jstoblocks.BlockFromJsElementResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,20 +22,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class JsProjectTest {
 
-    private FileUtil fileUtil;
+    private FileService fileService;
 
     @BeforeEach
     void setup() throws URISyntaxException, IOException {
         var testDirectory = "tojsproject";
-        fileUtil = new FileUtil(getResourcePath(JsProjectTest.class, testDirectory));
+        fileService = new FileService(getResourcePath(JsProjectTest.class, testDirectory));
     }
 
     @Test
     void should_get_elements_from_project() throws IOException {
         // Given
         var process = "simplify";
-        JsProject jsProject = new JsProjectImpl(process, fileUtil, MainFactoryTestUtil.createWithDefaults(fileUtil));
-        var mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        JsProject jsProject = new JsProjectImpl(process, fileService, MainFactoryTestUtil.createWithDefaults(fileService));
+        var mainFactory = MainFactoryTestUtil.createWithDefaults(fileService);
 
         // When
         var elements = jsProject.getElements();
@@ -53,8 +53,8 @@ class JsProjectTest {
         
         for (JsNode element : elements) {
             try {
-                BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
-                BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
+                BlockFromJsNode parser = mainFactory.getBlockBuilder(element.getElementName());
+                BlockFromJsElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {
                 throw new IllegalArgumentException("No parser found for element: " + element.getElementName());

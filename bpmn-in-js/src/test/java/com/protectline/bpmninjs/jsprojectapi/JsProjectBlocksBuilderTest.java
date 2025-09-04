@@ -5,10 +5,10 @@ import com.protectline.bpmninjs.model.jsproject.api.JsNode;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.model.jsproject.JsProjectImpl;
 import com.protectline.bpmninjs.util.MainFactoryTestUtil;
-import com.protectline.bpmninjs.engine.files.FileUtil;
-import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
-import com.protectline.bpmninjs.engine.tobpmn.jstoblocks.BlockFromElementResult;
-import com.protectline.bpmninjs.model.common.block.Block;
+import com.protectline.bpmninjs.engine.files.FileService;
+import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromJsNode;
+import com.protectline.bpmninjs.engine.tobpmn.jstoblocks.BlockFromJsElementResult;
+import com.protectline.bpmninjs.model.block.Block;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,19 +20,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class JsProjectBlocksBuilderTest {
 
     MainFactory mainFactory;
-    FileUtil fileUtil;
+    FileService fileService;
 
     @BeforeEach
     void setup() throws IOException, URISyntaxException {
-        fileUtil = new FileUtil(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
-        mainFactory = MainFactoryTestUtil.createWithDefaults(fileUtil);
+        fileService = new FileService(com.protectline.bpmninjs.util.FileUtil.getResourcePath(JsProjectBlocksBuilderTest.class, "tobpmn"));
+        mainFactory = MainFactoryTestUtil.createWithDefaults(fileService);
     }
 
 
     @Test
     void should_parse_js_file() throws URISyntaxException, IOException {
         // Given
-        JsProject jsProject = new JsProjectImpl("tus.prc.actionCombine", fileUtil, mainFactory);
+        JsProject jsProject = new JsProjectImpl("tus.prc.actionCombine", fileService, mainFactory);
 
         // When
         var elementsFromProject = jsProject.getElements();
@@ -45,7 +45,7 @@ class JsProjectBlocksBuilderTest {
     @Test
     void should_parse_minimal_two_function_js_content() throws URISyntaxException, IOException {
         // Given
-        JsProject jsProject = new JsProjectImpl("CreateCustomer_Dev_minimal", fileUtil, mainFactory);
+        JsProject jsProject = new JsProjectImpl("CreateCustomer_Dev_minimal", fileService, mainFactory);
 
         // When - Parse the JS content through JsProject interface
         var elementsFromProject = jsProject.getElements();
@@ -68,8 +68,8 @@ class JsProjectBlocksBuilderTest {
         
         for (JsNode element : elements) {
             try {
-                BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
-                BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
+                BlockFromJsNode parser = mainFactory.getBlockBuilder(element.getElementName());
+                BlockFromJsElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {
                 throw new IllegalArgumentException("No parser found for element: " + element.getElementName());

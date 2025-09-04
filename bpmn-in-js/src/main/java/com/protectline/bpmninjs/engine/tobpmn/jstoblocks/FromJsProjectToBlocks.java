@@ -1,10 +1,10 @@
 package com.protectline.bpmninjs.engine.tobpmn.jstoblocks;
 
 import com.protectline.bpmninjs.engine.mainfactory.MainFactory;
-import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromElement;
+import com.protectline.bpmninjs.engine.tobpmn.spi.BlockFromJsNode;
 import com.protectline.bpmninjs.engine.tobpmn.spi.UpdateBlock;
-import com.protectline.bpmninjs.model.common.block.Block;
-import com.protectline.bpmninjs.engine.files.FileUtil;
+import com.protectline.bpmninjs.model.block.Block;
+import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.model.jsproject.api.JsNode;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.model.jsproject.JsProjectImpl;
@@ -12,22 +12,22 @@ import com.protectline.bpmninjs.model.jsproject.JsProjectImpl;
 import java.io.IOException;
 import java.util.List;
 
-import static com.protectline.bpmninjs.model.common.block.persist.BlockUtil.readBlocksFromFile;
-import static com.protectline.bpmninjs.model.common.block.persist.BlockUtil.writeBlocksToFile;
+import static com.protectline.bpmninjs.model.block.persist.BlockUtil.readBlocksFromFile;
+import static com.protectline.bpmninjs.model.block.persist.BlockUtil.writeBlocksToFile;
 
 public class FromJsProjectToBlocks {
-    private final FileUtil fileUtil;
+    private final FileService fileService;
     private final MainFactory mainFactory;
 
-    public FromJsProjectToBlocks(FileUtil fileUtil, MainFactory mainFactory) {
-        this.fileUtil = fileUtil;
+    public FromJsProjectToBlocks(FileService fileService, MainFactory mainFactory) {
+        this.fileService = fileService;
         this.mainFactory = mainFactory;
     }
 
     public void updateBlockFromJsProject(String process) throws IOException {
-        List<Block> blocksFromFile = readBlocksFromFile(fileUtil.getBlocksFile(process));
+        List<Block> blocksFromFile = readBlocksFromFile(fileService.getBlocksFile(process));
 
-        JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
+        JsProject jsProject = new JsProjectImpl(process, fileService, mainFactory);
         List<JsNode> elementsFromJsProject = jsProject.getElements();
         
         List<Block> blocksFromJsProject = convertElementsToBlocks(elementsFromJsProject);
@@ -36,10 +36,10 @@ public class FromJsProjectToBlocks {
 
         for (Block block : blocksFromJsProject) {
             UpdateBlock updater = mainFactory.blockUpdaterFromJsFactory(block.getType());
-            updater.updateBlockContent(blocksFromFile, block);
+            updater.update(blocksFromFile, block);
         }
 
-        writeBlocksToFile(blocksFromFile, fileUtil.getBlocksFile(process));
+        writeBlocksToFile(blocksFromFile, fileService.getBlocksFile(process));
     }
 
     private static void checkBlocksAreSimilar(List<Block> blocksFromFile, List<Block> blocksFromJsProject) {
@@ -66,8 +66,8 @@ public class FromJsProjectToBlocks {
 
         for (JsNode element : elements) {
             try {
-                BlockFromElement parser = mainFactory.getBlockBuilder(element.getElementName());
-                BlockFromElementResult result = parser.parse(element.getContent(), element.getAttributes());
+                BlockFromJsNode parser = mainFactory.getBlockBuilder(element.getElementName());
+                BlockFromJsElementResult result = parser.parse(element.getContent(), element.getAttributes());
                 allBlocks.addAll(result.getBlocks());
             } catch (Exception e) {
                 throw new IllegalArgumentException("No parser found for element: " + element.getElementName());

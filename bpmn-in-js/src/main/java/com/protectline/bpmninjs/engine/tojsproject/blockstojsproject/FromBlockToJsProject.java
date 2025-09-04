@@ -7,8 +7,13 @@ import com.protectline.bpmninjs.engine.files.FileUtil;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.model.jsproject.JsProjectImpl;
 import com.protectline.bpmninjs.engine.tojsproject.spi.JsUpdater;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static com.protectline.bpmninjs.model.common.block.persist.BlockUtil.readBlocksFromFile;
@@ -29,7 +34,7 @@ public class FromBlockToJsProject {
         List<Block> blocks = readBlocksFromFile(fileUtil.getBlocksFile(process));
         
         fileUtil.deleteJsDirectoryIfExists(process);
-        fileUtil.copyTemplateToJsDirectory(process);
+        copyTemplateToJsDirectory(process);
         
         JsProject jsProject = new JsProjectImpl(process, fileUtil, mainFactory);
         
@@ -42,5 +47,23 @@ public class FromBlockToJsProject {
         }
         
         jsProject.writeJsContent(updatedContent);
+    }
+    
+    private void copyTemplateToJsDirectory(String process) throws IOException {
+        Path destination = fileUtil.getJsProjectDirectory(process);
+        Files.createDirectories(destination);
+        
+        // Copy the 3 template files from resources
+        String[] templateFiles = {"BpmnRunner.js", "package.json", "script.js"};
+        
+        for (String fileName : templateFiles) {
+            try (InputStream inputStream = getClass().getResourceAsStream("/jstemplate/" + fileName)) {
+                if (inputStream == null) {
+                    throw new IOException("Template file not found: " + fileName);
+                }
+                Path targetFile = destination.resolve(fileName);
+                Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
     }
 }

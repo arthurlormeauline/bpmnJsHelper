@@ -14,29 +14,38 @@ import com.protectline.bpmninjs.engine.mainfactory.entrypoint.tojsproject.EntryP
 import com.protectline.bpmninjs.model.template.TemplateUtil;
 import com.protectline.bpmninjs.model.template.Template;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 public class EntryPointTranslateUnitFactory implements TranslateUnitAbstractFactory {
 
+    private static final Path TEMPLATE_FILE = getTemplateFile();
+    
     private final Template template;
-    private final Path workingDirectory;
     private EntryPointJsUpdater jsUpdater;
     private EntryPointBlockFromElement blockFromElement;
     private List<String> elementNames;
 
-    public EntryPointTranslateUnitFactory(Path workingDirectory) {
+    public EntryPointTranslateUnitFactory() {
         try {
-            this.workingDirectory = workingDirectory;
-            Path templateFile = workingDirectory.resolve("jsupdatertemplates")
-                .resolve("main").resolve("jsupdatertemplate.json");
-            this.template = TemplateUtil.loadFromFile(templateFile).get(0);
+            this.template = TemplateUtil.loadFromFile(TEMPLATE_FILE).get(0);
             this.blockFromElement = new EntryPointBlockFromElement(template);
             this.jsUpdater = new EntryPointJsUpdater(template);
             this.elementNames = List.of("main");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load main templates", e);
+            throw new RuntimeException("Failed to load entrypoint templates", e);
+        }
+    }
+    
+    private static Path getTemplateFile() {
+        try {
+            return Paths.get(EntryPointTranslateUnitFactory.class.getClassLoader()
+                .getResource("factorytemplates/entrypoint/jsupdatertemplate.json").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Failed to locate entrypoint template file", e);
         }
     }
 

@@ -29,7 +29,7 @@ public class MainFactory {
         this.translateFactories = new ArrayList<>();
         this.factoryByElement = new HashMap<>();
 
-        addTranslateFactory(new EntryPointTranslateUnitFactory(fileUtil.getWorkingDirectory()));
+        addTranslateFactory(new EntryPointTranslateUnitFactory());
 
         for (TranslateUnitAbstractFactory factory : translateFactories) {
             addTranslateFactory(factory);
@@ -111,6 +111,4 @@ public class MainFactory {
         
         return updaters;
     }
-
-    
 }

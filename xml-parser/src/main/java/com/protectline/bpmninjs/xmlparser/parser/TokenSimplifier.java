@@ -1,4 +1,8 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.parser;
+
+import com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
+import com.protectline.bpmninjs.xmlparser.lexer.tokendefinition.SimplifiedTokenDefinition;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,7 +5,6 @@ import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.model.jsproject.api.JsNode;
 import com.protectline.bpmninjs.model.jsproject.api.JsProject;
 import com.protectline.bpmninjs.xmlparser.XmlParser;
-import com.protectline.bpmninjs.xmlparser.JsProjectTokenDefinition;
 
 import java.io.IOException;
 import java.util.List;

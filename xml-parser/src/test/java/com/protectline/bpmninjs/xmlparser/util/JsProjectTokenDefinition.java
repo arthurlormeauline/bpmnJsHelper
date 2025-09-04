@@ -1,8 +1,11 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.util;
+
+import com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.lexer.TokenDefinition;
 
 import java.util.List;
 
-import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
+import static com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE.*;
 
 /**
  * Définition des tokens pour les projets JavaScript (//<element>)

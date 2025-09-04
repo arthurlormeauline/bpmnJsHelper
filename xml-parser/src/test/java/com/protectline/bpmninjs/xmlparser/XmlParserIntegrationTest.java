@@ -1,5 +1,9 @@
 package com.protectline.bpmninjs.xmlparser;
 
+import com.protectline.bpmninjs.xmlparser.util.LexerFactory;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
+import com.protectline.bpmninjs.xmlparser.parser.TokenParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

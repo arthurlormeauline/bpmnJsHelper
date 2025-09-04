@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.parser;
 
 /**
  * Représente une balise fermante
@@ -6,7 +6,7 @@ package com.protectline.bpmninjs.xmlparser;
 public class CloseMark {
     private final String elementName;
     
-    CloseMark(String elementName) {
+    public CloseMark(String elementName) {
         this.elementName = elementName;
     }
     

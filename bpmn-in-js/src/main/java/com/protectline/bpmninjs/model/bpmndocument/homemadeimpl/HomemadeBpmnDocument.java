@@ -5,9 +5,8 @@ import com.protectline.bpmninjs.model.bpmndocument.api.model.Node;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.ScriptNode;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.ServiceTaskNode;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.StartNode;
-import com.protectline.bpmninjs.xmlparser.Element;
 import com.protectline.bpmninjs.xmlparser.XmlParser;
-import com.protectline.bpmninjs.xmlparser.tokendefinition.BpmnTokenDefinition;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
 
 import java.io.File;
 import java.io.IOException;

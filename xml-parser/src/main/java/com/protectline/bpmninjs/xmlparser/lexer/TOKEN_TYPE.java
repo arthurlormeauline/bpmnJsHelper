@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer;
 
 public enum TOKEN_TYPE {
     // Tokens de base (lexer)
@@ -6,7 +6,7 @@ public enum TOKEN_TYPE {
     CLOSE,        // >
     EQUALS,       // =
     END_SYMBOL,   // /
-    ELEMENT,      // nom d'élement après <
+    ELEMENT,      //
     STRING,       //
     
     // Nouveaux tokens pour la tokenisation en deux étapes

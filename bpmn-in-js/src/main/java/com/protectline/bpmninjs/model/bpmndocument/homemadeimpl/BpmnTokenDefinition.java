@@ -1,11 +1,14 @@
-package com.protectline.bpmninjs.xmlparser.tokendefinition;
+package com.protectline.bpmninjs.model.bpmndocument.homemadeimpl;
 
-import com.protectline.bpmninjs.xmlparser.TOKEN_TYPE;
-import com.protectline.bpmninjs.xmlparser.TokenDefinition;
+
+
+import com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.lexer.TokenDefinition;
 
 import java.util.List;
 
-import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
+import static com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE.*;
+
 
 /**
  * Définition des tokens pour les fichiers BPMN XML (<element> et <?xml ...?>)

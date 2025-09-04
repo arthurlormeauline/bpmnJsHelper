@@ -1,6 +1,6 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer;
 
-import com.protectline.bpmninjs.xmlparser.tokendefinition.BpmnTokenDefinition;
+import com.protectline.bpmninjs.xmlparser.util.LexerFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
 
 class LexerTest {
 
@@ -101,7 +101,7 @@ class LexerTest {
     }
 
     @Test
-    void should_debug_tokenize_minimal_test_content() throws Exception {
+    void should_tokenize_real_js_file_content() throws Exception {
         // Given
         var resourcePath = this.getClass().getClassLoader().getResourceAsStream("tobpmn/output/CreateCustomer_Dev_minimal/BpmnRunner.js");
 
@@ -116,46 +116,15 @@ class LexerTest {
         // When
         List<Token> tokens = LexerFactory.tokenizeJsProject(jsContent);
 
-        // Then - Log all tokens for debugging
-        System.out.println("=== LEXER DEBUG: Found " + tokens.size() + " tokens ===");
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            String value = token.getValue()
-                    .replace("\n", "\\n")
-                    .replace("\r", "\\r")
-                    .replace("\t", "\\t")
-                    .replace("'", "\\'");
-            System.out.println("Token " + i + ": " + token.getType() + " = '" + value + "' (length: " + token.getValue().length() + ")");
-        }
-
-        // Count function tokens specifically
-        long functionTokens = tokens.stream()
-                .filter(token -> token.getType() == STRING && "function".equals(token.getValue()))
-                .count();
-        System.out.println("Found " + functionTokens + " function element tokens");
-
-        // Look for function IDs
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            if (token.getType() == STRING && "function".equals(token.getValue())) {
-                // Look ahead for id attribute
-                for (int j = i + 1; j < Math.min(i + 10, tokens.size()); j++) {
-                    Token nextToken = tokens.get(j);
-                    if (nextToken.getValue().contains("32cb633b-0bb2-4c27-89fd-8812410863c6") ||
-                            nextToken.getValue().contains("f15c404f-979e-440d-bbf0-04c98580d03b")) {
-                        System.out.println("Found function ID in token " + j + ": " + nextToken.getValue());
-                    }
-                }
-            }
-        }
-
-        // Verify we have tokens (but don't assert specific count since we're debugging)
-        assertThat(tokens.size()).isGreaterThan(0);
+        // Then
+        assertThat(tokens).isNotEmpty();
+        assertThat(tokens.stream().anyMatch(token -> token.getType() == OPEN)).isTrue();
+        assertThat(tokens.stream().anyMatch(token -> token.getType() == STRING)).isTrue();
     }
 
 
     @Test
-    void should_debug_apostrophe_issue() throws Exception {
+    void should_handle_apostrophe_in_js_content() throws Exception {
         // Given
         var resourcePath = this.getClass().getClassLoader().getResourceAsStream("apostrophe_test.js");
         String jsContent;
@@ -165,27 +134,12 @@ class LexerTest {
             jsContent = java.nio.file.Files.readString(java.nio.file.Paths.get("apostrophe_test.js"));
         }
 
-        System.out.println("=== INPUT CONTENT ===");
-        System.out.println("'" + jsContent.replace("\n", "\\n").replace("\r", "\\r") + "'");
-        System.out.println("Content length: " + jsContent.length());
-
         // When
         List<Token> tokens = LexerFactory.tokenizeJsProject(jsContent);
 
-        // Then - Log all tokens for debugging
-        System.out.println("=== APOSTROPHE LEXER DEBUG: Found " + tokens.size() + " tokens ===");
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            String value = token.getValue()
-                    .replace("\n", "\\n")
-                    .replace("\r", "\\r")
-                    .replace("\t", "\\t")
-                    .replace("'", "\\'");
-            System.out.println("Token " + i + ": " + token.getType() + " = '" + value + "' (length: " + token.getValue().length() + ")");
-        }
-
-        // Verify we have tokens (ajusté pour le nouveau comportement)
-        assertThat(tokens.size()).isEqualTo(5);
+        // Then
+        assertThat(tokens).hasSize(5);
+        assertThat(tokens.stream().anyMatch(token -> token.getValue().contains("'"))).isTrue();
     }
 
     @ParameterizedTest
@@ -197,13 +151,7 @@ class LexerTest {
         List<Token> tokens = LexerFactory.tokenizeJsProject(input);
 
         // Then
-        if (expectedTokens == null) {
-            // Cas où on veut juste logger pour debug
-            logTokens(input, tokens);
-            assertThat(tokens.size()).isGreaterThan(0);
-        } else {
-            assertThat(tokens).containsExactly(expectedTokens.toArray(new Token[0]));
-        }
+        assertThat(tokens).containsExactly(expectedTokens.toArray(new Token[0]));
     }
     
     static Stream<Arguments> provideWordTokenTestCases() {
@@ -301,18 +249,4 @@ class LexerTest {
         );
     }
 
-    // Méthode utilitaire pour logger au besoin
-    private void logTokens(String input, List<Token> tokens) {
-        System.out.println("\n=== LOGGING TOKENS FOR: '" + input + "' ===");
-        System.out.println("Found " + tokens.size() + " tokens:");
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            String value = token.getValue()
-                    .replace("\n", "\\n")
-                    .replace("\r", "\\r")
-                    .replace("\t", "\\t");
-            System.out.println("  Token " + i + ": " + token.getType() + " = '" + value + "'");
-        }
-        System.out.println("========================");
-    }
 }

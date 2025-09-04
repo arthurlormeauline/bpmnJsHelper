@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer;
 
 import java.util.List;
 

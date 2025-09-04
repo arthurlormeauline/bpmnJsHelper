@@ -1,6 +1,7 @@
 package com.protectline.bpmninjs.model.bpmndocument.homemadeimpl;
 
-import com.protectline.bpmninjs.xmlparser.Element;
+
+import com.protectline.bpmninjs.xmlparser.parser.Element;
 
 import java.util.ArrayList;
 import java.util.List;

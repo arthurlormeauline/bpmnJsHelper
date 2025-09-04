@@ -1,4 +1,8 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer;
+
+import com.protectline.bpmninjs.xmlparser.parser.CloseMark;
+import com.protectline.bpmninjs.xmlparser.parser.OpenMark;
+import com.protectline.bpmninjs.xmlparser.parser.SelfCloseMark;
 
 public class Token {
     private final TOKEN_TYPE type;
@@ -9,7 +13,7 @@ public class Token {
         this.value = value;
     }
     
-    Token(TOKEN_TYPE type, Object value) {
+    public Token(TOKEN_TYPE type, Object value) {
         this.type = type;
         this.value = value;
     }
@@ -18,7 +22,7 @@ public class Token {
         return type;
     }
     
-    String getValue() {
+    public String getValue() {
         return value.toString();
     }
     

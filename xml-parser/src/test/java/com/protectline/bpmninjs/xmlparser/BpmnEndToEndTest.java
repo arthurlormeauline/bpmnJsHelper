@@ -1,6 +1,7 @@
 package com.protectline.bpmninjs.xmlparser;
 
-import com.protectline.bpmninjs.xmlparser.tokendefinition.BpmnTokenDefinition;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
+import com.protectline.bpmninjs.xmlparser.util.BpmnTokenDefinition;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

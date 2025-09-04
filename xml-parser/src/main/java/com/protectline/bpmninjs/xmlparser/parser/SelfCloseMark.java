@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.parser;
 
 import java.util.Map;
 

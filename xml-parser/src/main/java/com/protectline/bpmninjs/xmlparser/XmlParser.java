@@ -1,8 +1,15 @@
 package com.protectline.bpmninjs.xmlparser;
 
+import com.protectline.bpmninjs.xmlparser.lexer.GenericLexer;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
+import com.protectline.bpmninjs.xmlparser.lexer.TokenDefinition;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
+import com.protectline.bpmninjs.xmlparser.parser.TokenParser;
+
 import java.util.List;
 
-import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
+import static com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE.*;
+
 
 public class XmlParser {
 

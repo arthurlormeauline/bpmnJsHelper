@@ -1,5 +1,7 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer.tokendefinition;
 
+import com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

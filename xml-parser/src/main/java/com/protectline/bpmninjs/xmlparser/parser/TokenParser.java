@@ -1,4 +1,7 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.parser;
+
+import com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +49,7 @@ public class TokenParser {
     private Element parseTokensToArtificialRoot(List<Token> tokens) {
         // Vérifier si les tokens sont déjà simplifiés (pour la compatibilité avec les tests)
         boolean alreadySimplified = tokens.stream()
-                .anyMatch(token -> token.getType() == TOKEN_TYPE.OPEN_MARK || 
+                .anyMatch(token -> token.getType() == TOKEN_TYPE.OPEN_MARK ||
                                  token.getType() == TOKEN_TYPE.CLOSE_MARK ||
                                  token.getType() == TOKEN_TYPE.SELF_CLOSE_MARK);
         

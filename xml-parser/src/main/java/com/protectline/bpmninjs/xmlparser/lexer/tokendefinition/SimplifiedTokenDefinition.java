@@ -1,4 +1,11 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer.tokendefinition;
+
+import com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
+import com.protectline.bpmninjs.xmlparser.parser.CloseMark;
+import com.protectline.bpmninjs.xmlparser.parser.OpenMark;
+import com.protectline.bpmninjs.xmlparser.parser.SelfCloseMark;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -285,6 +292,7 @@ public class SimplifiedTokenDefinition {
     /**
      * Classe pour encapsuler le résultat du parsing d'un SELF_CLOSE_MARK
      */
+    @Getter
     public static class SelfCloseMarkResult {
         public final SelfCloseMark selfCloseMark;
         public final int nextIndex;

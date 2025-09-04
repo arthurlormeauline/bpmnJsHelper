@@ -1,4 +1,4 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.parser;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ public class OpenMark {
     private final String elementName;
     private final Map<String, String> attributes;
     
-    OpenMark(String elementName, Map<String, String> attributes) {
+    public OpenMark(String elementName, Map<String, String> attributes) {
         this.elementName = elementName;
         this.attributes = attributes;
     }

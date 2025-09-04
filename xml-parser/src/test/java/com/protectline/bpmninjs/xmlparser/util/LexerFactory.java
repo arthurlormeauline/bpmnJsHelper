@@ -1,9 +1,11 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.util;
 
-import com.protectline.bpmninjs.xmlparser.tokendefinition.BpmnTokenDefinition;
+import com.protectline.bpmninjs.xmlparser.lexer.GenericLexer;
+import com.protectline.bpmninjs.xmlparser.lexer.Token;
+
 import java.util.List;
 
-import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.*;
+import static com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE.*;
 
 /**
  * Factory pour créer des lexers spécialisés

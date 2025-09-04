@@ -2,7 +2,7 @@ package com.protectline.bpmninjs.model.bpmndocument.homemadeimpl;
 
 import com.protectline.bpmninjs.model.bpmndocument.api.model.Node;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.NodeType;
-import com.protectline.bpmninjs.xmlparser.Element;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
 
 import java.util.List;
 

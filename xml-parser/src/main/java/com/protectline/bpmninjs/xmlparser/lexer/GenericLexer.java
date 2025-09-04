@@ -1,10 +1,11 @@
-package com.protectline.bpmninjs.xmlparser;
+package com.protectline.bpmninjs.xmlparser.lexer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.protectline.bpmninjs.xmlparser.TOKEN_TYPE.STRING;
+import static com.protectline.bpmninjs.xmlparser.lexer.TOKEN_TYPE.STRING;
+
 
 /**
  * Lexer générique qui supporte plusieurs symboles pour un même type de token

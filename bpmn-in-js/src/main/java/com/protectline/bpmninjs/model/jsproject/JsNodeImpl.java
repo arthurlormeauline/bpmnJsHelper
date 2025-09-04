@@ -1,7 +1,7 @@
 package com.protectline.bpmninjs.model.jsproject;
 
 import com.protectline.bpmninjs.model.jsproject.api.JsNode;
-import com.protectline.bpmninjs.xmlparser.Element;
+import com.protectline.bpmninjs.xmlparser.parser.Element;
 
 import java.util.Map;
 

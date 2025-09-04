@@ -14,10 +14,10 @@ import java.util.List;
 public class FunctionBlockFromBpmnNode implements BlockFromBpmnNode {
 
     @Override
-    public List<Block> getBlocks(BpmnDocument bpmnCamundaDocument) {
+    public List<Block> getBlocks(BpmnDocument document) {
         List<Block> blocks = new ArrayList<>();
 
-        List<Node> nodes = bpmnCamundaDocument.getFirstLevelElements();
+        List<Node> nodes = document.getFirstLevelElements();
 
         for (Node node : nodes) {
             NodeToBlock toFunctionBlock = ToFunctionBlockFactory.getNodeToFunctionBlock(node);

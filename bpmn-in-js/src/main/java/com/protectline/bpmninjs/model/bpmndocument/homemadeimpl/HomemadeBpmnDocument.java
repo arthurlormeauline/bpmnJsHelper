@@ -20,8 +20,7 @@ public class HomemadeBpmnDocument implements BpmnDocument {
 
     public HomemadeBpmnDocument(File processFile) throws IOException {
         this.originalFile = processFile;
-        formatBpmnFile(processFile);
-        
+
         String bpmnContent = Files.readString(processFile.toPath());
         XmlParser xmlParser = new XmlParser();
         this.rootElement = xmlParser.getRootElement(bpmnContent, new BpmnTokenDefinition());
@@ -119,12 +118,5 @@ public class HomemadeBpmnDocument implements BpmnDocument {
     public void writeToFile(File file) throws IOException {
         String xmlContent = rootElement.toXml();
         Files.writeString(file.toPath(), xmlContent);
-        formatBpmnFile(file);
-    }
-
-    private static void formatBpmnFile(File file) throws IOException {
-        String content = Files.readString(file.toPath());
-        // Appliquer le même formatage que BpmnCamundaDocument
-        Files.writeString(file.toPath(), content);
     }
 }

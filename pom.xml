@@ -22,7 +22,6 @@
         <commons-io.version>2.11.0</commons-io.version>
         <jackson.version>2.19.2</jackson.version>
         <guava.version>33.4.8-jre</guava.version>
-        <camunda-bpmn-model.version>7.23.0</camunda-bpmn-model.version>
         <javatuples.version>1.2</javatuples.version>
         <lombok.version>1.18.38</lombok.version>
         <assertj.version>4.0.0-M1</assertj.version>
@@ -51,11 +50,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
-            <artifactId>camunda-bpmn-model</artifactId>
-            <version>${camunda-bpmn-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.javatuples</groupId>

@@ -16,11 +16,11 @@ public class MainBlockFromBpmnNode implements BlockFromBpmnNode {
     }
 
     @Override
-    public List<Block> getBlocks(BpmnDocument bpmnCamundaDocument) {
+    public List<Block> getBlocks(BpmnDocument document) {
         List<Block> blocks = new ArrayList<>();
 
         for (BlockFromBpmnNode builder : builders){
-            blocks.addAll(builder.getBlocks(bpmnCamundaDocument));
+            blocks.addAll(builder.getBlocks(document));
         }
 
         return blocks;

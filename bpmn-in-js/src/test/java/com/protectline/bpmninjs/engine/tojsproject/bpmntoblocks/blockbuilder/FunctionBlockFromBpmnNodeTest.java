@@ -1,10 +1,11 @@
 package com.protectline.bpmninjs.engine.tojsproject.bpmntoblocks.blockbuilder;
 
+import com.protectline.bpmninjs.model.bpmndocument.api.BpmnDocument;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.NodeType;
-import com.protectline.bpmninjs.model.bpmndocument.camundaimpl.BpmnCamundaDocument;
 import com.protectline.bpmninjs.model.block.Block;
 import com.protectline.bpmninjs.engine.files.FileService;
 import com.protectline.bpmninjs.application.function.tojsproject.blockfrombpmnnode.FunctionBlockFromBpmnNode;
+import com.protectline.bpmninjs.model.bpmndocument.homemadeimpl.HomemadeBpmnDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class FunctionBlockFromBpmnNodeTest {
     void should_get_function_block_from_document() throws IOException {
         // Given
         var process = "simplify";
-        BpmnCamundaDocument document = new BpmnCamundaDocument(fileService.getBpmnFile(process).toFile());
+        BpmnDocument document = new HomemadeBpmnDocument(fileService.getBpmnFile(process).toFile());
 
         // When
         var actual = builder.getBlocks(document);
@@ -55,7 +56,7 @@ class FunctionBlockFromBpmnNodeTest {
     void should_get_function_block_from_document_with_backslash() throws IOException {
         // Given
         var process = "simplify-with-backslash";
-        BpmnCamundaDocument document = new BpmnCamundaDocument(fileService.getBpmnFile(process).toFile());
+        BpmnDocument document = new HomemadeBpmnDocument(fileService.getBpmnFile(process).toFile());
 
         // When
         var actual = builder.getBlocks(document);

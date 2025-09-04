@@ -1,6 +1,5 @@
 package com.protectline.bpmninjs.util;
 
-import org.camunda.bpm.model.bpmn.Bpmn;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;

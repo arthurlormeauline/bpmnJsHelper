@@ -4,9 +4,9 @@ import com.protectline.bpmninjs.engine.tojsproject.spi.BlockFromBpmnNode;
 import com.protectline.bpmninjs.application.function.tojsproject.blockfrombpmnnode.FunctionBlockFromBpmnNode;
 import com.protectline.bpmninjs.engine.tojsproject.bpmntoblocks.MainBlockFromBpmnNode;
 import com.protectline.bpmninjs.model.bpmndocument.api.model.NodeType;
-import com.protectline.bpmninjs.model.bpmndocument.camundaimpl.BpmnCamundaDocument;
 import com.protectline.bpmninjs.model.block.Block;
 import com.protectline.bpmninjs.engine.files.FileService;
+import com.protectline.bpmninjs.model.bpmndocument.homemadeimpl.HomemadeBpmnDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,7 +41,7 @@ class MainBlockFromBpmnNodeTest {
     void should_extract_all_blocks(List<BlockFromBpmnNode> builders) throws IOException {
         // Given
         var process = "simplify";
-        var document = new BpmnCamundaDocument(fileService.getBpmnFile(process).toFile());
+        var document = new HomemadeBpmnDocument(fileService.getBpmnFile(process).toFile());
 
         // When
         List<Block> actual = builder

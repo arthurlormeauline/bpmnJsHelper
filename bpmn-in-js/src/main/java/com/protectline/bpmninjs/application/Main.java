@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException {
-       // String[] arg = new String[]{"CreateCustomer_Dev",};
-        String[] arg = new String[]{"CreateCustomer_Dev", "-toBpmn"};
+        //String[] arg = new String[]{"tus.prc.actionCombine",};
+        String[] arg = new String[]{"CreateCustomer_Dev"};
         Engine engine = new Engine(List.of(new FunctionTranslateUnit()));
         engine.run(arg);
     }

@@ -1,0 +1,1008 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1l06s8n" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0">
+  <bpmn:process id="SalePipeline" isExecutable="true" camunda:versionTag="V0.1.0">
+    <bpmn:sequenceFlow id="Flow_1hs7whr" sourceRef="StartEvent_1" targetRef="ServiceTask_1a1r9y3">
+      <bpmn:extensionElements />
+    </bpmn:sequenceFlow>
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1hs7whr</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0fw5trv" messageRef="Message_14f2kp4" />
+    </bpmn:startEvent>
+    <bpmn:subProcess id="SubProcess_085n162" triggeredByEvent="true">
+      <bpmn:startEvent id="StartEvent_03idx0z">
+        <bpmn:outgoing>SequenceFlow_02noohs</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_01bg2gs" errorRef="Error_0a8hc3i" camunda:errorMessageVariable="errorTaskId" />
+      </bpmn:startEvent>
+      <bpmn:userTask id="UserTask_0pdqhnx" name="Review Task">
+        <bpmn:incoming>SequenceFlow_02hvc3v</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1kqhl73</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="EndEvent_19wiclb">
+        <bpmn:incoming>SequenceFlow_0jg7ptp</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:scriptTask id="ScriptTask_1k0uuxl" name="Return to Last Task" camunda:asyncAfter="true" scriptFormat="JavaScript">
+        <bpmn:incoming>SequenceFlow_1kqhl73</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_1oka6jq</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0jg7ptp</bpmn:outgoing>
+        <bpmn:script>print('Return to flow is Running');
+var errorTaskId = execution.getVariable('errorTaskId');
+if(errorTaskId == null){
+print('No where to go back to');
+}else{          execution.getProcessEngineServices().
+getRuntimeService().createProcessInstanceModification(execution.getProcessInstanceId()).startBeforeActivity(errorTaskId).
+execute();
+}</bpmn:script>
+      </bpmn:scriptTask>
+      <bpmn:sequenceFlow id="SequenceFlow_02noohs" sourceRef="StartEvent_03idx0z" targetRef="ExclusiveGateway_0fofy8h" />
+      <bpmn:sequenceFlow id="SequenceFlow_1kqhl73" sourceRef="UserTask_0pdqhnx" targetRef="ScriptTask_1k0uuxl" />
+      <bpmn:sequenceFlow id="SequenceFlow_0jg7ptp" sourceRef="ScriptTask_1k0uuxl" targetRef="EndEvent_19wiclb" />
+      <bpmn:exclusiveGateway id="ExclusiveGateway_0fofy8h">
+        <bpmn:incoming>SequenceFlow_02noohs</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_02hvc3v</bpmn:outgoing>
+        <bpmn:outgoing>SequenceFlow_0naabt8</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="SequenceFlow_02hvc3v" sourceRef="ExclusiveGateway_0fofy8h" targetRef="UserTask_0pdqhnx">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${httpCode != 401}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="SequenceFlow_0naabt8" sourceRef="ExclusiveGateway_0fofy8h" targetRef="Task_1atrp8f">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${httpCode == 401}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:serviceTask id="Task_1atrp8f" name="Refresh Token">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="url">
+                <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_keycloack');
+url_tb+'/realms/Protectline/protocol/openid-connect/token'</camunda:script>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="content-type">application/x-www-form-urlencoded</camunda:entry>
+                  <camunda:entry key="Accept">application/json</camunda:entry>
+                  <camunda:entry key="authorization">Basic ${basicToken}</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+              <camunda:outputParameter name="Output_1b9kukr">
+                <camunda:script scriptFormat="JavaScript">obj = JSON.parse(connector.getVariable('response'));
+var execution = connector.getParentVariableScope();
+execution.setVariable('token',obj.access_token);</camunda:script>
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_0naabt8</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1oka6jq</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1oka6jq" sourceRef="Task_1atrp8f" targetRef="ScriptTask_1k0uuxl" />
+    </bpmn:subProcess>
+    <bpmn:serviceTask id="ServiceTask_1a1r9y3" name="Get keycloak token">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_keycloack');
+url_tb+'/realms/Protectline/protocol/openid-connect/token'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="content-type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="authorization">Basic ${basicToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+            <camunda:outputParameter name="Output_1tcqe5d">
+              <camunda:script scriptFormat="JavaScript">obj = JSON.parse(connector.getVariable('response'));
+var execution = connector.getParentVariableScope();
+execution.setVariable('token',obj.access_token);</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1hs7whr</bpmn:incoming>
+      <bpmn:outgoing>Flow_013nhm5</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:callActivity id="Activity_05m151g" name="Processus recall 1 Prospect" calledElement="ProspectRecall">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_14hx7hi</bpmn:incoming>
+      <bpmn:outgoing>Flow_133r1tk</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_013nhm5" sourceRef="ServiceTask_1a1r9y3" targetRef="ServiceTask_1sk19ng" />
+    <bpmn:callActivity id="Activity_1xjz82f" name="Processus recall send quote" calledElement="ProspectRecallSendQuote">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1a0foz8</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o5j031</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="Activity_1ywtqvc" name="Processus recall send contract" calledElement="ProspectRecallSendContract">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_08xwggp</bpmn:incoming>
+      <bpmn:incoming>Flow_0leu5q7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1omhugt</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="Gateway_1ha211n">
+      <bpmn:incoming>Flow_1o4tdch</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a0foz8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0leu5q7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0igfpnq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1b8mmnn</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_133r1tk" sourceRef="Activity_05m151g" targetRef="Gateway_0howjmp" />
+    <bpmn:sequenceFlow id="Flow_1a0foz8" name="quote send" sourceRef="Gateway_1ha211n" targetRef="Activity_1xjz82f">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'QUOTESEND'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1o5j031" sourceRef="Activity_1xjz82f" targetRef="Gateway_1tpkm2o" />
+    <bpmn:sequenceFlow id="Flow_08xwggp" name="contract send" sourceRef="Gateway_01ymoqh" targetRef="Activity_1ywtqvc">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'CONTRACTSEND'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1omhugt" sourceRef="Activity_1ywtqvc" targetRef="Gateway_17ubuwb" />
+    <bpmn:sequenceFlow id="Flow_0i1qohi" name="contract signed" sourceRef="Gateway_0my7nmk" targetRef="Activity_0c7u60t">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'CONTRACTSIGNED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0leu5q7" name="contract send" sourceRef="Gateway_1ha211n" targetRef="Activity_1ywtqvc">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'CONTRACTSEND'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_0f2foca">
+      <bpmn:incoming>Flow_1h7wcm2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_01ymoqh">
+      <bpmn:incoming>Flow_0td50na</bpmn:incoming>
+      <bpmn:incoming>Flow_15vcxhn</bpmn:incoming>
+      <bpmn:outgoing>Flow_08xwggp</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1tnwxuo</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0zt0ufr</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_0my7nmk">
+      <bpmn:incoming>Flow_1j0fiv7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0i1qohi</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ocjw2h</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1inuiiy</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0vsvuwr</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_0kjetbx" name="Add activity PROSPECT_CREATED">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospectCode');
+
+url_tb+'/api/prospect/v1/camunda/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">'{"activityName":"PROSPECT_CREATED"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0lg5jyq</bpmn:incoming>
+      <bpmn:outgoing>Flow_14hx7hi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_14hx7hi" sourceRef="Activity_0kjetbx" targetRef="Activity_05m151g" />
+    <bpmn:serviceTask id="Activity_0c7u60t" name="Set status Prospect to CONTRACTSEND">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode = execution.getVariable('prospectCode');
+var pipelineCode = execution.getVariable('leadPipelineCode');
+
+url_tb+'/api/prospect/v1/pipeline/' + pipelineCode + '/leadProspect/' + prospectCode + '/step/CONTRACTSIGNED'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0i1qohi</bpmn:incoming>
+      <bpmn:outgoing>Flow_1h7wcm2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1h7wcm2" sourceRef="Activity_0c7u60t" targetRef="Event_0f2foca" />
+    <bpmn:receiveTask id="Activity_1jih7ug" name="Waiting event activity" messageRef="Message_3ek4d9u">
+      <bpmn:incoming>Flow_0ocjw2h</bpmn:incoming>
+      <bpmn:outgoing>Flow_15vcxhn</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:sequenceFlow id="Flow_0ocjw2h" name="Signature canceled" sourceRef="Gateway_0my7nmk" targetRef="Activity_1jih7ug">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'SIGNATURE_CANCELED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_15vcxhn" sourceRef="Activity_1jih7ug" targetRef="Gateway_01ymoqh" />
+    <bpmn:endEvent id="Event_17qayhn">
+      <bpmn:incoming>Flow_1iwdqd3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0zt0ufr" name="contacted || unreachable" sourceRef="Gateway_01ymoqh" targetRef="Activity_1fawf1y">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'CONTACTED' || activityEvent == 'UNREACHABLE'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1tnwxuo" name="denied" sourceRef="Gateway_01ymoqh" targetRef="Gateway_1bgymwa">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'DENIED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1inuiiy" name="denied" sourceRef="Gateway_0my7nmk" targetRef="Gateway_1bgymwa">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'DENIED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:callActivity id="Activity_1fawf1y" name="Processus recall loop" calledElement="ProspectRecallLoop">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zt0ufr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wzswa3</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0wzswa3" sourceRef="Activity_1fawf1y" targetRef="Gateway_1tpkm2o" />
+    <bpmn:sequenceFlow id="Flow_0igfpnq" name="denied" sourceRef="Gateway_1ha211n" targetRef="Gateway_1bgymwa">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'DENIED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:callActivity id="Activity_0prrcfe" name="Processus recall loop" calledElement="ProspectRecallLoop">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0vsvuwr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rbmni5</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0vsvuwr" name="contacted || unreachable" sourceRef="Gateway_0my7nmk" targetRef="Activity_0prrcfe">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'CONTACTED' || activityEvent == 'UNREACHABLE'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0rbmni5" sourceRef="Activity_0prrcfe" targetRef="Gateway_17ubuwb" />
+    <bpmn:exclusiveGateway id="Gateway_1tpkm2o">
+      <bpmn:incoming>Flow_1o5j031</bpmn:incoming>
+      <bpmn:incoming>Flow_0wzswa3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0td50na</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0td50na" sourceRef="Gateway_1tpkm2o" targetRef="Gateway_01ymoqh" />
+    <bpmn:exclusiveGateway id="Gateway_17ubuwb">
+      <bpmn:incoming>Flow_1omhugt</bpmn:incoming>
+      <bpmn:incoming>Flow_0rbmni5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1j0fiv7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1j0fiv7" sourceRef="Gateway_17ubuwb" targetRef="Gateway_0my7nmk" />
+    <bpmn:exclusiveGateway id="Gateway_0howjmp">
+      <bpmn:incoming>Flow_133r1tk</bpmn:incoming>
+      <bpmn:incoming>Flow_111ybqf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o4tdch</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1o4tdch" sourceRef="Gateway_0howjmp" targetRef="Gateway_1ha211n" />
+    <bpmn:callActivity id="Activity_0omecoq" name="Processus recall loop" calledElement="ProspectRecallLoop">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1b8mmnn</bpmn:incoming>
+      <bpmn:outgoing>Flow_111ybqf</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1b8mmnn" name="contacted || unreachable" sourceRef="Gateway_1ha211n" targetRef="Activity_0omecoq">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${activityEvent == 'CONTACTED' || activityEvent == 'UNREACHABLE'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_111ybqf" sourceRef="Activity_0omecoq" targetRef="Gateway_0howjmp" />
+    <bpmn:serviceTask id="Activity_0plf6ln" name="Add activity ARCHIVED">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode= execution.getVariable('prospectCode');
+
+url_tb+'/api/prospect/v1/camunda/prospect/' + prospectCode + '/activity'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var activityComment = execution.getVariable('activityComment');
+JSON.stringify({
+  activityName: "ARCHIVED",
+  comment: activityComment || null
+});
+</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06ssfge</bpmn:incoming>
+      <bpmn:outgoing>Flow_1l77os9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0tw9z2q" name="Set status Prospect to Archive">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_prospect');
+var prospectCode = execution.getVariable('prospectCode');
+var pipelineCode = execution.getVariable('leadPipelineCode');
+
+url_tb+'/api/prospect/v1/pipeline/' + pipelineCode + '/leadProspect/' + prospectCode + '/step/DENIED'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">PUT</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_2b2lk51">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1l77os9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1iwdqd3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1l77os9" sourceRef="Activity_0plf6ln" targetRef="Activity_0tw9z2q" />
+    <bpmn:sequenceFlow id="Flow_1iwdqd3" sourceRef="Activity_0tw9z2q" targetRef="Event_17qayhn" />
+    <bpmn:exclusiveGateway id="Gateway_1bgymwa">
+      <bpmn:incoming>Flow_1tnwxuo</bpmn:incoming>
+      <bpmn:incoming>Flow_0igfpnq</bpmn:incoming>
+      <bpmn:incoming>Flow_1inuiiy</bpmn:incoming>
+      <bpmn:outgoing>Flow_06ssfge</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_06ssfge" sourceRef="Gateway_1bgymwa" targetRef="Activity_0plf6ln" />
+    <bpmn:serviceTask id="ServiceTask_1sk19ng" name="Send SMS Prospect_Recall">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="JavaScript">var url_tb= execution.getVariable('url_crm_notifications');
+url_tb+'/api/v1/notifications/sms/prospectRecall'</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                <camunda:entry key="authorization">Bearer ${token}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="JavaScript">var prospect = S(execution.getVariable('prospect'));
+var seller = prospect.prop("parentSeller").value();
+var customerCategory = prospect.prop("customerCategory").value();
+var mobile = prospect.prop("mobile").value();
+
+'{"mobile":"' + mobile + '"' +
+',"customerCategory":"' + customerCategory +'"' +
+',"seller":"' + seller +'"}';</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_0uu921g">
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+var activityId = execution.getCurrentActivityId();
+var activityName = execution.getCurrentActivityName();
+
+print(activityName);
+var resp = connector.getVariable('response');
+print(activityName + ' ' + resp);
+
+var respStatusCode = connector.getVariable('statusCode')
+print(respStatusCode );
+
+if ( respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+ print('no error');
+
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"SUCCESS")
+execution.setVariable('responseMessage',response)
+} else {
+execution.setVariable('httpCode',respStatusCode);
+execution.setVariable('state',"FAIL")
+execution.setVariable('responseMessage',response);
+/*solve incident if exist*/
+print('incientId : '+execution.getVariable('incidentId'));
+if (execution.getVariable('incidentId')!=null)
+{
+execution.getProcessEngineServices().getRuntimeService().createIncidentQuery().incidentId(execution.getVariable('incidentId')).singleResult().resolve();
+execution.setVariable('incidentId',null);
+}
+/* end solving incident*/
+/* create incident*/
+
+var IncidentEntity  = Java.type('org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity');
+	var IncidentContext = Java.type('org.camunda.bpm.engine.impl.incident.IncidentContext');
+	var context = new IncidentContext();
+  var parentScope = connector.getParentVariableScope()
+	context.setActivityId(parentScope.getCurrentActivityId());
+	context.setExecutionId(parentScope.getProcessInstanceId());
+	context.setProcessDefinitionId(parentScope.getProcessDefinitionId());
+	var newIncident  = IncidentEntity.createAndInsertIncident("Api Fail", context, response);
+	newIncident.getId()
+execution.setVariable('incidentId',newIncident.getId());
+print('incientId'+newIncident.getId());
+/*end create incident*/
+throw new org.camunda.bpm.engine.delegate.BpmnError('CheckError',activityId);
+}</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_013nhm5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lg5jyq</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0lg5jyq" sourceRef="ServiceTask_1sk19ng" targetRef="Activity_0kjetbx" />
+    <bpmn:textAnnotation id="TextAnnotation_0eyybrb">
+      <bpmn:text>Archive le prospect</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1pg1pxv" sourceRef="Activity_0tw9z2q" targetRef="TextAnnotation_0eyybrb" />
+  </bpmn:process>
+  <bpmn:message id="Message_14f2kp4" name="salePipeline" />
+  <bpmn:message id="Message_0bht3g0" name="planifProcessReturn" />
+  <bpmn:error id="Error_0a8hc3i" name="Error_27erg8r" />
+  <bpmn:message id="Message_1g82wb4" name="installProcessReturn" />
+  <bpmn:message id="Message_16vz4vj" name="reassignmentAndCommentTicketCodeCloture47MessageQa" />
+  <bpmn:message id="Message_12cd20s" name="reassignmentAndCommentTicketMessage" />
+  <bpmn:message id="Message_2uj5if9" name="activityEvent" />
+  <bpmn:message id="Message_3ek4d9u" name="activityEvent" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SalePipeline">
+      <bpmndi:BPMNEdge id="Flow_0lg5jyq_di" bpmnElement="Flow_0lg5jyq">
+        <di:waypoint x="470" y="280" />
+        <di:waypoint x="500" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06ssfge_di" bpmnElement="Flow_06ssfge">
+        <di:waypoint x="1530" y="505" />
+        <di:waypoint x="1530" y="600" />
+        <di:waypoint x="1620" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iwdqd3_di" bpmnElement="Flow_1iwdqd3">
+        <di:waypoint x="1920" y="600" />
+        <di:waypoint x="2012" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1l77os9_di" bpmnElement="Flow_1l77os9">
+        <di:waypoint x="1720" y="600" />
+        <di:waypoint x="1820" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_111ybqf_di" bpmnElement="Flow_111ybqf">
+        <di:waypoint x="910" y="160" />
+        <di:waypoint x="860" y="160" />
+        <di:waypoint x="860" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b8mmnn_di" bpmnElement="Flow_1b8mmnn">
+        <di:waypoint x="1060" y="265" />
+        <di:waypoint x="1060" y="160" />
+        <di:waypoint x="1010" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="989" y="226" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o4tdch_di" bpmnElement="Flow_1o4tdch">
+        <di:waypoint x="885" y="280" />
+        <di:waypoint x="1045" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j0fiv7_di" bpmnElement="Flow_1j0fiv7">
+        <di:waypoint x="1935" y="280" />
+        <di:waypoint x="2120" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0td50na_di" bpmnElement="Flow_0td50na">
+        <di:waypoint x="1355" y="280" />
+        <di:waypoint x="1515" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rbmni5_di" bpmnElement="Flow_0rbmni5">
+        <di:waypoint x="1950" y="160" />
+        <di:waypoint x="1910" y="160" />
+        <di:waypoint x="1910" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vsvuwr_di" bpmnElement="Flow_0vsvuwr">
+        <di:waypoint x="2130" y="270" />
+        <di:waypoint x="2130" y="162" />
+        <di:waypoint x="2050" y="162" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2059" y="176" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0igfpnq_di" bpmnElement="Flow_0igfpnq">
+        <di:waypoint x="1070" y="305" />
+        <di:waypoint x="1070" y="480" />
+        <di:waypoint x="1505" y="480" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1073" y="323" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wzswa3_di" bpmnElement="Flow_0wzswa3">
+        <di:waypoint x="1370" y="160" />
+        <di:waypoint x="1330" y="160" />
+        <di:waypoint x="1330" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1inuiiy_di" bpmnElement="Flow_1inuiiy">
+        <di:waypoint x="2160" y="290" />
+        <di:waypoint x="2160" y="480" />
+        <di:waypoint x="1555" y="480" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2113" y="453" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tnwxuo_di" bpmnElement="Flow_1tnwxuo">
+        <di:waypoint x="1530" y="295" />
+        <di:waypoint x="1530" y="455" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1493" y="323" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zt0ufr_di" bpmnElement="Flow_0zt0ufr">
+        <di:waypoint x="1540" y="255" />
+        <di:waypoint x="1540" y="160" />
+        <di:waypoint x="1470" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1550" y="215" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15vcxhn_di" bpmnElement="Flow_15vcxhn">
+        <di:waypoint x="1800" y="394" />
+        <di:waypoint x="1550" y="394" />
+        <di:waypoint x="1550" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ocjw2h_di" bpmnElement="Flow_0ocjw2h">
+        <di:waypoint x="2145" y="305" />
+        <di:waypoint x="2145" y="394" />
+        <di:waypoint x="1900" y="394" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2096" y="316" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1h7wcm2_di" bpmnElement="Flow_1h7wcm2">
+        <di:waypoint x="2400" y="280" />
+        <di:waypoint x="2452" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14hx7hi_di" bpmnElement="Flow_14hx7hi">
+        <di:waypoint x="600" y="280" />
+        <di:waypoint x="650" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0leu5q7_di" bpmnElement="Flow_0leu5q7">
+        <di:waypoint x="1080" y="265" />
+        <di:waypoint x="1080" y="90" />
+        <di:waypoint x="1760" y="90" />
+        <di:waypoint x="1760" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1100" y="63" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0i1qohi_di" bpmnElement="Flow_0i1qohi">
+        <di:waypoint x="2170" y="280" />
+        <di:waypoint x="2300" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2192" y="262" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1omhugt_di" bpmnElement="Flow_1omhugt">
+        <di:waypoint x="1810" y="280" />
+        <di:waypoint x="1885" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08xwggp_di" bpmnElement="Flow_08xwggp">
+        <di:waypoint x="1565" y="280" />
+        <di:waypoint x="1710" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1563" y="262" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o5j031_di" bpmnElement="Flow_1o5j031">
+        <di:waypoint x="1280" y="280" />
+        <di:waypoint x="1305" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a0foz8_di" bpmnElement="Flow_1a0foz8">
+        <di:waypoint x="1095" y="280" />
+        <di:waypoint x="1180" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1111" y="262" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_133r1tk_di" bpmnElement="Flow_133r1tk">
+        <di:waypoint x="750" y="280" />
+        <di:waypoint x="835" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_013nhm5_di" bpmnElement="Flow_013nhm5">
+        <di:waypoint x="340" y="280" />
+        <di:waypoint x="370" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hs7whr_di" bpmnElement="Flow_1hs7whr">
+        <di:waypoint x="188" y="280" />
+        <di:waypoint x="240" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1k1ifhk_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="262" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_085n162_di" bpmnElement="SubProcess_085n162" isExpanded="true">
+        <dc:Bounds x="880" y="750" width="740" height="363" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1oka6jq_di" bpmnElement="SequenceFlow_1oka6jq">
+        <di:waypoint x="1231" y="1046" />
+        <di:waypoint x="1431" y="1046" />
+        <di:waypoint x="1431" y="971" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0naabt8_di" bpmnElement="SequenceFlow_0naabt8">
+        <di:waypoint x="1031" y="956" />
+        <di:waypoint x="1031" y="1046" />
+        <di:waypoint x="1131" y="1046" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_02hvc3v_di" bpmnElement="SequenceFlow_02hvc3v">
+        <di:waypoint x="1056" y="931" />
+        <di:waypoint x="1131" y="931" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0jg7ptp_di" bpmnElement="SequenceFlow_0jg7ptp">
+        <di:waypoint x="1481" y="931" />
+        <di:waypoint x="1553" y="931" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1kqhl73_di" bpmnElement="SequenceFlow_1kqhl73">
+        <di:waypoint x="1231" y="931" />
+        <di:waypoint x="1381" y="931" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_02noohs_di" bpmnElement="SequenceFlow_02noohs">
+        <di:waypoint x="949" y="931" />
+        <di:waypoint x="1006" y="931" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_03idx0z_di" bpmnElement="StartEvent_03idx0z">
+        <dc:Bounds x="913" y="913" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0pdqhnx_di" bpmnElement="UserTask_0pdqhnx">
+        <dc:Bounds x="1131" y="891" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_19wiclb_di" bpmnElement="EndEvent_19wiclb">
+        <dc:Bounds x="1553" y="913" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_1k0uuxl_di" bpmnElement="ScriptTask_1k0uuxl">
+        <dc:Bounds x="1381" y="891" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0fofy8h_di" bpmnElement="ExclusiveGateway_0fofy8h" isMarkerVisible="true">
+        <dc:Bounds x="1006" y="906" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1sp384m_di" bpmnElement="Task_1atrp8f">
+        <dc:Bounds x="1131" y="1006" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1a1r9y3_di" bpmnElement="ServiceTask_1a1r9y3">
+        <dc:Bounds x="240" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00fu9yb_di" bpmnElement="Activity_05m151g">
+        <dc:Bounds x="650" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1dt2gx4" bpmnElement="Activity_1xjz82f">
+        <dc:Bounds x="1180" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_09k4xan" bpmnElement="Activity_1ywtqvc">
+        <dc:Bounds x="1710" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ha211n_di" bpmnElement="Gateway_1ha211n" isMarkerVisible="true">
+        <dc:Bounds x="1045" y="255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1kfpe0k_di" bpmnElement="Event_0f2foca">
+        <dc:Bounds x="2452" y="262" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_01ymoqh_di" bpmnElement="Gateway_01ymoqh" isMarkerVisible="true">
+        <dc:Bounds x="1515" y="255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0my7nmk_di" bpmnElement="Gateway_0my7nmk" isMarkerVisible="true">
+        <dc:Bounds x="2120" y="255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_150mj2b" bpmnElement="Activity_0kjetbx">
+        <dc:Bounds x="500" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1gvq1lx" bpmnElement="Activity_0c7u60t">
+        <dc:Bounds x="2300" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0bkoeuw" bpmnElement="Activity_1jih7ug">
+        <dc:Bounds x="1800" y="354" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17qayhn_di" bpmnElement="Event_17qayhn">
+        <dc:Bounds x="2012" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0nqeoqy" bpmnElement="Activity_1fawf1y">
+        <dc:Bounds x="1370" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0fl5sis" bpmnElement="Activity_0prrcfe">
+        <dc:Bounds x="1950" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1tpkm2o_di" bpmnElement="Gateway_1tpkm2o" isMarkerVisible="true">
+        <dc:Bounds x="1305" y="255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_17ubuwb_di" bpmnElement="Gateway_17ubuwb" isMarkerVisible="true">
+        <dc:Bounds x="1885" y="255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0howjmp_di" bpmnElement="Gateway_0howjmp" isMarkerVisible="true">
+        <dc:Bounds x="835" y="255" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0grluhl" bpmnElement="Activity_0omecoq">
+        <dc:Bounds x="910" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1h4wzqh" bpmnElement="Activity_0plf6ln">
+        <dc:Bounds x="1620" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_02fnuv1" bpmnElement="Activity_0tw9z2q">
+        <dc:Bounds x="1820" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1bgymwa_di" bpmnElement="Gateway_1bgymwa" isMarkerVisible="true">
+        <dc:Bounds x="1505" y="455" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1sk19ng_di" bpmnElement="ServiceTask_1sk19ng">
+        <dc:Bounds x="370" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0eyybrb_di" bpmnElement="TextAnnotation_0eyybrb">
+        <dc:Bounds x="1850" y="700" width="150" height="27" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1pg1pxv_di" bpmnElement="Association_1pg1pxv">
+        <di:waypoint x="1906" y="640" />
+        <di:waypoint x="1918" y="700" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

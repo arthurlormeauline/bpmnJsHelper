@@ -1,0 +1,1541 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Camunda Modeler" exporterVersion="5.33.1" expressionLanguage="http://www.w3.org/1999/XPath" id="Definitions_0ql66o2" targetNamespace="http://bpmn.io/schema/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema">
+    
+  <bpmn:error id="Error_0j5ifb1"/>
+    
+  <bpmn:error errorCode="errorPatch" id="Error_1q2j438" name="errorPatch"/>
+    
+  <bpmn:error id="Error_1h32sh3" name="Error_181l3vi"/>
+    
+  <bpmn:process camunda:versionTag="tus.prc.actionCombine_0.2.4" id="tus.prc.actionCombine" isClosed="false" isExecutable="true" name="tus.prc.actionCombine" processType="None">
+        
+    <bpmn:exclusiveGateway gatewayDirection="Unspecified" id="Gateway_0hjhvq1">
+            
+      <bpmn:incoming>Flow_02bokxp</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_0pb3yu8</bpmn:outgoing>
+            
+      <bpmn:outgoing>Flow_0ebq08j</bpmn:outgoing>
+          
+    </bpmn:exclusiveGateway>
+        
+    <bpmn:intermediateCatchEvent id="Event_04bifcz" parallelMultiple="false">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:inputOutput>
+                    
+          <camunda:outputParameter name="Output_1knffci">
+                        
+            <camunda:script scriptFormat="Javascript">var duration = execution.getVariable("duration");
+print("Break for retry deactivate Sercomm : " + duration);</camunda:script>
+                      
+          </camunda:outputParameter>
+                  
+        </camunda:inputOutput>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_1fi3t3s</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_1200nhf</bpmn:outgoing>
+            
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1neeyiq">
+                
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${duration}</bpmn:timeDuration>
+              
+      </bpmn:timerEventDefinition>
+          
+    </bpmn:intermediateCatchEvent>
+        
+    <bpmn:sequenceFlow id="Flow_1200nhf" sourceRef="Event_04bifcz" targetRef="Gateway_1hvqbqt"/>
+        
+    <bpmn:serviceTask completionQuantity="1" id="Activity_17sgb2x" implementation="##WebService" isForCompensation="false" name="Désactivation caméra" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">
+                            
+              <camunda:script scriptFormat="JavaScript">var url_device = execution.getVariable('url_device');
+        var cameraId = execution.getVariable('constructorId');
+        execution.setVariable('status', 'inactive');
+        print('status of sercomm : ' + status);
+        print('mac sercomm ' + cameraId);
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        print(time);
+
+        url_device + 'gateways/' + cameraId + '/state?mode=total&amp;status=' + status;</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">PATCH</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                                
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                                
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="deviceRS">
+                            
+              <camunda:script scriptFormat="JavaScript">/* get activity id from parent*/
+        var execution = connector.getParentVariableScope();
+        var activityId = execution.getCurrentActivityId();
+        /*end get activity id from parent*/
+
+        var resp = connector.getVariable('response');
+        print('update camera Sercomm state to inactive : ' + resp);
+        var respStatusCode = connector.getVariable('statusCode');
+        print(respStatusCode);
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        print(time);
+
+        if (respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+            execution.setVariable('httpCodeDevice', respStatusCode);
+            execution.setVariable('stateDevice', "SUCCESS");
+            execution.setVariable('deviceObject', response);
+            var obj = JSON.parse(response);
+        } else {
+            execution.setVariable('httpCodeDevice', respStatusCode);
+            print("Error to patch state");
+        }</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_0pb3yu8</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_1ph7c3g</bpmn:outgoing>
+            
+      <bpmn:outgoing>Flow_1fi3t3s</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_1ph7c3g" sourceRef="Activity_17sgb2x" targetRef="Event_0tb6exc">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${httpCodeDevice==200}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:sequenceFlow id="Flow_1fi3t3s" sourceRef="Activity_17sgb2x" targetRef="Event_04bifcz">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${httpCodeDevice!=200}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:sequenceFlow id="Flow_0pb3yu8" sourceRef="Gateway_0hjhvq1" targetRef="Activity_17sgb2x">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('nbRetry')&lt;=3}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:exclusiveGateway default="Flow_15rg1p0" gatewayDirection="Unspecified" id="Gateway_1hvqbqt">
+            
+      <bpmn:incoming>Flow_inactive</bpmn:incoming>
+            
+      <bpmn:incoming>Flow_1200nhf</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_15rg1p0</bpmn:outgoing>
+          
+    </bpmn:exclusiveGateway>
+        
+    <bpmn:sequenceFlow id="Flow_15rg1p0" sourceRef="Gateway_1hvqbqt" targetRef="Activity_1n45qfs"/>
+        
+    <bpmn:scriptTask completionQuantity="1" id="Activity_1n45qfs" isForCompensation="false" name="increment retries" scriptFormat="JavaScript" startQuantity="1">
+            
+      <bpmn:incoming>Flow_15rg1p0</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_02bokxp</bpmn:outgoing>
+            
+      <bpmn:script>var nbRetry = execution.getVariable("nbRetry");
+        if (nbRetry != null) {
+            nbRetry = nbRetry + 1;
+        } else {
+            nbRetry = 0;
+        }
+        var duration = null;
+        switch (nbRetry) {
+            case 0:
+                duration = "PT0S";
+                break;
+            case 1:
+                duration = "PT15S";
+                break;
+            case 2:
+                duration = "PT1M";
+                break;
+            case 3:
+                duration = "PT2M"
+                break;
+        }
+        execution.setVariable("status", "inactive");
+        execution.setVariable("duration", duration);
+        execution.setVariable("nbRetry", nbRetry);
+        print("Retry number : " + nbRetry)</bpmn:script>
+          
+    </bpmn:scriptTask>
+        
+    <bpmn:sequenceFlow id="Flow_02bokxp" sourceRef="Activity_1n45qfs" targetRef="Gateway_0hjhvq1"/>
+        
+    <bpmn:serviceTask completionQuantity="1" id="sendPush" implementation="##WebService" isForCompensation="false" name="Send push " startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">
+                            
+              <camunda:script scriptFormat="JavaScript">print("Send push when error to patch camera");
+
+        function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r &amp; 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        var deviceId = execution.getVariable('constructorId');
+        var supplier = execution.getVariable('supplier');
+        var customerId = execution.getVariable('customerId');
+        var dateTimeGateway = execution.getVariable('dateTimeGateway');
+        var location = execution.getVariable('location');
+        var url = execution.getVariable('url_notif');
+        var deviceType = execution.getVariable('deviceType');
+        var status = execution.getVariable('status');
+        if (status == "active") {
+            execution.setVariable("typePush", "Activation");
+        } else {
+            execution.setVariable("typePush", "Désactivation");
+        }
+        var obj = {
+            metadata: {
+                messageId: uuidv4(),
+                callerId: "teamUsages.camunda",
+                messageType: "POST"
+            },
+            supplier: supplier,
+            customerId: customerId,
+            push: {
+                eventType: "usagesErreur",
+                event: {
+                    gatewayId: deviceId,
+                    deviceId: deviceId,
+                    dateTimeGateway: dateTimeGateway,
+                    type: execution.getVariable("typePush"),
+                    label: "appearance",
+                    location: location,
+                    deviceType: deviceType
+                }
+            }
+        }
+
+        var json = JSON.stringify(obj);
+        print(json);
+        execution.setVariable("json", json);
+
+        url + '/pushNotifs';</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                                
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                                
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="payload">${json}</camunda:inputParameter>
+                        
+            <camunda:outputParameter name="codeResponse">
+                            
+              <camunda:script scriptFormat="JavaScript">statusCode;</camunda:script>
+                          
+            </camunda:outputParameter>
+                        
+            <camunda:outputParameter name="SendPushNotif">
+                            
+              <camunda:script scriptFormat="JavaScript">var execution = connector.getParentVariableScope();
+        if (statusCode != 200) {
+            print("Push KO");
+        } else {
+            execution.setVariable('stateSendNotif', "SUCCESS");
+            print("Push OK");
+        }</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_1ebsjik</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_17ro9no</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_17ro9no" sourceRef="sendPush" targetRef="Event_162s1xy"/>
+        
+    <bpmn:sequenceFlow id="Flow_0ebq08j" sourceRef="Gateway_0hjhvq1" targetRef="Activity_1cpocdy">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('nbRetry')&gt;3}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:exclusiveGateway default="Other_cas_status_crow" gatewayDirection="Unspecified" id="Status_crow" name="Status de la crow">
+            
+      <bpmn:incoming>Flow_0yj4m2y</bpmn:incoming>
+            
+      <bpmn:outgoing>Other_cas_status_crow</bpmn:outgoing>
+            
+      <bpmn:outgoing>Flow_inactive2</bpmn:outgoing>
+            
+      <bpmn:outgoing>Flow_active2</bpmn:outgoing>
+          
+    </bpmn:exclusiveGateway>
+        
+    <bpmn:sequenceFlow id="Other_cas_status_crow" name="Autre cas" sourceRef="Status_crow" targetRef="Gateway_1mnisi5"/>
+        
+    <bpmn:sequenceFlow id="Flow_inactive2" name="inactive" sourceRef="Status_crow" targetRef="Event_04m3cny">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${status=="inactive"}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:serviceTask completionQuantity="1" id="get_state_crow_on_device" implementation="##WebService" isForCompensation="false" name="Get state" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">
+                            
+              <camunda:script scriptFormat="JavaScript">var cameraId = execution.getVariable("constructorId");
+        var customerId = execution.getVariable("customerId");
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        if (execution.getVariable("debug") === true) {
+            print("DEBUG FOR CUSTOMER : " + customerId + " AND CAMERA : " + cameraId + " TIME : " + time + " ... [" + "DELAY END" + "]");
+        } else {
+            print("DELAY END");
+
+        }
+
+        var url_device = execution.getVariable('url_device');
+        var cameraId = execution.getVariable('constructorId');
+        var crowId = execution.getVariable('crowGatewayId');
+        print("Get state");
+
+
+        url_device + 'gateways/' + crowId + '/state';</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                                
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                                
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="GetDeviceState">
+                            
+              <camunda:script scriptFormat="JavaScript">/* get activity id from parent*/
+        var execution = connector.getParentVariableScope();
+        var activityId = execution.getCurrentActivityId();
+        /*end get activity id from parent*/
+        var respStatusCode = connector.getVariable('statusCode');
+        print(respStatusCode);
+
+        if (respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+            var resp = connector.getVariable('response');
+            var obj = JSON.parse(resp);
+            print("get status " + obj.status);
+            execution.setVariable("status", obj.status);
+            print('get camera state : ' + response);
+
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            print(time);
+            execution.setVariable('httpCodeDevice', respStatusCode);
+            execution.setVariable('stateDevice', "SUCCESS");
+            execution.setVariable('deviceObject', response);
+            var obj = JSON.parse(response);
+        } else {
+            print("Get State fail");
+            execution.setVariable('httpCodeDevice', respStatusCode);
+            execution.setVariable('stateDevice', "FAIL");
+            execution.setVariable('deviceObject', null);
+        }</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_0tsncrr</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_0yj4m2y</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_0yj4m2y" sourceRef="get_state_crow_on_device" targetRef="Status_crow"/>
+        
+    <bpmn:exclusiveGateway gatewayDirection="Unspecified" id="ckeck_status_variable">
+            
+      <bpmn:incoming>Flow_17xa2p8</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_inactive</bpmn:outgoing>
+            
+      <bpmn:outgoing>Flow_active</bpmn:outgoing>
+          
+    </bpmn:exclusiveGateway>
+        
+    <bpmn:sequenceFlow id="Flow_inactive" name="Inactive" sourceRef="ckeck_status_variable" targetRef="Gateway_1hvqbqt">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('status')=="inactive"}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:startEvent id="Event_1u1d1qi" isInterrupting="true" parallelMultiple="false">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:executionListener event="start">
+                    
+          <camunda:script scriptFormat="JavaScript">var cameraId = execution.getVariable("constructorId");
+        var customerId = execution.getVariable("customerId");
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        if (execution.getVariable("debug") === true) {
+            print("DEBUG FOR CUSTOMER : " + customerId + " AND CAMERA : " + cameraId + " TIME : " + time + " ... [" + "Action combine : begin" + "]");
+        } else {
+            print("Action combine : begin");
+
+        }</camunda:script>
+                  
+        </camunda:executionListener>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:outgoing>Flow_17xa2p8</bpmn:outgoing>
+          
+    </bpmn:startEvent>
+        
+    <bpmn:sequenceFlow id="Flow_17xa2p8" sourceRef="Event_1u1d1qi" targetRef="ckeck_status_variable"/>
+        
+    <bpmn:sequenceFlow id="Flow_active2" name="active or ongoing" sourceRef="Status_crow" targetRef="Patch_state_camera">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${status=="active" || status=="ongoing"}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:serviceTask completionQuantity="1" id="Patch_state_camera" implementation="##WebService" isForCompensation="false" name="Patch camera state" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">
+                            
+              <camunda:script scriptFormat="JavaScript">var url_device = execution.getVariable('url_device');
+        var mode = execution.getVariable('mode');
+        var status = execution.getVariable('status');
+        if (status == "ongoing") {
+            status = "active";
+        }
+        var cameraId = execution.getVariable('constructorId');
+        print("Patch camera sate ; mode : " + mode + " status : " + status);
+
+
+        url_device + 'gateways/' + cameraId + '/state?mode=' + mode + '&amp;status=' + status;</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">PATCH</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                                
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                                
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="deviceRS">
+                            
+              <camunda:script scriptFormat="JavaScript">/* get activity id from parent*/
+        var execution = connector.getParentVariableScope();
+        var activityId = execution.getCurrentActivityId();
+        /*end get activity id from parent*/
+
+        var resp = connector.getVariable('response');
+
+
+        print('update camera state : ' + resp);
+        var respStatusCode = connector.getVariable('statusCode');
+        print(respStatusCode);
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        print(time);
+
+        if (respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+            print("Patch camera state SUCCESS");
+            execution.setVariable('httpCodeDevice', respStatusCode);
+            execution.setVariable('stateDevice', "SUCCESS");
+            execution.setVariable('deviceObject', response);
+            var obj = JSON.parse(response);
+        } else {
+            print("Patch camera state FAIL");
+            print("Error to patch state");
+            throw new org.camunda.bpm.engine.delegate.BpmnError("errorPatch");
+        }</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_active2</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_095x6ls</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_095x6ls" sourceRef="Patch_state_camera" targetRef="Event_0081z3j"/>
+        
+    <bpmn:boundaryEvent attachedToRef="Patch_state_camera" cancelActivity="true" id="errorPatch" parallelMultiple="false">
+            
+      <bpmn:outgoing>Flow_19way9d</bpmn:outgoing>
+            
+      <bpmn:errorEventDefinition errorRef="Error_1q2j438" id="ErrorEventDefinition_1pmmopi"/>
+          
+    </bpmn:boundaryEvent>
+        
+    <bpmn:sequenceFlow id="Flow_19way9d" sourceRef="errorPatch" targetRef="Activity_11um1do"/>
+        
+    <bpmn:exclusiveGateway default="Flow_0xp4n2k" gatewayDirection="Unspecified" id="Gateway_1mnisi5">
+            
+      <bpmn:incoming>Other_cas_status_crow</bpmn:incoming>
+            
+      <bpmn:incoming>Flow_067k84f</bpmn:incoming>
+            
+      <bpmn:incoming>Flow_12a0l4p</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_1ebsjik</bpmn:outgoing>
+            
+      <bpmn:outgoing>Flow_0xp4n2k</bpmn:outgoing>
+          
+    </bpmn:exclusiveGateway>
+        
+    <bpmn:sequenceFlow id="Flow_1ebsjik" name="Orange" sourceRef="Gateway_1mnisi5" targetRef="sendPush">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('supplier')=="orange"  &amp;&amp; (execution.getVariable('stateSendNotif') == null || execution.getVariable('stateSendNotif') != "SUCCESS")}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:sequenceFlow id="Flow_0xp4n2k" sourceRef="Gateway_1mnisi5" targetRef="Event_1ll7xfo"/>
+        
+    <bpmn:endEvent id="Event_04m3cny" name="Fin">
+            
+      <bpmn:extensionElements/>
+            
+      <bpmn:incoming>Flow_inactive2</bpmn:incoming>
+            
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0nosn9d"/>
+          
+    </bpmn:endEvent>
+        
+    <bpmn:endEvent id="Event_0081z3j" name="Fin">
+            
+      <bpmn:extensionElements/>
+            
+      <bpmn:incoming>Flow_095x6ls</bpmn:incoming>
+            
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_098mg3t"/>
+          
+    </bpmn:endEvent>
+        
+    <bpmn:endEvent id="Event_162s1xy" name="Fin">
+            
+      <bpmn:extensionElements/>
+            
+      <bpmn:incoming>Flow_17ro9no</bpmn:incoming>
+            
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_1judw4y"/>
+          
+    </bpmn:endEvent>
+        
+    <bpmn:endEvent id="Event_0tb6exc" name="Fin">
+            
+      <bpmn:extensionElements/>
+            
+      <bpmn:incoming>Flow_1ph7c3g</bpmn:incoming>
+            
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0rwvjgu"/>
+          
+    </bpmn:endEvent>
+        
+    <bpmn:endEvent id="Event_1ll7xfo" name="Fin">
+            
+      <bpmn:extensionElements/>
+            
+      <bpmn:incoming>Flow_0xp4n2k</bpmn:incoming>
+            
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0v66n9k"/>
+          
+    </bpmn:endEvent>
+        
+    <bpmn:intermediateCatchEvent id="Event_0e5d4ov" name="Delay" parallelMultiple="false">
+            
+      <bpmn:incoming>Flow_1jtxx9v</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_0tsncrr</bpmn:outgoing>
+            
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1szeab5">
+                
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">${duration}</bpmn:timeDuration>
+              
+      </bpmn:timerEventDefinition>
+          
+    </bpmn:intermediateCatchEvent>
+        
+    <bpmn:sequenceFlow id="Flow_0tsncrr" sourceRef="Event_0e5d4ov" targetRef="get_state_crow_on_device"/>
+        
+    <bpmn:serviceTask completionQuantity="1" id="Activity_1cpocdy" implementation="##WebService" isForCompensation="false" name="Get state" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">
+                            
+              <camunda:script scriptFormat="JavaScript">var url_device = execution.getVariable('url_device');
+        var cameraId = execution.getVariable('constructorId');
+        url_device + 'gateways/' + cameraId + '/state';</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                                
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                                
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="GetDeviceState">
+                            
+              <camunda:script scriptFormat="JavaScript">/* get activity id from parent*/
+        var execution = connector.getParentVariableScope();
+        var activityId = execution.getCurrentActivityId();
+        /*end get activity id from parent*/
+
+        var resp = connector.getVariable('response');
+        var respStatusCode = connector.getVariable('statusCode');
+        var cameraId = execution.getVariable('constructorId')
+        print("Get state " + cameraId + " respStatusCode " + resp);
+        var topic;
+        var obj = JSON.parse(resp);
+
+        if (respStatusCode == 200) {
+            topic = 'teamusages.notification.push.error.desactivation.200';
+        }
+        if (respStatusCode == 504 &amp;&amp; obj.errorCode == "50401") {
+            topic = 'teamusages.notification.push.error.desactivation.504';
+        }
+        if (respStatusCode == 504 &amp;&amp; obj.errorCode == "50404") {
+            topic = 'teamusages.notification.push.error.desactivation.500';
+        }
+        if (respStatusCode == 500) {
+            topic = 'teamusages.notification.push.error.desactivation.500';
+        }
+        execution.setVariable('bodyMessage', resp);
+        execution.setVariable('topic', topic);</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_0ebq08j</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_1b9nbhg</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_1b9nbhg" sourceRef="Activity_1cpocdy" targetRef="Activity_1bfakjk"/>
+        
+    <bpmn:serviceTask completionQuantity="1" id="Activity_1bfakjk" implementation="##WebService" isForCompensation="false" name="Send message Kafka" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">${url_kafka_util}/api/sendMessage?topic=${topic}&amp;header=false&amp;key=${constructorId}</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="payload">
+                            
+              <camunda:script scriptFormat="Javascript">'{"response": "' + execution.getVariable('bodyMessage') + '"}'</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="response send message kafka to TLS">
+                            
+              <camunda:script scriptFormat="JavaScript">var resp = connector.getVariable('response')
+        var respStatusCode = connector.getVariable('statusCode')
+        print("Response status api send message kafka to TLS: " + respStatusCode + " " + resp);</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_1b9nbhg</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_067k84f</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_067k84f" sourceRef="Activity_1bfakjk" targetRef="Gateway_1mnisi5"/>
+        
+    <bpmn:serviceTask completionQuantity="1" id="Activity_11um1do" implementation="##WebService" isForCompensation="false" name="Send message Kafka" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">${url_kafka_util}/api/sendMessage?topic=teamusages.notification.push.error.activation&amp;header=false&amp;key=${constructorId}</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="content-type">application/json</camunda:entry>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="payload">
+                            
+              <camunda:script scriptFormat="Javascript">'{"gatewayId": "' + execution.getVariable('constructorId') + '"}'</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="response send message kafka to TLS">
+                            
+              <camunda:script scriptFormat="JavaScript">var resp = connector.getVariable('response')
+        var respStatusCode = connector.getVariable('statusCode')
+        print("Response status api send message kafka to TLS: " + respStatusCode + " " + resp);</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_19way9d</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_12a0l4p</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:sequenceFlow id="Flow_12a0l4p" sourceRef="Activity_11um1do" targetRef="Gateway_1mnisi5"/>
+        
+    <bpmn:sequenceFlow id="Flow_active" name="active" sourceRef="ckeck_status_variable" targetRef="Activity_0rwauzg">
+            
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('status')=="active"}</bpmn:conditionExpression>
+          
+    </bpmn:sequenceFlow>
+        
+    <bpmn:serviceTask completionQuantity="1" id="Activity_0rwauzg" implementation="##WebService" isForCompensation="false" name="Get device by name" startQuantity="1">
+            
+      <bpmn:extensionElements>
+                
+        <camunda:connector>
+                    
+          <camunda:inputOutput>
+                        
+            <camunda:inputParameter name="url">
+                            
+              <camunda:script scriptFormat="JavaScript">var tbFacade_url = execution.getVariable('url_tbFacade');
+        var deviceName = execution.getVariable("constructorId");
+
+        print("Get device with name: ");
+
+        tbFacade_url + '/api/device/' + deviceName;</camunda:script>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+                        
+            <camunda:inputParameter name="headers">
+                            
+              <camunda:map>
+                                
+                <camunda:entry key="accept">application/json</camunda:entry>
+                                
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                                
+                <camunda:entry key="Authorization">${token}</camunda:entry>
+                              
+              </camunda:map>
+                          
+            </camunda:inputParameter>
+                        
+            <camunda:outputParameter name="GetDeviceState">
+                            
+              <camunda:script scriptFormat="JavaScript">/* get activity id from parent*/
+        var execution = connector.getParentVariableScope();
+        var activityId = execution.getCurrentActivityId();
+        /*end get activity id from parent*/
+        var respStatusCode = connector.getVariable('statusCode');
+        print(respStatusCode);
+
+        var printDebug = (msg, execution) =&gt; {
+            var cameraId = execution.getVariable("constructorId");
+            var customerId = execution.getVariable("customerId");
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            if (execution.getVariable("debug") === true) {
+                print("DEBUG FOR CUSTOMER : " + customerId + " AND CAMERA : " + cameraId + " TIME : " + time + " ... [" + msg + "]");
+            } else {
+                print(msg);
+            }
+        }
+
+        printDebug("GET DEVICE BY NAME", execution);
+        var exitDelay = execution.getVariable('exitDelayTime');
+        var stayExitDelay = execution.getVariable('stayExitDelayTime');
+        printDebug("Default exitDelaytime from shared metadata : " + exitDelay, execution);
+        printDebug("Default stayExitDelaytime from shared metadata : " + stayExitDelay, execution);
+
+        if (respStatusCode == 200 || respStatusCode == 201 || respStatusCode == 202 || respStatusCode == 204) {
+            var resp = connector.getVariable('response');
+            var obj = JSON.parse(resp);
+            if (obj.attributeData.exitDelay != undefined) {
+                printDebug("Exit delay : " + obj.attributeData.exitDelay, execution);
+                printDebug("Set exitDelay from device shared attributes", execution);
+                exitDelay = obj.attributeData.exitDelay;
+            } else {
+                printDebug("No exit delay in device shared attributes, keep default value", execution);
+            }
+            if (obj.attributeData.stayExitDelay != undefined) {
+                printDebug("Stay exit delay : " + obj.attributeData.stayExitDelay, execution);
+                printDebug("Set stayExitDelay from device shared attributes", execution);
+                stayExitDelay = obj.attributeData.stayExitDelay;
+            } else {
+                printDebug("No stay exit delay in device shared attributes, keep default value", execution);
+            }
+            execution.setVariable('httpCode=', respStatusCode);
+            execution.setVariable('state=', "SUCCESS");
+        } else {
+            execution.setVariable('httpCodeDevice', respStatusCode);
+            execution.setVariable('stateDevice', "FAIL");
+            execution.setVariable('deviceObject', null);
+
+            printDebug("Get device by name failed; use exitDelayTime and stayExitDelayTime from shared attributes", execution);
+        }
+
+        execution.setVariable("exitDelay", exitDelay);
+        execution.setVariable("stayExitDelay", stayExitDelay);</camunda:script>
+                          
+            </camunda:outputParameter>
+                      
+          </camunda:inputOutput>
+                    
+          <camunda:connectorId>http-connector</camunda:connectorId>
+                  
+        </camunda:connector>
+              
+      </bpmn:extensionElements>
+            
+      <bpmn:incoming>Flow_active</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_0p7iqz0</bpmn:outgoing>
+          
+    </bpmn:serviceTask>
+        
+    <bpmn:scriptTask completionQuantity="1" id="Activity_0q6wfo8" isForCompensation="false" name="Delay definition" scriptFormat="javascript" startQuantity="1">
+            
+      <bpmn:incoming>Flow_0p7iqz0</bpmn:incoming>
+            
+      <bpmn:outgoing>Flow_1jtxx9v</bpmn:outgoing>
+            
+      <bpmn:script>var printDebug = (msg, execution) =&gt; {
+            var cameraId = execution.getVariable("constructorId");
+            var customerId = execution.getVariable("customerId");
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            if (execution.getVariable("debug") === true) {
+                print("DEBUG FOR CUSTOMER : " + customerId + " AND CAMERA : " + cameraId + " TIME : " + time + " ... [" + msg + "]");
+            } else {
+                print(msg);
+            }
+        }
+
+        printDebug("Delay definition", execution);
+
+        var dateTimeGateway = execution.getVariable('dateTimeGateway');
+        var time = Date.parse(dateTimeGateway);
+        var actual = Date.now();
+        const isCamExt = execution.getVariable('deviceType') == "cameraExt";
+        const mode = execution.getVariable('mode');
+        var desiredDelay = 300000;
+
+        var exitDelay = execution.getVariable('exitDelay');
+        var stayExitDelay = execution.getVariable('stayExitDelay');
+
+        if (mode == "total") {
+            desiredDelay = (exitDelay || exitDelay === 0) ? (exitDelay * 1000) : 60000;
+            printDebug("Total mode. DesiredDelay : " + desiredDelay, execution);
+        } else {
+            desiredDelay = (stayExitDelay || stayExitDelay === 0) ? (exitDelay * 1000) : 60000;
+            printDebug("Partial mode. DesiredDelay : " + desiredDelay, execution);
+        }
+
+        var diff = (actual - time) / 1000;
+        printDebug("Diff : " + diff, execution);
+
+        printDebug("remain = (desired - (actual -time))/1000", execution);
+
+        var remain_delay = (desiredDelay - (actual - time)) / 1000;
+        printDebug("RemainDelay : " + remain_delay, execution);
+
+        if (remain_delay &gt; desiredDelay) {
+            remain_delay = 60;
+        }
+        if (remain_delay &lt; 0) {
+            remain_delay = 0;
+        }
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var iso = 'PT' + Math.floor(remain_delay) + 'S';
+        if (isCamExt) {
+            const mm = Math.floor(remain_delay / 60);
+            const ss = Math.floor(remain_delay - mm * 60);
+            iso = 'PT' + mm + 'M' + ss + 'S';
+        }
+        printDebug("Duration " + iso + "for the camera " + execution.getVariable('constructorId'), execution);
+        printDebug("DELAY BEGIN", execution);
+        execution.setVariable('duration', iso);</bpmn:script>
+          
+    </bpmn:scriptTask>
+        
+    <bpmn:sequenceFlow id="Flow_1jtxx9v" sourceRef="Activity_0q6wfo8" targetRef="Event_0e5d4ov"/>
+        
+    <bpmn:sequenceFlow id="Flow_0p7iqz0" sourceRef="Activity_0rwauzg" targetRef="Activity_0q6wfo8"/>
+        
+    <bpmn:textAnnotation id="TextAnnotation_0lncc8v" textFormat="text/plain">
+            
+      <bpmn:text>Status de la crow</bpmn:text>
+          
+    </bpmn:textAnnotation>
+        
+    <bpmn:association associationDirection="None" id="Association_1uc1y9i" sourceRef="ckeck_status_variable" targetRef="TextAnnotation_0lncc8v"/>
+      
+  </bpmn:process>
+    
+  <bpmn:error camunda:errorMessage="testJH" errorCode="testJH" id="Error_0geqh6f" name="testJH"/>
+    
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        
+    <bpmndi:BPMNPlane bpmnElement="tus.prc.actionCombine" id="BPMNPlane_1">
+            
+      <bpmndi:BPMNShape bpmnElement="Gateway_0hjhvq1" id="Gateway_0hjhvq1_di" isMarkerVisible="true">
+                
+        <dc:Bounds height="50" width="50" x="525" y="184"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_04bifcz" id="BPMNShape_16ws8za">
+                
+        <dc:Bounds height="36" width="36" x="662" y="81"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Activity_17sgb2x" id="BPMNShape_1flxfzr">
+                
+        <dc:Bounds height="80" width="100" x="630" y="169"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Gateway_1hvqbqt" id="BPMNShape_1csdaw7" isMarkerVisible="true">
+                
+        <dc:Bounds height="50" width="50" x="395" y="305"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="58" x="231" y="-17"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Activity_1n45qfs" id="BPMNShape_1g3g0h2">
+                
+        <dc:Bounds height="80" width="100" x="370" y="169"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="sendPush" id="Activity_0slojab_di">
+                
+        <dc:Bounds height="80" width="100" x="1050" y="240"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Status_crow" id="Gateway_045brph_di" isMarkerVisible="true">
+                
+        <dc:Bounds height="50" width="50" x="925" y="675"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="86" x="817" y="623"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="get_state_crow_on_device" id="Activity_0n8ru87_di">
+                
+        <dc:Bounds height="80" width="100" x="780" y="660"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="ckeck_status_variable" id="Gateway_13vq0f8_di" isMarkerVisible="true">
+                
+        <dc:Bounds height="50" width="50" x="395" y="485"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="86" x="335" y="263"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_1u1d1qi" id="Event_1u1d1qi_di">
+                
+        <dc:Bounds height="36" width="36" x="152" y="492"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Patch_state_camera" id="Activity_0g48q3y_di">
+                
+        <dc:Bounds height="80" width="100" x="1070" y="660"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Gateway_1mnisi5" id="Gateway_1mnisi5_di" isMarkerVisible="true">
+                
+        <dc:Bounds height="50" width="50" x="925" y="345"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_04m3cny" id="BPMNShape_1b27rhb">
+                
+        <dc:Bounds height="36" width="36" x="932" y="802"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="16" x="942" y="845"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_0081z3j" id="BPMNShape_1awmon4">
+                
+        <dc:Bounds height="36" width="36" x="1222" y="682"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="16" x="1232" y="725"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_162s1xy" id="BPMNShape_0nwkjhg">
+                
+        <dc:Bounds height="36" width="36" x="1222" y="262"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="16" x="1232" y="305"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_0tb6exc" id="BPMNShape_10gcord">
+                
+        <dc:Bounds height="36" width="36" x="812" y="191"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="16" x="822" y="234"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_1ll7xfo" id="BPMNShape_0868j8k">
+                
+        <dc:Bounds height="36" width="36" x="812" y="352"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="16" x="822" y="395"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Event_0e5d4ov" id="BPMNShape_1mcb945">
+                
+        <dc:Bounds height="36" width="36" x="692" y="682"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="29" x="695" y="658"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bioc:fill="#ffcdd2" bioc:stroke="#831311" bpmnElement="Activity_1cpocdy" color:background-color="#ffcdd2" color:border-color="#831311" id="BPMNShape_1uwf2cy">
+                
+        <dc:Bounds height="80" width="100" x="620" y="260"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bioc:fill="#ffcdd2" bioc:stroke="#831311" bpmnElement="Activity_1bfakjk" color:background-color="#ffcdd2" color:border-color="#831311" id="BPMNShape_0m4udep">
+                
+        <dc:Bounds height="80" width="100" x="760" y="260"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bioc:fill="#ffcdd2" bioc:stroke="#831311" bpmnElement="Activity_11um1do" color:background-color="#ffcdd2" color:border-color="#831311" id="BPMNShape_14gqssq">
+                
+        <dc:Bounds height="80" width="100" x="1070" y="450"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Activity_0rwauzg" id="BPMNShape_1c5o677">
+                
+        <dc:Bounds height="80" width="100" x="390" y="800"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="Activity_0q6wfo8" id="BPMNShape_18o9u8t">
+                
+        <dc:Bounds height="80" width="100" x="660" y="800"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="TextAnnotation_0lncc8v" id="TextAnnotation_0lncc8v_di">
+                
+        <dc:Bounds height="41" width="100" x="490" y="420"/>
+                
+        <bpmndi:BPMNLabel/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNShape bpmnElement="errorPatch" id="Event_09e85sm_di">
+                
+        <dc:Bounds height="36" width="36" x="1102" y="642"/>
+              
+      </bpmndi:BPMNShape>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_1200nhf" id="Flow_1200nhf_di">
+                
+        <di:waypoint x="662" y="99"/>
+                
+        <di:waypoint x="230" y="99"/>
+                
+        <di:waypoint x="230" y="330"/>
+                
+        <di:waypoint x="395" y="330"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_1ph7c3g" id="Flow_1ph7c3g_di">
+                
+        <di:waypoint x="730" y="209"/>
+                
+        <di:waypoint x="812" y="209"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_1fi3t3s" id="Flow_1fi3t3s_di">
+                
+        <di:waypoint x="680" y="169"/>
+                
+        <di:waypoint x="680" y="117"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_0pb3yu8" id="Flow_0pb3yu8_di">
+                
+        <di:waypoint x="575" y="209"/>
+                
+        <di:waypoint x="630" y="209"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_15rg1p0" id="Flow_15rg1p0_di">
+                
+        <di:waypoint x="420" y="305"/>
+                
+        <di:waypoint x="420" y="249"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="48" x="356" y="271"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_02bokxp" id="Flow_02bokxp_di">
+                
+        <di:waypoint x="470" y="209"/>
+                
+        <di:waypoint x="525" y="209"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_17ro9no" id="Flow_17ro9no_di">
+                
+        <di:waypoint x="1150" y="280"/>
+                
+        <di:waypoint x="1222" y="280"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_0ebq08j" id="Flow_0ebq08j_di">
+                
+        <di:waypoint x="550" y="234"/>
+                
+        <di:waypoint x="550" y="300"/>
+                
+        <di:waypoint x="620" y="300"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Other_cas_status_crow" id="Flow_1qnhqz9_di">
+                
+        <di:waypoint x="950" y="675"/>
+                
+        <di:waypoint x="950" y="395"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="46" x="958" y="600"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_inactive2" id="Flow_1do2noe_di">
+                
+        <di:waypoint x="950" y="725"/>
+                
+        <di:waypoint x="950" y="802"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="38" x="981" y="761"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_0yj4m2y" id="Flow_0yj4m2y_di">
+                
+        <di:waypoint x="880" y="700"/>
+                
+        <di:waypoint x="925" y="700"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_inactive" id="Flow_0kbr6lc_di">
+                
+        <di:waypoint x="420" y="485"/>
+                
+        <di:waypoint x="420" y="355"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="38" x="375" y="443"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_17xa2p8" id="Flow_17xa2p8_di">
+                
+        <di:waypoint x="188" y="510"/>
+                
+        <di:waypoint x="395" y="510"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_active2" id="Flow_1rw6ewi_di">
+                
+        <di:waypoint x="975" y="700"/>
+                
+        <di:waypoint x="1070" y="700"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="84" x="982" y="682"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_095x6ls" id="Flow_095x6ls_di">
+                
+        <di:waypoint x="1170" y="700"/>
+                
+        <di:waypoint x="1222" y="700"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_19way9d" id="Flow_19way9d_di">
+                
+        <di:waypoint x="1120" y="642"/>
+                
+        <di:waypoint x="1120" y="530"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_1ebsjik" id="Flow_1ebsjik_di">
+                
+        <di:waypoint x="970" y="365"/>
+                
+        <di:waypoint x="970" y="280"/>
+                
+        <di:waypoint x="1050" y="280"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="37" x="981" y="315"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_0xp4n2k" id="Flow_0xp4n2k_di">
+                
+        <di:waypoint x="925" y="370"/>
+                
+        <di:waypoint x="848" y="370"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_0tsncrr" id="Flow_0tsncrr_di">
+                
+        <di:waypoint x="728" y="700"/>
+                
+        <di:waypoint x="780" y="700"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_1b9nbhg" id="Flow_1b9nbhg_di">
+                
+        <di:waypoint x="720" y="300"/>
+                
+        <di:waypoint x="760" y="300"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_067k84f" id="Flow_067k84f_di">
+                
+        <di:waypoint x="860" y="300"/>
+                
+        <di:waypoint x="950" y="300"/>
+                
+        <di:waypoint x="950" y="345"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_12a0l4p" id="Flow_12a0l4p_di">
+                
+        <di:waypoint x="1120" y="450"/>
+                
+        <di:waypoint x="1120" y="370"/>
+                
+        <di:waypoint x="975" y="370"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_active" id="Flow_0cdy1r7_di">
+                
+        <di:waypoint x="420" y="535"/>
+                
+        <di:waypoint x="420" y="800"/>
+                
+        <bpmndi:BPMNLabel>
+                    
+          <dc:Bounds height="14" width="30" x="393" y="733"/>
+                  
+        </bpmndi:BPMNLabel>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_1jtxx9v" id="Flow_1jtxx9v_di">
+                
+        <di:waypoint x="710" y="800"/>
+                
+        <di:waypoint x="710" y="718"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Flow_0p7iqz0" id="Flow_0p7iqz0_di">
+                
+        <di:waypoint x="490" y="840"/>
+                
+        <di:waypoint x="660" y="840"/>
+              
+      </bpmndi:BPMNEdge>
+            
+      <bpmndi:BPMNEdge bpmnElement="Association_1uc1y9i" id="Association_1uc1y9i_di">
+                
+        <di:waypoint x="435" y="500"/>
+                
+        <di:waypoint x="497" y="461"/>
+              
+      </bpmndi:BPMNEdge>
+          
+    </bpmndi:BPMNPlane>
+      
+  </bpmndi:BPMNDiagram>
+  
+</bpmn:definitions>

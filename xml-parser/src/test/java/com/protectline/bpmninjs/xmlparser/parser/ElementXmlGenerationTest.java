@@ -18,7 +18,11 @@ class ElementXmlGenerationTest {
         attributes.put("name", "testName");
         
         // When
-        Element selfClosingElement = new Element("element", attributes, true);
+        Element selfClosingElement = Element.Builder.builder()
+                .withElementName("element")
+                .withAttributes(attributes)
+                .withSelfClosing(true)
+                .build();
         String xml = selfClosingElement.toXml();
         
         // Then
@@ -36,7 +40,11 @@ class ElementXmlGenerationTest {
         attributes.put("attr", "value");
         
         // When
-        Element element = new Element("test", attributes, "content");
+        Element element = Element.Builder.builder()
+                .withElementName("test")
+                .withAttributes(attributes)
+                .withContent("content")
+                .build();
         String xml = element.toXml();
         
         // Then
@@ -46,11 +54,23 @@ class ElementXmlGenerationTest {
     @Test
     void should_generate_xml_for_element_with_children() {
         // Given
-        Element child1 = new Element("child1", new HashMap<>(), "content1");
-        Element child2 = new Element("child2", new HashMap<>(), true);
+        Element child1 = Element.Builder.builder()
+                .withElementName("child1")
+                .withAttributes(new HashMap<>())
+                .withContent("content1")
+                .build();
+        Element child2 = Element.Builder.builder()
+                .withElementName("child2")
+                .withAttributes(new HashMap<>())
+                .withSelfClosing(true)
+                .build();
         
         // When
-        Element parent = new Element("parent", new HashMap<>(), List.of(child1, child2));
+        Element parent = Element.Builder.builder()
+                .withElementName("parent")
+                .withAttributes(new HashMap<>())
+                .withChildren(List.of(child1, child2))
+                .build();
         String xml = parent.toXml();
         
         // Then
@@ -64,7 +84,11 @@ class ElementXmlGenerationTest {
     @Test
     void should_generate_xml_for_empty_element() {
         // Given
-        Element element = new Element("empty", new HashMap<>(), "");
+        Element element = Element.Builder.builder()
+                .withElementName("empty")
+                .withAttributes(new HashMap<>())
+                .withContent("")
+                .build();
         
         // When
         String xml = element.toXml();
@@ -76,8 +100,16 @@ class ElementXmlGenerationTest {
     @Test
     void should_handle_root_element_without_name() {
         // Given - Root element with empty name (artificial root)
-        Element child = new Element("child", new HashMap<>(), "content");
-        Element root = new Element("", new HashMap<>(), List.of(child));
+        Element child = Element.Builder.builder()
+                .withElementName("child")
+                .withAttributes(new HashMap<>())
+                .withContent("content")
+                .build();
+        Element root = Element.Builder.builder()
+                .withElementName("")
+                .withAttributes(new HashMap<>())
+                .withChildren(List.of(child))
+                .build();
         
         // When
         String xml = root.toXml();
@@ -91,9 +123,21 @@ class ElementXmlGenerationTest {
     @Test
     void should_generate_properly_indented_nested_xml() {
         // Given
-        Element grandchild = new Element("grandchild", new HashMap<>(), "deep content");
-        Element child = new Element("child", new HashMap<>(), List.of(grandchild));
-        Element parent = new Element("parent", new HashMap<>(), List.of(child));
+        Element grandchild = Element.Builder.builder()
+                .withElementName("grandchild")
+                .withAttributes(new HashMap<>())
+                .withContent("deep content")
+                .build();
+        Element child = Element.Builder.builder()
+                .withElementName("child")
+                .withAttributes(new HashMap<>())
+                .withChildren(List.of(grandchild))
+                .build();
+        Element parent = Element.Builder.builder()
+                .withElementName("parent")
+                .withAttributes(new HashMap<>())
+                .withChildren(List.of(child))
+                .build();
         
         // When
         String xml = parent.toXml();

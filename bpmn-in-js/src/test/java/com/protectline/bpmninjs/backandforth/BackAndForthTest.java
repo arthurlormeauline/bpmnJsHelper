@@ -94,7 +94,7 @@ class BackAndForthTest {
 
     @Test
     void should_create_jsProject_and_create_bpmn_back_again() throws IOException {
-        var process = "CreateCustomer_Dev";
+        var process = "sav_Dev";
         var bpmnFile = fileService.getBpmnFile(process);
         var workDir = fileService.getWorkingDirectory();
 

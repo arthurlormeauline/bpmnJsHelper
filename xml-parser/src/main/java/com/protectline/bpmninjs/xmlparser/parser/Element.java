@@ -17,41 +17,6 @@ public class Element {
     private final boolean isSelfClosing;
     private final boolean isXmlDeclaration;
     
-    public Element(String elementName, Map<String, String> attributes, String content) {
-        this.elementName = elementName;
-        this.attributes = attributes;
-        this.content = content;
-        this.children = new ArrayList<>();
-        this.isSelfClosing = false;
-        this.isXmlDeclaration = "xml".equals(elementName);
-    }
-    
-    public Element(String elementName, Map<String, String> attributes, List<Element> children) {
-        this.elementName = elementName;
-        this.attributes = attributes;
-        this.content = "";
-        this.children = new ArrayList<>(children);
-        this.isSelfClosing = false;
-        this.isXmlDeclaration = "xml".equals(elementName);
-    }
-    
-    public Element(String elementName, Map<String, String> attributes, boolean isSelfClosing) {
-        this.elementName = elementName;
-        this.attributes = attributes;
-        this.content = "";
-        this.children = new ArrayList<>();
-        this.isSelfClosing = isSelfClosing;
-        this.isXmlDeclaration = "xml".equals(elementName);
-    }
-    
-    public Element(String elementName, Map<String, String> attributes, String content, List<Element> children) {
-        this.elementName = elementName;
-        this.attributes = attributes;
-        this.content = content;
-        this.children = new ArrayList<>(children);
-        this.isSelfClosing = false;
-        this.isXmlDeclaration = "xml".equals(elementName);
-    }
     
     public String getElementName() {
         return elementName;
@@ -172,5 +137,103 @@ public class Element {
                 ", children=" + children.size() +
                 ", isSelfClosing=" + isSelfClosing +
                 '}';
+    }
+    
+    /**
+     * Builder pattern pour construire des Elements de façon flexible
+     */
+    public static class Builder {
+        private String elementName = "";
+        private Map<String, String> attributes = new LinkedHashMap<>();
+        private String content = "";
+        private List<Element> children = new ArrayList<>();
+        private boolean isSelfClosing = false;
+        private boolean isXmlDeclaration = false;
+        
+        private Builder() {}
+        
+        private Builder(Element source) {
+            this.elementName = source.elementName;
+            this.attributes = new LinkedHashMap<>(source.attributes);
+            this.content = source.content;
+            this.children = new ArrayList<>(source.children);
+            this.isSelfClosing = source.isSelfClosing;
+            this.isXmlDeclaration = source.isXmlDeclaration;
+        }
+        
+        /**
+         * Crée un nouveau builder vide
+         */
+        public static Builder builder() {
+            return new Builder();
+        }
+        
+        /**
+         * Crée un builder à partir d'un Element existant (pattern copie)
+         */
+        public static Builder builder(Element source) {
+            return new Builder(source);
+        }
+        
+        public Builder withElementName(String elementName) {
+            this.elementName = elementName;
+            // Auto-detect XML declaration
+            if ("xml".equals(elementName)) {
+                this.isXmlDeclaration = true;
+            }
+            return this;
+        }
+        
+        public Builder withAttributes(Map<String, String> attributes) {
+            this.attributes = new LinkedHashMap<>(attributes);
+            return this;
+        }
+        
+        public Builder withAttribute(String key, String value) {
+            this.attributes.put(key, value);
+            return this;
+        }
+        
+        public Builder withContent(String content) {
+            this.content = content;
+            return this;
+        }
+        
+        public Builder withChildren(List<Element> children) {
+            this.children = new ArrayList<>(children);
+            return this;
+        }
+        
+        public Builder withChild(Element child) {
+            this.children.add(child);
+            return this;
+        }
+        
+        public Builder withSelfClosing(boolean isSelfClosing) {
+            this.isSelfClosing = isSelfClosing;
+            return this;
+        }
+        
+        public Builder withXmlDeclaration(boolean isXmlDeclaration) {
+            this.isXmlDeclaration = isXmlDeclaration;
+            return this;
+        }
+        
+        public Element build() {
+            return new Element(elementName, attributes, content, children, isSelfClosing, isXmlDeclaration);
+        }
+    }
+    
+    /**
+     * Constructeur privé utilisé par le Builder
+     */
+    private Element(String elementName, Map<String, String> attributes, String content, 
+                   List<Element> children, boolean isSelfClosing, boolean isXmlDeclaration) {
+        this.elementName = elementName;
+        this.attributes = new LinkedHashMap<>(attributes);
+        this.content = content;
+        this.children = new ArrayList<>(children);
+        this.isSelfClosing = isSelfClosing;
+        this.isXmlDeclaration = isXmlDeclaration;
     }
 }

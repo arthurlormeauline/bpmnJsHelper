@@ -60,7 +60,12 @@ public class FunctionBlockFromJsNode implements BlockFromJsNode {
         int lastBrace = content.lastIndexOf('}');
         
         if (firstBrace != -1 && lastBrace != -1 && firstBrace < lastBrace) {
-            return content.substring(firstBrace + 1, lastBrace).trim();
+            String rawContent = content.substring(firstBrace + 1, lastBrace);
+            // Le template ajoute un retour à la ligne après '{' et avant '}' 
+            // On doit enlever le premier et le dernier retour à la ligne (quelque soit l'encodage)
+            rawContent = rawContent.replaceFirst("^\\R", ""); // Enlève le premier retour à la ligne
+            rawContent = rawContent.replaceFirst("\\R$", ""); // Enlève le dernier retour à la ligne
+            return rawContent;
         }
         return null;
     }

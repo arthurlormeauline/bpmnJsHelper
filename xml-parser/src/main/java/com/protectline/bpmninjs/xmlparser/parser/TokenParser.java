@@ -59,7 +59,11 @@ public class TokenParser {
         List<Token> simplifiedTokens = alreadySimplified ? tokens : tokenSimplifier.simplifyTokens(tokens);
         
         // Créer un élément root fictif qui contiendra tous les éléments top-level
-        Element rootElement = new Element("", new HashMap<>(), new ArrayList<>());
+        Element rootElement = Element.Builder.builder()
+                .withElementName("")
+                .withAttributes(new HashMap<>())
+                .withChildren(new ArrayList<>())
+                .build();
         
         int i = 0;
         while (i < simplifiedTokens.size()) {
@@ -72,8 +76,11 @@ public class TokenParser {
                 
             } else if (currentType == TOKEN_TYPE.SELF_CLOSE_MARK) {
                 SelfCloseMark selfCloseMark = simplifiedTokens.get(i).getSelfCloseMark();
-                Element selfClosingElement = new Element(selfCloseMark.getElementName(), 
-                                                       selfCloseMark.getAttributes(), true);
+                Element selfClosingElement = Element.Builder.builder()
+                        .withElementName(selfCloseMark.getElementName())
+                        .withAttributes(selfCloseMark.getAttributes())
+                        .withSelfClosing(true)
+                        .build();
                 rootElement.addChild(selfClosingElement);
                 i++;
                 
@@ -119,8 +126,11 @@ public class TokenParser {
 
             } else if (currentType == TOKEN_TYPE.SELF_CLOSE_MARK) {
                 SelfCloseMark selfCloseMark = tokens.get(i).getSelfCloseMark();
-                Element selfClosingChild = new Element(selfCloseMark.getElementName(), 
-                                                     selfCloseMark.getAttributes(), true);
+                Element selfClosingChild = Element.Builder.builder()
+                        .withElementName(selfCloseMark.getElementName())
+                        .withAttributes(selfCloseMark.getAttributes())
+                        .withSelfClosing(true)
+                        .build();
                 children.add(selfClosingChild);
                 i++;
 
@@ -132,18 +142,13 @@ public class TokenParser {
                 }
 
                 // Créer l'élément final
-                Element element;
-                String content = contentBuilder.toString().trim();
-                if (children.isEmpty() && !content.isEmpty()) {
-                    // Élément avec contenu textuel uniquement
-                    element = new Element(openMark.getElementName(), openMark.getAttributes(), content);
-                } else if (!children.isEmpty() && !content.isEmpty()) {
-                    // Élément avec contenu ET enfants
-                    element = new Element(openMark.getElementName(), openMark.getAttributes(), content, children);
-                } else {
-                    // Élément avec des enfants uniquement (ou vide)
-                    element = new Element(openMark.getElementName(), openMark.getAttributes(), children);
-                }
+                String content = contentBuilder.toString();
+                Element element = Element.Builder.builder()
+                        .withElementName(openMark.getElementName())
+                        .withAttributes(openMark.getAttributes())
+                        .withContent(content)
+                        .withChildren(children)
+                        .build();
 
                 i++; // Avancer après le CLOSE_MARK
                 return new ParseResult(element, i);

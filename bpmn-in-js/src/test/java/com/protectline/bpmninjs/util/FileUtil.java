@@ -40,14 +40,11 @@ public class FileUtil {
 
         // back up expected file to restore at the end of comparison
         var backUpExpected = Files.readString(expectedModify);
-
         String expectedContent = Files.readString(expectedModify);
-
         Diff myDiff = DiffBuilder.compare(expectedContent)
                 .withTest(modifiedContent)
-                .normalizeWhitespace()
                 .ignoreComments()
-                .ignoreWhitespace()
+                .checkForSimilar()
                 .build();
 
 
@@ -64,6 +61,11 @@ public class FileUtil {
 
         // restore expected for other tests
         Files.writeString(expectedModify, backUpExpected);
+    }
+
+    private static void printXml(String title, String xml) {
+        System.out.println(title);
+        System.out.println(xml);
     }
 
     public static Path getResourcePath(Class<?> resourceClass, String resource) throws URISyntaxException {

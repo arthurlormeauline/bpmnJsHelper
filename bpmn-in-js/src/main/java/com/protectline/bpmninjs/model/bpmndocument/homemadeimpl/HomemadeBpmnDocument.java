@@ -75,12 +75,10 @@ public class HomemadeBpmnDocument implements BpmnDocument {
             updatedChildren.add(updateScriptInElement(child, targetElementId, scriptIndex, newContent));
         }
 
-        // Recréer l'élément avec les enfants mis à jour
-        if (element.getChildren().isEmpty()) {
-            return new Element(element.getElementName(), element.getAttributes(), element.getContent());
-        } else {
-            return new Element(element.getElementName(), element.getAttributes(), element.getContent(), updatedChildren);
-        }
+        // Recréer l'élément avec les enfants mis à jour en préservant tous les champs
+        return Element.Builder.builder(element)
+                .withChildren(updatedChildren)
+                .build();
     }
 
     private Element updateScriptsInElement(Element element, Integer scriptIndex, String newContent) {
@@ -97,21 +95,20 @@ public class HomemadeBpmnDocument implements BpmnDocument {
         
         for (Element child : element.getChildren()) {
             if (child == targetScript) {
-                // Remplacer le script avec le nouveau contenu
-                updatedChildren.add(new Element(
-                    child.getElementName(),
-                    child.getAttributes(),
-                    newContent,
-                    child.getChildren()
-                ));
+                // Remplacer le script avec le nouveau contenu en préservant tous les champs
+                updatedChildren.add(Element.Builder.builder(child)
+                        .withContent(newContent)
+                        .build());
             } else {
                 // Récursivement mettre à jour les autres enfants
                 updatedChildren.add(updateElementScriptContent(child, targetScript, newContent));
             }
         }
 
-        // Recréer l'élément parent avec les enfants mis à jour
-        return new Element(element.getElementName(), element.getAttributes(), element.getContent(), updatedChildren);
+        // Recréer l'élément parent avec les enfants mis à jour en préservant tous les champs
+        return Element.Builder.builder(element)
+                .withChildren(updatedChildren)
+                .build();
     }
 
     @Override

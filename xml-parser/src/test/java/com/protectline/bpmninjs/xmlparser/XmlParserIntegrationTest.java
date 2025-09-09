@@ -43,7 +43,7 @@ class XmlParserIntegrationTest {
             .orElseThrow();
             
         assertThat(mainElement.getAttributes()).isEmpty();
-        assertThat(mainElement.getContent()).isEqualTo("console.log('Starting workflow');\n\nconsole.log('Workflow complete');");
+        assertThat(mainElement.getContent()).isEqualTo("\nconsole.log('Starting workflow');\n\nconsole.log('Workflow complete');\n");
 
         // Function element
         List<Element> functionElements = elements.stream()
